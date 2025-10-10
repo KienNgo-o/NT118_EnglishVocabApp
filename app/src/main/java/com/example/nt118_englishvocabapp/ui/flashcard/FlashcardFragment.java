@@ -1,4 +1,4 @@
-package com.example.nt118_englishvocabapp.ui.home;
+package com.example.nt118_englishvocabapp.ui.flashcard;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,22 +10,22 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.nt118_englishvocabapp.databinding.FragmentHomeBinding;
+import com.example.nt118_englishvocabapp.databinding.FragmentFlashcardBinding;
 
-public class HomeFragment extends Fragment {
+public class FlashcardFragment extends Fragment {
 
-    private FragmentHomeBinding binding;
+    private FragmentFlashcardBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        HomeViewModel homeViewModel =
-                new ViewModelProvider(this).get(HomeViewModel.class);
+        FlashcardViewModel flashcardViewModel =
+                new ViewModelProvider(this).get(FlashcardViewModel.class);
 
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        binding = FragmentFlashcardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        final TextView textView = binding.textDialog;
 
-        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        final TextView textView = binding.textFlashcard;
+        flashcardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 

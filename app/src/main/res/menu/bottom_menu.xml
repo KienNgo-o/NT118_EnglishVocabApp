@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/home"
+        android:title="Home"
+        android:icon="@drawable/home"/>
+    <item
+        android:id="@+id/flashcard"
+        android:title="Flashcard"
+        android:icon="@drawable/flashcard"/>
+    <item
+        android:id="@+id/translate"
+        android:title=""
+        android:enabled="false"/>
+    <item
+        android:id="@+id/quiz"
+        android:title="Quiz"
+        android:icon="@drawable/quiz"/>
+    <item
+        android:id="@+id/vocab"
+        android:title="Vocab"
+        android:icon="@drawable/vocab"/>
+</menu>
