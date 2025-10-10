@@ -1,37 +1,64 @@
 package com.example.nt118_englishvocabapp;
 
-import android.os.Bundle;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import android.annotation.SuppressLint;
+import android.os.Bundle;
+import android.view.View;
 
 import com.example.nt118_englishvocabapp.databinding.ActivityMainBinding;
+import com.example.nt118_englishvocabapp.ui.flashcard.FlashcardFragment;
+import com.example.nt118_englishvocabapp.ui.home.HomeFragment;
+import com.example.nt118_englishvocabapp.ui.quiz.QuizFragment;
+import com.example.nt118_englishvocabapp.ui.vocab.VocabFragment;
+import com.example.nt118_englishvocabapp.ui.translate.TranslateFragment;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding binding;
+    ActivityMainBinding binding;
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(binding.navView, navController);
+        replaceFragment(new HomeFragment());
+        binding.bottomNavigationView.setBackground(null);
+
+        binding.bottomNavigationView.setOnItemSelectedListener(selectedMenuItem -> {
+            int itemId = selectedMenuItem.getItemId();
+            if (itemId == R.id.home) {
+                replaceFragment(new HomeFragment());
+            } else if (itemId == R.id.flashcard) {
+                replaceFragment(new FlashcardFragment());
+            } else if (itemId == R.id.quiz) {
+                replaceFragment(new QuizFragment());
+            } else if (itemId == R.id.vocab) {
+                replaceFragment(new VocabFragment());
+            }
+            return true;
+        });
+
+        // Add this block for the FAB
+        binding.getRoot().findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                replaceFragment(new TranslateFragment());
+            }
+        });
     }
 
+
+    private void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.frame_layout, fragment);
+        fragmentTransaction.commit();
+    }
 }

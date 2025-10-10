@@ -1,16 +1,16 @@
-package com.example.nt118_englishvocabapp.ui.dashboard;
+package com.example.nt118_englishvocabapp.ui.flashcard;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class DashboardViewModel extends ViewModel {
+public class FlashcardViewModel extends ViewModel {
 
     private final MutableLiveData<String> mText;
 
-    public DashboardViewModel() {
+    public FlashcardViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is dashboard fragment");
+        mText.setValue("This is Flashcard fragment");
     }
 
     public LiveData<String> getText() {
