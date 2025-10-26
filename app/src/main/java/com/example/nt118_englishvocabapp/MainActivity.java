@@ -27,7 +27,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
         replaceFragment(new HomeFragment());
         binding.bottomNavigationView.setBackground(null);
 
