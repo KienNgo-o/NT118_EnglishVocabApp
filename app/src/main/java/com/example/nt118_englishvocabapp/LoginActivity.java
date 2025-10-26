@@ -14,7 +14,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
         if (savedInstanceState == null) {
             //Hiển thị Fragment Sign In đầu tiên khi Activity được tạo
             getSupportFragmentManager().beginTransaction()
