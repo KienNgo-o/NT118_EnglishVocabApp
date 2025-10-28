@@ -4,11 +4,11 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_flashcard">Flashcard</string>
-    <string name="search_button">search_button\n</string>
+    <string name="search_button">search_button</string>
     <string name="temp_vocab">Vocab</string>
     <string name="temp_quiz">temp_quiz</string>
     <string name="temp_home">temp_home</string>
-    <string name="temp_flashcard">temp_flashcard\n</string>
+    <string name="temp_flashcard">temp_flashcard</string>
     <string name="temp_translate">temp_translate</string>
 
     <!-- Tab labels and content descriptions -->
@@ -20,4 +20,28 @@
     <string name="cd_tab_forms">Tab: Word\'s forms</string>
     <string name="cd_tab_synonyms">Tab: Synonyms or Acronyms</string>
 
+    <!-- Added for vocab fragments -->
+    <string name="title_vocabulary">Vocabulary</string>
+    <string name="cd_back">Back</string>
+
+    <!-- Account fragment strings -->
+    <string name="account_name">Pham Khoi</string>
+    <string name="account_email">phamkhoi@gmail.com</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="notifications_label">Notifications</string>
+    <string name="language_label">Language</string>
+    <string name="english_us">English (US)</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="logout">Logout</string>
+    <string name="delete_account">Delete Account</string>
+
+    <!-- Content descriptions for accessibility -->
+    <string name="cd_avatar">Profile picture</string>
+    <string name="cd_edit">Edit icon</string>
+    <string name="cd_chevron">Navigate</string>
+    <string name="cd_notifications">Notifications icon</string>
+    <string name="cd_language">Language icon</string>
+    <string name="cd_dark_mode">Dark mode toggle</string>
+    <string name="cd_logout">Logout icon</string>
+    <string name="cd_delete">Delete icon</string>
 </resources>
