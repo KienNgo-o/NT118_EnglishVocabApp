@@ -11,4 +11,13 @@
     <string name="temp_flashcard">temp_flashcard\n</string>
     <string name="temp_translate">temp_translate</string>
 
+    <!-- Tab labels and content descriptions -->
+    <string name="tab_definition">Definition</string>
+    <string name="tab_forms">Word\'s forms</string>
+    <string name="tab_synonyms">Synonyms/Acronyms</string>
+
+    <string name="cd_tab_definition">Tab: Definition</string>
+    <string name="cd_tab_forms">Tab: Word\'s forms</string>
+    <string name="cd_tab_synonyms">Tab: Synonyms or Acronyms</string>
+
 </resources>

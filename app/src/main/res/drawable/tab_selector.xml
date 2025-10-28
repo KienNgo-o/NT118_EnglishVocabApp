@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Selected state uses existing active pill drawable -->
+    <item android:state_selected="true" android:drawable="@drawable/tab_active" />
+    <!-- Pressed/activated ripple fallback to system ripple if available (keeps touch feedback) -->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#22000000" />
+        </shape>
+    </item>
+    <!-- Default transparent background so container rounded bg shows through -->
+    <item android:drawable="@android:color/transparent" />
+</selector>
+

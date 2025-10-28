@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="flashcard_purple">#D2D5FF</color>
-    <color name="light_purple">#848BDF</color>
+    <color name="light_purple">#D2D5FF</color>
     <color name="dark_purple">#410FA3</color>
     <color name="orange">#FF6600</color>
 
@@ -14,5 +14,9 @@
     <color name="white">#FFFFFFFF</color>
     <color name="purple_500">#9C27B0</color>
 
+    <!-- Added colors -->
+    <color name="gray">#757575</color>
+    <color name="light_gray">#E0E0E0</color>
+    <color name="purple_700">#5E35B1</color>
 
 </resources>
