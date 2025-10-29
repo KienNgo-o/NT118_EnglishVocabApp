@@ -19,4 +19,8 @@
     <color name="light_gray">#E0E0E0</color>
     <color name="purple_700">#5E35B1</color>
 
+    <!-- Colors used by the multiple-choice fragment for feedback -->
+    <color name="correct_green">#2E7D32</color>
+    <color name="incorrect_red">#C62828</color>
+
 </resources>

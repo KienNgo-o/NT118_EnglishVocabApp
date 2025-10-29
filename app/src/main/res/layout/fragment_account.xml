@@ -42,6 +42,37 @@
         android:layout_weight="9"
         android:padding="16dp">
 
+        <!-- Circular avatar overlapping the top of the card -->
+        <ImageView
+            android:id="@+id/img_avatar"
+            android:layout_width="112dp"
+            android:layout_height="112dp"
+            android:src="@drawable/image_avatar"
+            android:background="@drawable/circle_avatar_bg"
+            android:padding="0dp"
+            android:elevation="10dp"
+
+            android:scaleType="centerCrop"
+            android:clipToOutline="true"
+            android:contentDescription="@string/cd_avatar"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="0dp" />
+
+        <!-- Small overlay button that slightly overlaps the bottom of the avatar -->
+        <ImageButton
+            android:id="@+id/btn_avatar_action"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="92dp"
+            android:background="@drawable/up_image"
+            android:padding="0dp"
+            android:contentDescription="@string/cd_avatar_action"
+            android:elevation="12dp"
+            android:scaleType="centerCrop"
+            android:clickable="true"
+            android:focusable="true" />
+
         <!-- White rounded card that holds the scrollable content -->
         <androidx.cardview.widget.CardView
             android:id="@+id/card_container"
@@ -52,21 +83,22 @@
             app:cardUseCompatPadding="true"
             app:cardElevation="6dp">
 
-            <ScrollView
+            <!-- Make a vertical container so we can have a fixed header and a scrollable body -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fillViewport="true">
+                android:orientation="vertical">
 
+                <!-- Fixed header: name and email (will not scroll) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:paddingTop="72dp"
-                    android:paddingBottom="24dp"
+                    android:paddingBottom="12dp"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp">
 
-                    <!-- Name and email centered -->
                     <TextView
                         android:id="@+id/tv_name"
                         android:layout_width="match_parent"
@@ -87,245 +119,373 @@
                         android:textSize="13sp"
                         android:layout_marginTop="6dp" />
 
-                    <!-- Divider -->
+                    <!-- Divider spacing under header -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="18dp"
                         android:background="@android:color/transparent" />
 
-                    <!-- Rows -->
+                </LinearLayout>
+
+                <!-- Scrollable body: keep the existing rows here so they scroll independently -->
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:fillViewport="true">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:paddingBottom="24dp"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp">
 
-                        <!-- Row template: icon, label, (optional right view), chevron -->
-
+                        <!-- Rows -->
                         <LinearLayout
+                            android:id="@+id/rows_container"
                             android:layout_width="match_parent"
-                            android:layout_height="56dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
 
-                            <ImageView
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:src="@drawable/profile"
-                                app:tint="#4C4C4C"
-                                android:contentDescription="@string/cd_edit" />
+                            <!-- Row template: icon, label, (optional right view), chevron -->
 
-                            <TextView
-                                android:layout_width="0dp"
+                            <LinearLayout
+                                android:id="@+id/row_edit_profile"
+                                android:layout_width="match_parent"
+                                android:layout_height="56dp"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:clickable="true"
+                                android:focusable="true">
+
+                                <ImageView
+                                    android:layout_width="28dp"
+                                    android:layout_height="28dp"
+                                    android:src="@drawable/profile"
+                                    app:tint="#4C4C4C"
+                                    android:contentDescription="@string/cd_edit" />
+
+                                <TextView
+                                    android:id="@+id/tv_row_edit_label"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="14dp"
+                                    android:text="@string/edit_profile"
+                                    android:textColor="#111214"
+                                    android:textSize="15sp" />
+
+                                <ImageView
+                                    android:id="@+id/iv_edit_chevron"
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:src="@drawable/see_more"
+                                    app:tint="#7A7A7A"
+                                    android:contentDescription="@string/cd_chevron" />
+
+                            </LinearLayout>
+
+                            <!-- Expanded edit-card (initially hidden) -->
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/card_edit_profile_expanded"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginStart="14dp"
-                                android:text="@string/edit_profile"
-                                android:textColor="#111214"
-                                android:textSize="15sp" />
+                                android:layout_marginTop="8dp"
+                                android:layout_marginBottom="8dp"
+                                android:visibility="gone"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="4dp"
+                                app:cardUseCompatPadding="true">
 
-                            <ImageView
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:src="@drawable/see_more"
-                                app:tint="#7A7A7A"
-                                android:contentDescription="@string/cd_chevron" />
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="12dp">
 
-                        </LinearLayout>
+                                    <TextView
+                                        android:id="@+id/expanded_card_title"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/edit_profile"
+                                        android:textStyle="bold"
+                                        android:textSize="16sp"
+                                        android:textColor="#111214"
+                                        android:paddingBottom="8dp" />
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F1F1" />
+                                    <!-- Username row -->
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Username"
+                                        android:textSize="12sp"
+                                        android:textColor="#7A7A7A" />
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                                    <TextView
+                                        android:id="@+id/expanded_username"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/account_name"
+                                        android:textSize="14sp"
+                                        android:textColor="#111214"
+                                        android:paddingTop="6dp"
+                                        android:paddingBottom="10dp" />
 
-                            <ImageView
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:src="@drawable/notification"
-                                app:tint="#4C4C4C"
-                                android:contentDescription="@string/cd_notifications" />
+                                    <!-- Email row -->
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Email"
+                                        android:textSize="12sp"
+                                        android:textColor="#7A7A7A" />
 
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginStart="14dp"
-                                android:text="@string/notifications_label"
-                                android:textColor="#111214"
-                                android:textSize="15sp" />
+                                    <TextView
+                                        android:id="@+id/expanded_email"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/account_email"
+                                        android:textSize="14sp"
+                                        android:textColor="#111214"
+                                        android:paddingTop="6dp"
+                                        android:paddingBottom="10dp" />
 
-                            <ImageView
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:src="@drawable/see_more"
-                                app:tint="#7A7A7A"
-                                android:contentDescription="@string/cd_chevron" />
+                                    <!-- Password row -->
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Password"
+                                        android:textSize="12sp"
+                                        android:textColor="#7A7A7A" />
 
-                        </LinearLayout>
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="horizontal"
+                                        android:gravity="center_vertical"
+                                        android:paddingTop="6dp"
+                                        android:paddingBottom="8dp">
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F1F1" />
+                                        <TextView
+                                            android:id="@+id/expanded_password"
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:text="***********"
+                                            android:textSize="14sp"
+                                            android:textColor="#111214" />
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                                        <ImageView
+                                            android:id="@+id/expanded_password_toggle"
+                                            android:layout_width="22dp"
+                                            android:layout_height="22dp"
+                                            android:src="@drawable/see_more"
+                                            app:tint="#7A7A7A"
+                                            android:contentDescription="@string/toggle_password_visibility" />
 
-                            <ImageView
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:src="@drawable/language"
-                                app:tint="#4C4C4C"
-                                android:contentDescription="@string/cd_language" />
+                                    </LinearLayout>
 
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginStart="14dp"
-                                android:text="@string/language_label"
-                                android:textColor="#111214"
-                                android:textSize="15sp" />
+                                    <!-- Apply button aligned to end -->
+                                    <TextView
+                                        android:id="@+id/btn_apply_edit"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/apply"
+                                        android:textColor="#2A7BFF"
+                                        android:textSize="14sp"
+                                        android:layout_gravity="end"
+                                        android:paddingTop="6dp"
+                                        android:clickable="true"
+                                        android:focusable="true" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/english_us"
-                                android:textColor="#2A7BFF"
-                                android:textSize="13sp"
-                                android:layout_marginEnd="8dp" />
+                                </LinearLayout>
 
-                            <ImageView
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:src="@drawable/see_more"
-                                app:tint="#7A7A7A"
-                                android:contentDescription="@string/cd_chevron" />
+                            </androidx.cardview.widget.CardView>
 
-                        </LinearLayout>
+                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F1F1" />
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F1F1" />
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="56dp"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                                <ImageView
+                                    android:layout_width="28dp"
+                                    android:layout_height="28dp"
+                                    android:src="@drawable/notification"
+                                    app:tint="#4C4C4C"
+                                    android:contentDescription="@string/cd_notifications" />
 
-                            <ImageView
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:src="@drawable/dark_mode"
-                                app:tint="#4C4C4C"
-                                android:contentDescription="@string/cd_dark_mode" />
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="14dp"
+                                    android:text="@string/notifications_label"
+                                    android:textColor="#111214"
+                                    android:textSize="15sp" />
 
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginStart="14dp"
-                                android:text="@string/dark_mode"
-                                android:textColor="#111214"
-                                android:textSize="15sp" />
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:src="@drawable/see_more"
+                                    app:tint="#7A7A7A"
+                                    android:contentDescription="@string/cd_chevron" />
 
-                            <androidx.appcompat.widget.SwitchCompat
-                                android:id="@+id/switch_dark_mode"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:checked="false"
-                                android:layout_marginEnd="8dp"
-                                android:contentDescription="@string/cd_dark_mode" />
+                            </LinearLayout>
 
-                        </LinearLayout>
+                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F1F1" />
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F1F1" />
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="56dp"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                                <ImageView
+                                    android:layout_width="28dp"
+                                    android:layout_height="28dp"
+                                    android:src="@drawable/language"
+                                    app:tint="#4C4C4C"
+                                    android:contentDescription="@string/cd_language" />
 
-                            <ImageView
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:src="@drawable/log_out"
-                                app:tint="#4C4C4C"
-                                android:contentDescription="@string/cd_logout" />
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="14dp"
+                                    android:text="@string/language_label"
+                                    android:textColor="#111214"
+                                    android:textSize="15sp" />
 
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginStart="14dp"
-                                android:text="@string/logout"
-                                android:textColor="#111214"
-                                android:textSize="15sp" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/english_us"
+                                    android:textColor="#2A7BFF"
+                                    android:textSize="13sp"
+                                    android:layout_marginEnd="8dp" />
 
-                            <ImageView
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:src="@drawable/see_more"
-                                app:tint="#7A7A7A"
-                                android:contentDescription="@string/cd_chevron" />
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:src="@drawable/see_more"
+                                    app:tint="#7A7A7A"
+                                    android:contentDescription="@string/cd_chevron" />
 
-                        </LinearLayout>
+                            </LinearLayout>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F1F1" />
+                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F1F1" />
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="56dp"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
 
-                            <ImageView
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:src="@drawable/delete_account"
-                                app:tint="#4C4C4C"
-                                android:contentDescription="@string/cd_delete" />
+                                <ImageView
+                                    android:layout_width="28dp"
+                                    android:layout_height="28dp"
+                                    android:src="@drawable/dark_mode"
+                                    app:tint="#4C4C4C"
+                                    android:contentDescription="@string/cd_dark_mode" />
 
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginStart="14dp"
-                                android:text="@string/delete_account"
-                                android:textColor="#111214"
-                                android:textSize="15sp" />
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="14dp"
+                                    android:text="@string/dark_mode"
+                                    android:textColor="#111214"
+                                    android:textSize="15sp" />
 
-                            <ImageView
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:src="@drawable/see_more"
-                                app:tint="#7A7A7A"
-                                android:contentDescription="@string/cd_chevron" />
+                                <androidx.appcompat.widget.SwitchCompat
+                                    android:id="@+id/switch_dark_mode"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:checked="false"
+                                    android:layout_marginEnd="8dp"
+                                    android:contentDescription="@string/cd_dark_mode" />
+
+                            </LinearLayout>
+
+                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F1F1" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="56dp"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <ImageView
+                                    android:layout_width="28dp"
+                                    android:layout_height="28dp"
+                                    android:src="@drawable/log_out"
+                                    app:tint="#4C4C4C"
+                                    android:contentDescription="@string/cd_logout" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="14dp"
+                                    android:text="@string/logout"
+                                    android:textColor="#111214"
+                                    android:textSize="15sp" />
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:src="@drawable/see_more"
+                                    app:tint="#7A7A7A"
+                                    android:contentDescription="@string/cd_chevron" />
+
+                            </LinearLayout>
+
+                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F1F1" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="56dp"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <ImageView
+                                    android:layout_width="28dp"
+                                    android:layout_height="28dp"
+                                    android:src="@drawable/delete_account"
+                                    app:tint="#4C4C4C"
+                                    android:contentDescription="@string/cd_delete" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="14dp"
+                                    android:text="@string/delete_account"
+                                    android:textColor="#111214"
+                                    android:textSize="15sp" />
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:src="@drawable/see_more"
+                                    app:tint="#7A7A7A"
+                                    android:contentDescription="@string/cd_chevron" />
+
+                            </LinearLayout>
 
                         </LinearLayout>
 
                     </LinearLayout>
 
-                </LinearLayout>
+                </ScrollView>
 
-            </ScrollView>
+            </LinearLayout>
 
         </androidx.cardview.widget.CardView>
-
-        <!-- Circular avatar overlapping the top of the card -->
-        <ImageView
-            android:id="@+id/img_avatar"
-            android:layout_width="112dp"
-            android:layout_height="112dp"
-            android:src="@android:drawable/sym_def_app_icon"
-            android:background="@drawable/circle_avatar_bg"
-            android:padding="10dp"
-            android:scaleType="centerCrop"
-            android:contentDescription="@string/cd_avatar"
-            android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="0dp" />
 
     </FrameLayout>
 
