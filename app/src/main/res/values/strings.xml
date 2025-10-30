@@ -70,9 +70,6 @@
     <string name="apply">Apply</string>
 
     <!-- Added labels used in expanded edit card to avoid hardcoded strings -->
-    <string name="username_label">Username</string>
-    <string name="email_label">Email</string>
-    <string name="password_label">Password</string>
     <string name="masked_password">***********</string>
 
     <!-- Quiz / Multiple choice strings -->
