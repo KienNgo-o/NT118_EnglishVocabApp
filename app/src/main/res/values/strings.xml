@@ -14,7 +14,8 @@
 
     <!-- Tab labels and content descriptions -->
     <string name="tab_definition">Definition</string>
-    <string name="tab_forms">Word\'s forms</string>    <string name="tab_synonyms">Synonyms/Acronyms</string>
+    <string name="tab_forms">Word\'s forms</string>
+    <string name="tab_synonyms">Synonyms/Acronyms</string>
     <string name="cd_tab_definition">Tab: Definition</string>
     <string name="cd_tab_forms">Tab: Word\'s forms</string>
     <string name="cd_tab_synonyms">Tab: Synonyms or Acronyms</string>
@@ -87,5 +88,8 @@
 
     <!-- New string for matching question header -->
     <string name="question_match">Match the pairs</string>
-    <string name="congrats_subtitle">You\'ve completed&#10;all flashcards.</string>
+    <string name="congrats_subtitle">You\'ve completed\nall flashcards.</string>
+
+    <!-- Stage label, uses placeholder %1$d for stage number -->
+    <string name="part_label">Part %1$d</string>
 </resources>
