@@ -13,12 +13,31 @@
 
     <!-- Tab labels and content descriptions -->
     <string name="tab_definition">Definition</string>
-    <string name="tab_forms">Word\'s forms</string>
+    <string name="tab_forms">Word&#39;s forms</string>
     <string name="tab_synonyms">Synonyms/Acronyms</string>
 
     <string name="cd_tab_definition">Tab: Definition</string>
-    <string name="cd_tab_forms">Tab: Word\'s forms</string>
+    <string name="cd_tab_forms">Tab: Word&#39;s forms</string>
     <string name="cd_tab_synonyms">Tab: Synonyms or Acronyms</string>
+
+    <!-- Auth strings -->
+    <string name="cd_illustration">Sign in illustration</string>
+    <string name="sign_in_heading">For free, join now and start learning</string>
+    <string name="email_label">Email Address</string>
+    <string name="email_hint">Email</string>
+    <string name="password_label">Password</string>
+    <string name="password_hint">Password</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="continue_label">Continue</string>
+    <string name="or_label">Or</string>
+    <string name="cd_facebook">Facebook logo</string>
+    <string name="cd_google">Google logo</string>
+    <string name="sign_up_prompt">Don&#39;t have account? Signup</string>
+
+    <string name="sign_up_heading">Create an Account</string>
+    <string name="username_label">Username</string>
+    <string name="username_hint">Name</string>
+    <string name="sign_in_prompt">Already you member? Login</string>
 
     <!-- Added for vocab fragments -->
     <string name="title_vocabulary">Vocabulary</string>
