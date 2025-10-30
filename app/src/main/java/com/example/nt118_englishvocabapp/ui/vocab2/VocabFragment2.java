@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.nt118_englishvocabapp.databinding.FragmentVocab2Binding;
 import com.example.nt118_englishvocabapp.ui.vocab3.VocabFragment3;
+import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,8 +47,14 @@ public class VocabFragment2 extends Fragment {
         // RecyclerView setup
         binding.recyclerTopics.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new VocabTopicAdapter(new ArrayList<>(fullTopics), (topic, position) -> {
-            // Open fragment_vocab3 when any card is clicked
+            // Open fragment_vocab3 when any card is clicked and pass the selected word data
             VocabFragment3 fragment = new VocabFragment3();
+            Bundle b = new Bundle();
+            b.putString(VocabFragment3.ARG_WORD, topic.getWord());
+            b.putString(VocabFragment3.ARG_WORD_TYPE, topic.getWordType());
+            b.putString(VocabFragment3.ARG_DEFINITION, topic.getDefinition());
+            fragment.setArguments(b);
+
             int hostId = (container != null) ? container.getId() : android.R.id.content;
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
@@ -84,14 +91,8 @@ public class VocabFragment2 extends Fragment {
         // Filter icon - simple feedback for now
         binding.filter.setOnClickListener(v -> Toast.makeText(requireContext(), "Filter clicked", Toast.LENGTH_SHORT).show());
 
-        // Return/back button
-        binding.btnReturn.setOnClickListener(v -> {
-            if (getParentFragmentManager().getBackStackEntryCount() > 0) {
-                getParentFragmentManager().popBackStack();
-            } else {
-                requireActivity().finish();
-            }
-        });
+        // Standardized return behavior: fall back to finishing the activity if no backstack
+        ReturnButtonHelper.bind(binding.getRoot(), this, null, () -> requireActivity().finish());
 
         Toast.makeText(getContext(), "Vocab Fragment 2 Opened!", Toast.LENGTH_SHORT).show();
         return root;

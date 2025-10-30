@@ -1,14 +1,11 @@
-// java
 package com.example.nt118_englishvocabapp.ui.vocab;
 
-import android.content.Context;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +19,7 @@ import com.example.nt118_englishvocabapp.databinding.FragmentVocabBinding;
 import com.example.nt118_englishvocabapp.ui.home.HomeFragment;
 import com.example.nt118_englishvocabapp.ui.vocab2.VocabFragment2;
 import com.example.nt118_englishvocabapp.util.KeyboardUtils;
+import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
 import android.util.Log;
 
 public class VocabFragment extends Fragment {
@@ -33,8 +31,6 @@ public class VocabFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        VocabViewModel vocabViewModel =
-                new ViewModelProvider(this).get(VocabViewModel.class);
 
         binding = FragmentVocabBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -159,28 +155,27 @@ public class VocabFragment extends Fragment {
             );
         });
 
-        binding.btnReturn.setOnClickListener(v -> {
+        // Standardize behavior: hide keyboard first, then pop backstack or navigate home as a fallback
+        View.OnClickListener preClick = v -> {
             if (!isAdded()) return;
-
-            // Use KeyboardUtils to hide keyboard, remove listener and restore bottom UI
             keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
                     requireActivity(),
                     v,
                     keyboardRootView,
                     keyboardListener
             );
+        };
 
-            // 4) Navigate back to HomeFragment
-            if (getParentFragmentManager().getBackStackEntryCount() > 0) {
-                getParentFragmentManager().popBackStack();
-            } else {
-                AppCompatActivity activity = (AppCompatActivity) requireActivity();
-                activity.getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.frame_layout, new HomeFragment())
-                        .commitAllowingStateLoss();
-            }
-        });
+        Runnable fallback = () -> {
+            if (!isAdded()) return;
+            AppCompatActivity activity = (AppCompatActivity) requireActivity();
+            activity.getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.frame_layout, new HomeFragment())
+                    .commitAllowingStateLoss();
+        };
+
+        ReturnButtonHelper.bind(binding.getRoot(), this, preClick, fallback);
 
         binding.cardTopic1.setOnClickListener(v -> onCardClicked(1));
         binding.cardTopic2.setOnClickListener(v -> onCardClicked(2));

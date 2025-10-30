@@ -3,6 +3,6 @@
     <string name="temp_vocab">Vocab</string>
     <string name="temp_quiz">temp_quiz</string>
     <string name="temp_home">temp_home</string>
-    <string name="temp_flashcard">temp_flashcard\n</string>
+    <string name="temp_flashcard">temp_flashcard</string>
     <string name="temp_translate">temp_translate</string>
 </resources>

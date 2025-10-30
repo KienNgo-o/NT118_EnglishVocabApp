@@ -1,4 +1,4 @@
-package com.example.nt118_englishvocabapp.ui.vocab4;
+package com.example.nt118_englishvocabapp.ui.vocab5;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,32 +13,32 @@ import androidx.fragment.app.Fragment;
 
 import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.ui.vocab3.VocabFragment3;
-import com.example.nt118_englishvocabapp.ui.vocab5.VocabFragment5;
+import com.example.nt118_englishvocabapp.ui.vocab4.VocabFragment4;
 import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
 
-public class VocabFragment4 extends Fragment {
+public class VocabFragment5 extends Fragment {
 
-    public VocabFragment4() {
+    public VocabFragment5() {
         // Required empty public constructor
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_vocab4, container, false);
+        View root = inflater.inflate(R.layout.fragment_vocab5, container, false);
 
         TextView tabDefinition = root.findViewById(R.id.tab_definition);
         TextView tabForms = root.findViewById(R.id.tab_forms);
         TextView tabSynonyms = root.findViewById(R.id.tab_synonyms);
 
-        // Mark Forms as active
-        tabForms.setSelected(true);
+        // Mark Synonyms as active
+        tabSynonyms.setSelected(true);
         tabDefinition.setSelected(false);
-        tabSynonyms.setSelected(false);
+        tabForms.setSelected(false);
         // Keep all tabs enabled so they remain clickable
-        tabForms.setEnabled(true);
-        tabDefinition.setEnabled(true);
         tabSynonyms.setEnabled(true);
+        tabDefinition.setEnabled(true);
+        tabForms.setEnabled(true);
 
         // Populate basic word info from args
         TextView wordText = root.findViewById(R.id.wordText);
@@ -55,7 +55,6 @@ public class VocabFragment4 extends Fragment {
 
         tabDefinition.setOnClickListener(v -> {
             VocabFragment3 f = new VocabFragment3();
-            // pass args through
             f.setArguments(args);
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
@@ -65,11 +64,7 @@ public class VocabFragment4 extends Fragment {
         });
 
         tabForms.setOnClickListener(v -> {
-            // already on Forms (this fragment) - no-op or provide subtle feedback
-        });
-
-        tabSynonyms.setOnClickListener(v -> {
-            VocabFragment5 f = new VocabFragment5();
+            VocabFragment4 f = new VocabFragment4();
             f.setArguments(args);
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
@@ -78,9 +73,13 @@ public class VocabFragment4 extends Fragment {
                     .commit();
         });
 
+        tabSynonyms.setOnClickListener(v -> {
+            // already on Synonyms - no-op
+        });
+
         // Bind standardized return button behavior
         ReturnButtonHelper.bind(root, this);
-        Toast.makeText(getContext(), "Vocab Fragment 4 Opened!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Vocab Fragment 5 Opened!", Toast.LENGTH_SHORT).show();
         return root;
     }
 }

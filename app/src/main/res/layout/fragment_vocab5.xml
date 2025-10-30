@@ -45,7 +45,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:text="@string/title_vocabulary"
+                    android:text="Vocabulary"
                     android:textSize="24sp"
                     android:textColor="@color/dark_purple"
                     android:textStyle="bold" />
@@ -60,7 +60,7 @@
                 android:background="@color/dark_purple" />
         </LinearLayout>
 
-        <!-- Tabs row: mark "Forms" as active -->
+        <!-- Tabs row: mark "Synonyms" as active -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -81,11 +81,11 @@
                 android:gravity="center"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:text="@string/tab_definition"
+                android:text="Definition"
                 android:textAllCaps="false"
                 android:textColor="@color/tab_text_color"
                 android:textSize="14sp"
-                android:contentDescription="@string/cd_tab_definition" />
+                android:contentDescription="Tab: Definition" />
 
             <TextView
                 android:id="@+id/tab_forms"
@@ -98,11 +98,11 @@
                 android:gravity="center"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:text="@string/tab_forms"
+                android:text="Word's forms"
                 android:textAllCaps="false"
                 android:textColor="@color/tab_text_color"
                 android:textSize="14sp"
-                android:contentDescription="@string/cd_tab_forms" />
+                android:contentDescription="Tab: Word's forms" />
 
             <TextView
                 android:id="@+id/tab_synonyms"
@@ -115,11 +115,11 @@
                 android:gravity="center"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:text="@string/tab_synonyms"
+                android:text="Synonyms/Acronyms"
                 android:textAllCaps="false"
                 android:textColor="@color/tab_text_color"
                 android:textSize="14sp"
-                android:contentDescription="@string/cd_tab_synonyms" />
+                android:contentDescription="Tab: Synonyms or Acronyms" />
 
         </LinearLayout>
 

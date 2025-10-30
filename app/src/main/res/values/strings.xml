@@ -4,11 +4,11 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_flashcard">Flashcard</string>
-    <string name="search_button">search_button\n</string>
+    <string name="search_button">search_button</string>
     <string name="temp_vocab">Vocab</string>
     <string name="temp_quiz">temp_quiz</string>
     <string name="temp_home">temp_home</string>
-    <string name="temp_flashcard">temp_flashcard\n</string>
+    <string name="temp_flashcard">temp_flashcard</string>
     <string name="temp_translate">temp_translate</string>
 
     <!-- Tab labels and content descriptions -->
@@ -39,4 +39,48 @@
     <string name="username_hint">Name</string>
     <string name="sign_in_prompt">Already you member? Login</string>
 
+    <!-- Added for vocab fragments -->
+    <string name="title_vocabulary">Vocabulary</string>
+    <string name="cd_back">Back</string>
+
+    <!-- Account fragment strings -->
+    <string name="account_name">Lê Đặng Quốc An</string>
+    <string name="account_email">ledanquocan@gmail.com</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="notifications_label">Notifications</string>
+    <string name="language_label">Language</string>
+    <string name="english_us">English (US)</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="logout">Logout</string>
+    <string name="delete_account">Delete Account</string>
+
+    <!-- Content descriptions for accessibility -->
+    <string name="cd_avatar">Profile picture</string>
+    <string name="cd_avatar_action">Change avatar</string>
+    <string name="cd_edit">Edit icon</string>
+    <string name="cd_chevron">Navigate</string>
+    <string name="cd_notifications">Notifications icon</string>
+    <string name="cd_language">Language icon</string>
+    <string name="cd_dark_mode">Dark mode toggle</string>
+    <string name="cd_logout">Logout icon</string>
+    <string name="cd_delete">Delete icon</string>
+
+    <!-- New strings added to remove hardcoded literals -->
+    <string name="toggle_password_visibility">Toggle password visibility</string>
+    <string name="apply">Apply</string>
+
+    <!-- Added labels used in expanded edit card to avoid hardcoded strings -->
+    <string name="username_label">Username</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="masked_password">***********</string>
+
+    <!-- Quiz / Multiple choice strings -->
+    <string name="title_quiz">Quiz</string>
+    <string name="question_1_of_3">Question 1 of 3</string>
+    <string name="question_example">Which word matches the meaning: &quot;A large, juicy fruit&quot;?</string>
+    <string name="answer_a">Watermelon</string>
+    <string name="answer_b">Banana</string>
+    <string name="answer_c">Chair</string>
+    <string name="answer_d">Computer</string>
 </resources>

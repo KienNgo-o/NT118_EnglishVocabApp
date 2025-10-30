@@ -20,4 +20,9 @@
     <color name="purple_700">#5E35B1</color>
     <color name="white_gray">#F4FBF8</color>
     <color name="light_white_gray">#EEEEEE</color>
+
+    <!-- Colors used by the multiple-choice fragment for feedback -->
+    <color name="correct_green">#2E7D32</color>
+    <color name="incorrect_red">#C62828</color>
+
 </resources>
