@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,8 +24,8 @@ public class SignInFragment extends Fragment {
 
         // Nút đăng nhập vào màn MainActivity
         view.findViewById(R.id.button_sign_in_to_main).setOnClickListener(v -> {
+            // NOTE: no backend yet — accept any input and go to MainActivity so UX can be tested.
             Intent intent = new Intent(getActivity(), MainActivity.class);
-            // Cờ này sẽ xóa hết các Activity cũ và tạo Task mới cho MainActivity
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
@@ -32,7 +34,7 @@ public class SignInFragment extends Fragment {
         view.findViewById(R.id.button_go_to_sign_up).setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container_view_auth, new SignUpFragment())
-                    .addToBackStack(null) // Thêm vào back stack để có thể quay lại
+                    .addToBackStack(null)
                     .commit();
         });
 
@@ -40,10 +42,15 @@ public class SignInFragment extends Fragment {
         view.findViewById(R.id.button_forgot_password).setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container_view_auth, new ForgotPasswordFragment())
-                    .addToBackStack(null) // Thêm vào back stack để có thể quay lại
+                    .addToBackStack(null)
                     .commit();
         });
 
+        // Social placeholders
+        ImageButton fb = view.findViewById(R.id.social_facebook_sign_in);
+        ImageButton g = view.findViewById(R.id.social_google_sign_in);
+        fb.setOnClickListener(v -> Toast.makeText(getContext(), "Facebook sign-in not implemented", Toast.LENGTH_SHORT).show());
+        g.setOnClickListener(v -> Toast.makeText(getContext(), "Google sign-in not implemented", Toast.LENGTH_SHORT).show());
 
         return view;
     }
