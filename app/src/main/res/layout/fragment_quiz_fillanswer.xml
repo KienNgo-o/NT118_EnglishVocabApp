@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/light_purple"
     android:orientation="vertical"
     android:weightSum="10"
-    tools:context=".ui.vocab.VocabFragment">
+    tools:context=".ui.quiz.FillAnswerQuizFragment">
 
     <!-- Header (same style as other fragments) -->
     <LinearLayout
@@ -38,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="Quiz- Stationery"
+                android:text="@string/title_fill_in_blank"
                 android:textColor="@color/dark_purple"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -62,11 +61,12 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- 1) Question indicators (e.g., "Question 1 of 3" and 3 small dots) -->
+        <!-- 1) Question indicators ("Question 1 of 3" + 3 dots) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:layout_marginTop="0dp"
             android:layout_marginBottom="12dp">
 
             <TextView
@@ -113,6 +113,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:layout_marginTop="36dp"
             android:layout_marginBottom="16dp"
             android:padding="12dp"
             android:background="@drawable/rounded_white">
@@ -127,53 +128,36 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- 3) Answer buttons (4 options) -->
+        <!-- 3) Edit textbox + confirm button -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_marginTop="8dp"
-            android:weightSum="4">
+            android:layout_marginTop="200dp">
+
+            <EditText
+                android:id="@+id/edt_answer"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/rounded_white"
+                android:hint="@string/your_answer"
+                android:padding="12dp"
+                android:inputType="text"
+                android:textColor="@color/dark_purple"
+                android:textColorHint="@color/gray"
+                android:importantForAutofill="no" />
 
             <Button
-                android:id="@+id/btn_answer_a"
+                android:id="@+id/btn_confirm"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/answer_a"
+                android:layout_marginTop="16dp"
+                android:text="@string/confirm"
                 android:background="@drawable/tab_selector"
                 android:textAllCaps="false"
-                android:textColor="@color/dark_purple" />
-
-            <Button
-                android:id="@+id/btn_answer_b"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/answer_b"
-                android:background="@drawable/tab_selector"
-                android:textAllCaps="false"
-                android:textColor="@color/dark_purple" />
-
-            <Button
-                android:id="@+id/btn_answer_c"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/answer_c"
-                android:background="@drawable/tab_selector"
-                android:textAllCaps="false"
-                android:textColor="@color/dark_purple" />
-
-            <Button
-                android:id="@+id/btn_answer_d"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="@string/answer_d"
-                android:background="@drawable/tab_selector"
-                android:textAllCaps="false"
-                android:textColor="@color/dark_purple" />
+                android:textColor="@color/white" />
 
         </LinearLayout>
 

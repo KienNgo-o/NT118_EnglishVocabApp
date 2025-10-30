@@ -1,6 +1,277 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/light_purple"
+    android:orientation="vertical"
+    android:weightSum="10"
+    tools:context=".ui.quiz.MatchingQuizFragment">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Header (same style as other fragments) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
+
+            <ImageButton
+                android:id="@+id/btn_return"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="@null"
+                android:contentDescription="@string/cd_back"
+                android:padding="8dp"
+                android:src="@drawable/return_final" />
+
+            <TextView
+                android:id="@+id/txt_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Quiz - Stationery"
+                android:textColor="@color/dark_purple"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/top_divider"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@color/dark_purple" />
+    </LinearLayout>
+
+    <!-- Content area -->
+    <LinearLayout
+        android:id="@+id/lower_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- 1) Question indicators -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:id="@+id/txt_question_index"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/question_1_of_3"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <View
+                    android:id="@+id/indicator_1"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/tab_selector" />
+
+                <View
+                    android:id="@+id/indicator_2"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/tab_selector" />
+
+                <View
+                    android:id="@+id/indicator_3"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/tab_selector" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 2) Question type (Match!) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp"
+            android:padding="12dp"
+            android:background="@drawable/rounded_white">
+
+            <TextView
+                android:id="@+id/txt_question"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Match the pairs"
+                android:textColor="@color/dark_purple"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- 3) Cards area (even number of cards). We use a FrameLayout so we can overlay a LineOverlay view on top -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="360dp"
+            android:layout_marginBottom="12dp">
+
+            <GridLayout
+                android:id="@+id/grid_cards"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alignmentMode="alignMargins"
+                android:columnCount="2"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:rowOrderPreserved="false"
+                android:useDefaultMargins="true">
+
+                <!-- Example: 8 cards (left/right matching). Texts are placeholder and can be set in code -->
+                <Button
+                    android:id="@+id/card_1"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_columnWeight="1"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_white"
+                    android:text="Metrics"
+                    android:textAllCaps="false"
+                    android:textColor="@color/dark_purple" />
+
+                <Button
+                    android:id="@+id/card_2"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_columnWeight="1"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_white"
+                    android:text="Số liệu"
+                    android:textAllCaps="false"
+                    android:textColor="@color/dark_purple" />
+
+                <Button
+                    android:id="@+id/card_3"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_columnWeight="1"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_white"
+                    android:text="Algorithm"
+                    android:textAllCaps="false"
+                    android:textColor="@color/dark_purple" />
+
+                <Button
+                    android:id="@+id/card_4"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_columnWeight="1"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_white"
+                    android:text="Vật thể"
+                    android:textAllCaps="false"
+                    android:textColor="@color/dark_purple" />
+
+                <Button
+                    android:id="@+id/card_5"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_columnWeight="1"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_white"
+                    android:text="Object"
+                    android:textAllCaps="false"
+                    android:textColor="@color/dark_purple" />
+
+                <Button
+                    android:id="@+id/card_6"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_columnWeight="1"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_white"
+                    android:text="Thuật toán"
+                    android:textAllCaps="false"
+                    android:textColor="@color/dark_purple" />
+
+                <Button
+                    android:id="@+id/card_7"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_columnWeight="1"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_white"
+                    android:text="Object"
+                    android:textAllCaps="false"
+                    android:textColor="@color/dark_purple" />
+
+                <Button
+                    android:id="@+id/card_8"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_columnWeight="1"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_white"
+                    android:text="Thuật toán"
+                    android:textAllCaps="false"
+                    android:textColor="@color/dark_purple" />
+
+            </GridLayout>
+
+            <!-- Overlay for drawing connecting lines -->
+            <View
+                android:id="@+id/line_overlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent" />
+
+        </FrameLayout>
+
+        <!-- 4) Confirm button -->
+        <Button
+            android:id="@+id/btn_confirm"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/confirm"
+            android:background="@drawable/rounded_white"
+            android:textAllCaps="false"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+</LinearLayout>

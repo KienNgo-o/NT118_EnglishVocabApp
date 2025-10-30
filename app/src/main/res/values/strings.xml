@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NT118_EnglishVocabApp</string>
     <string name="title_home">Home</string>
@@ -13,11 +14,9 @@
 
     <!-- Tab labels and content descriptions -->
     <string name="tab_definition">Definition</string>
-    <string name="tab_forms">Word&#39;s forms</string>
-    <string name="tab_synonyms">Synonyms/Acronyms</string>
-
+    <string name="tab_forms">Word\'s forms</string>    <string name="tab_synonyms">Synonyms/Acronyms</string>
     <string name="cd_tab_definition">Tab: Definition</string>
-    <string name="cd_tab_forms">Tab: Word&#39;s forms</string>
+    <string name="cd_tab_forms">Tab: Word\'s forms</string>
     <string name="cd_tab_synonyms">Tab: Synonyms or Acronyms</string>
 
     <!-- Auth strings -->
@@ -32,7 +31,7 @@
     <string name="or_label">Or</string>
     <string name="cd_facebook">Facebook logo</string>
     <string name="cd_google">Google logo</string>
-    <string name="sign_up_prompt">Don&#39;t have account? Signup</string>
+    <string name="sign_up_prompt">Don\'t have an account? Sign up</string>
 
     <string name="sign_up_heading">Create an Account</string>
     <string name="username_label">Username</string>
@@ -80,4 +79,13 @@
     <string name="answer_b">Banana</string>
     <string name="answer_c">Chair</string>
     <string name="answer_d">Computer</string>
+
+    <!-- Strings used by fragment_quiz_fillanswer.xml -->
+    <string name="title_fill_in_blank">Fill in the blank</string>
+    <string name="your_answer">Your answer</string>
+    <string name="confirm">Confirm</string>
+
+    <!-- New string for matching question header -->
+    <string name="question_match">Match the pairs</string>
+    <string name="congrats_subtitle">You\'ve completed&#10;all flashcards.</string>
 </resources>
