@@ -15,6 +15,8 @@ import com.example.nt118_englishvocabapp.ui.home.HomeFragment;
 import com.example.nt118_englishvocabapp.ui.quiz.QuizFragment;
 import com.example.nt118_englishvocabapp.ui.vocab.VocabFragment;
 import com.example.nt118_englishvocabapp.ui.translate.TranslateFragment;
+import com.example.nt118_englishvocabapp.ui.account.AccountFragment;
+import com.example.nt118_englishvocabapp.ui.quiz.ChooseAnswerQuizFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         binding.getRoot().findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                replaceFragment(new TranslateFragment());
+                replaceFragment(new ChooseAnswerQuizFragment());
             }
         });
     }

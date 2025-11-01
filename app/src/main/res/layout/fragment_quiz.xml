@@ -61,7 +61,6 @@
         </LinearLayout>
     </LinearLayout>
     <!-- Lower part: only keep word and wordType -->
-
     <LinearLayout
         android:id="@+id/lower_container"
         android:layout_width="match_parent"

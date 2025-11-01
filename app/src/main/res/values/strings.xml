@@ -92,4 +92,12 @@
 
     <!-- Stage label, uses placeholder %1$d for stage number -->
     <string name="part_label">Part %1$d</string>
+
+    <!-- New strings for choose-by-sound fragment -->
+    <string name="title_choose_by_sound">Quiz - Choose by Sound</string>
+    <string name="instruction_listen_tap">Listen and tap the matching item</string>
+    <string name="cd_play_sound">Play sound</string>
+
+    <!-- Today's quote displayed on Home -->
+    <string name="today_quote">"Procrastination is like a credit card: it's a lot of fun until you get the bill."</string>
 </resources>
