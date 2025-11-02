@@ -12,7 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.databinding.FragmentVocabBinding;
@@ -74,68 +74,42 @@ public class VocabFragment extends Fragment {
             keyboardRootView.getViewTreeObserver().addOnGlobalLayoutListener(keyboardListener);
         }
 
+        // RecyclerView setup: use TopicCardAdapter
+        java.util.List<TopicCard> allTopics = new java.util.ArrayList<>();
+        allTopics.add(new TopicCard("Fruits", "Easy", 10, R.drawable.fruits));
+        allTopics.add(new TopicCard("Information & Technology", "Medium", 12, R.drawable.it));
+        allTopics.add(new TopicCard("Careers", "Hard", 8, R.drawable.careers));
+        allTopics.add(new TopicCard("Apperances", "Easy", 9, R.drawable.apperances));
+        allTopics.add(new TopicCard("Personalities", "Medium", 11, R.drawable.personalities));
+        allTopics.add(new TopicCard("Travel", "Easy", 15, R.drawable.travel));
+
+        LinearLayoutManager lm = new LinearLayoutManager(requireContext());
+        binding.recyclerTopics.setLayoutManager(lm);
+        TopicCardAdapter topicAdapter = new TopicCardAdapter(allTopics, (item, pos) -> onCardClicked(pos+1));
+        binding.recyclerTopics.setAdapter(topicAdapter);
+
+        // Update: make search logic consistent with VocabFragment2
         binding.searchTopic.setOnClickListener(v -> {
             String query = binding.searchEditText.getText().toString().trim().toLowerCase();
 
+            // If empty, behave like VocabFragment2: show all (there's no list adapter here) and inform the user
             if (query.isEmpty()) {
-                // focus and open keyboard using KeyboardUtils
-                KeyboardUtils.showKeyboard(requireActivity(), binding.searchEditText);
+                Toast.makeText(requireContext(), "Showing all topics", Toast.LENGTH_SHORT).show();
+                topicAdapter.updateList(new java.util.ArrayList<>(allTopics));
                 return;
             }
 
-            // Arrays of cards and their label TextViews (view binding generated names)
-            View[] cards = new View[] {
-                    binding.cardTopic1,
-                    binding.cardTopic2,
-                    binding.cardTopic3,
-                    binding.cardTopic4,
-                    binding.cardTopic5,
-                    binding.cardTopic6
-            };
-
-            TextView[] labels = new TextView[] {
-                    binding.txtTopic1,
-                    binding.txtTopic2,
-                    binding.txtTopic3,
-                    binding.txtTopic4,
-                    binding.txtTopic5,
-                    binding.txtTopic6
-            };
-
-            int foundIndex = -1;
-            for (int i = 0; i < labels.length; i++) {
-                if (labels[i] != null) {
-                    String labelText = labels[i].getText().toString().toLowerCase();
-                    if (labelText.contains(query)) {
-                        foundIndex = i;
-                        break;
-                    }
+            java.util.List<TopicCard> filtered = new java.util.ArrayList<>();
+            for (TopicCard t : allTopics) {
+                if (t.title != null && t.title.toLowerCase().contains(query)) {
+                    filtered.add(t);
                 }
             }
 
-            if (foundIndex >= 0) {
-                // Use KeyboardUtils to hide keyboard / remove listener / restore bottom UI
-                keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
-                        requireActivity(),
-                        v,
-                        keyboardRootView,
-                        keyboardListener
-                );
-
-                final View targetCard = cards[foundIndex];
-                // scroll after layout pass to ensure coordinates are ready
-                binding.scrollTopics.post(() -> {
-                    int top = targetCard.getTop();
-                    binding.scrollTopics.smoothScrollTo(0, top);
-                    // optional: brief visual feedback (flash elevation) - keep minimal
-                    targetCard.animate().alpha(0.9f).setDuration(120).withEndAction(() ->
-                            targetCard.animate().alpha(1f).setDuration(120)
-                    );
-                });
-
-            } else {
+            if (filtered.isEmpty()) {
                 Toast.makeText(requireContext(), "No topic found for: " + query, Toast.LENGTH_SHORT).show();
             }
+            topicAdapter.updateList(filtered);
         });
 
 
@@ -177,12 +151,7 @@ public class VocabFragment extends Fragment {
 
         ReturnButtonHelper.bind(binding.getRoot(), this, preClick, fallback);
 
-        binding.cardTopic1.setOnClickListener(v -> onCardClicked(1));
-        binding.cardTopic2.setOnClickListener(v -> onCardClicked(2));
-        binding.cardTopic3.setOnClickListener(v -> onCardClicked(3));
-        binding.cardTopic4.setOnClickListener(v -> onCardClicked(4));
-        binding.cardTopic5.setOnClickListener(v -> onCardClicked(5));
-        binding.cardTopic6.setOnClickListener(v -> onCardClicked(6));
+        // individual card clicks handled by adapter callback
 
         return root;
     }

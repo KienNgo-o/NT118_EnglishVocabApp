@@ -27,11 +27,18 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.activity.result.ActivityResultCallback;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
+import com.example.nt118_englishvocabapp.util.KeyboardUtils;
+import com.example.nt118_englishvocabapp.ui.home.HomeFragment;
+
 public class AccountFragment extends Fragment {
 
     // Activity result launcher for picking an image from gallery
     private ActivityResultLauncher<String> pickImageLauncher;
     private ImageView imgAvatar; // will be assigned in onViewCreated
+    private View keyboardRootView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -99,6 +106,13 @@ public class AccountFragment extends Fragment {
         imgAvatar = view.findViewById(com.example.nt118_englishvocabapp.R.id.img_avatar);
         ImageButton btnAvatarAction = view.findViewById(com.example.nt118_englishvocabapp.R.id.btn_avatar_action);
 
+        // Use Activity content view as stable root for keyboard detection (same pattern as other fragments)
+        if (getActivity() != null) {
+            keyboardRootView = requireActivity().findViewById(android.R.id.content);
+        } else {
+            keyboardRootView = view; // fallback
+        }
+
         // initialize enabled state of frequency controls based on the switch's current value
         if (switchNotifications != null) {
             boolean enabled = switchNotifications.isChecked();
@@ -134,7 +148,7 @@ public class AccountFragment extends Fragment {
                     // }
 
                     // rotate chevron
-                    chevron.animate().rotation(expanded ? 180f : 0f).setDuration(220).start();
+                    chevron.animate().rotation(expanded ? 90f : 0f).setDuration(220).start();
                 }
             });
         }
@@ -149,7 +163,7 @@ public class AccountFragment extends Fragment {
                     TransitionManager.beginDelayedTransition((ViewGroup) rowsContainer, new AutoTransition());
                     expanded = !expanded;
                     notificationsCard.setVisibility(expanded ? View.VISIBLE : View.GONE);
-                    notificationsChevron.animate().rotation(expanded ? 180f : 0f).setDuration(220).start();
+                    notificationsChevron.animate().rotation(expanded ? 90f : 0f).setDuration(220).start();
                 }
             });
         }
@@ -170,6 +184,94 @@ public class AccountFragment extends Fragment {
                 }
             });
         }
+
+        // Password toggle: make the expanded edit-card editable and allow toggling visibility
+        final android.widget.EditText edtPassword = view.findViewById(com.example.nt118_englishvocabapp.R.id.expanded_password);
+        final android.widget.EditText edtName = view.findViewById(com.example.nt118_englishvocabapp.R.id.expanded_username);
+        final android.widget.EditText edtEmail = view.findViewById(com.example.nt118_englishvocabapp.R.id.expanded_email);
+        final ImageButton btnPasswordToggle = view.findViewById(com.example.nt118_englishvocabapp.R.id.expanded_password_toggle);
+
+        if (btnPasswordToggle != null && edtPassword != null) {
+            // start with password hidden (inputType already set in layout)
+            btnPasswordToggle.setOnClickListener(v -> {
+                try {
+                    int inputType = edtPassword.getInputType();
+                    // Check whether password is currently visible: if inputType contains TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                    boolean isVisible = (inputType & android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) == android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+                    if (isVisible) {
+                        // hide password
+                        edtPassword.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        btnPasswordToggle.setImageResource(com.example.nt118_englishvocabapp.R.drawable.eye_closed);
+                    } else {
+                        // show password
+                        edtPassword.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                        btnPasswordToggle.setImageResource(com.example.nt118_englishvocabapp.R.drawable.eye_open);
+                    }
+                    // Move cursor to end after changing inputType
+                    edtPassword.setSelection(edtPassword.getText() != null ? edtPassword.getText().length() : 0);
+                } catch (Exception e) {
+                    Log.e("AccountFragment", "Error toggling password visibility", e);
+                }
+            });
+        }
+
+        // Apply button: save edits into header and collapse card
+        View btnApply = view.findViewById(com.example.nt118_englishvocabapp.R.id.btn_apply_edit);
+        if (btnApply != null) {
+            btnApply.setOnClickListener(v -> {
+                try {
+                    if (!isAdded()) return;
+
+                    // hide keyboard first
+                    KeyboardUtils.hideKeyboardAndRestoreUI(requireActivity(), v, keyboardRootView, null);
+
+                    // read values
+                    String newName = (edtName != null && edtName.getText() != null) ? edtName.getText().toString().trim() : null;
+                    String newEmail = (edtEmail != null && edtEmail.getText() != null) ? edtEmail.getText().toString().trim() : null;
+
+                    if (newName != null && !newName.isEmpty()) {
+                        TextView headerName = view.findViewById(com.example.nt118_englishvocabapp.R.id.tv_name);
+                        if (headerName != null) headerName.setText(newName);
+                    }
+                    if (newEmail != null && !newEmail.isEmpty()) {
+                        TextView headerEmail = view.findViewById(com.example.nt118_englishvocabapp.R.id.tv_email);
+                        if (headerEmail != null) headerEmail.setText(newEmail);
+                    }
+
+                    // collapse expanded card and rotate chevron back
+                    if (expandedCard != null) expandedCard.setVisibility(View.GONE);
+                    if (chevron != null) chevron.animate().rotation(0f).setDuration(200).start();
+
+                    Toast.makeText(getContext(), "Profile updated", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Log.e("AccountFragment", "Error applying profile edits", e);
+                    Toast.makeText(getContext(), "Failed to apply changes", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        // Standard return behavior: hide keyboard first, then pop backstack or navigate home as fallback
+        View.OnClickListener preClick = v -> {
+            if (!isAdded()) return;
+            // hide keyboard and restore UI; we don't have a keyboardListener in this fragment so just call the helper
+            KeyboardUtils.hideKeyboardAndRestoreUI(
+                    requireActivity(),
+                    v,
+                    keyboardRootView,
+                    null
+            );
+        };
+
+        Runnable fallback = () -> {
+            if (!isAdded()) return;
+            AppCompatActivity activity = (AppCompatActivity) requireActivity();
+            activity.getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(com.example.nt118_englishvocabapp.R.id.frame_layout, new HomeFragment())
+                    .commitAllowingStateLoss();
+        };
+
+        ReturnButtonHelper.bind(view, this, preClick, fallback);
 
         // Listeners for switch and frequency
         if (switchNotifications != null) {

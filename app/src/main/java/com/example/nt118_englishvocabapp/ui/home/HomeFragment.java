@@ -1,17 +1,15 @@
 package com.example.nt118_englishvocabapp.ui.home;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -20,13 +18,14 @@ import com.example.nt118_englishvocabapp.databinding.FragmentHomeBinding;
 import com.example.nt118_englishvocabapp.ui.account.AccountFragment;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
-
-    private static final List<String> WEEK_DAYS = Arrays.asList("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su");
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -46,6 +45,15 @@ public class HomeFragment extends Fragment {
         TextView flashProgress = root.findViewById(R.id.text_flash_sub);
         ImageView avatar = root.findViewById(R.id.image_avatar);
         LinearLayout rowDays = root.findViewById(R.id.row_days);
+
+        // Ensure the study-days row is on top of other views (avoid accidental overlay)
+        if (rowDays != null) {
+            try {
+                rowDays.bringToFront();
+                rowDays.setTranslationZ(20f);
+            } catch (Exception ignored) {
+            }
+        }
 
         // Observe and populate
         homeViewModel.getTodayQuote().observe(getViewLifecycleOwner(), s -> {
@@ -70,65 +78,51 @@ public class HomeFragment extends Fragment {
             if (flashProgress != null) flashProgress.setText(s);
         });
 
-        // Observe study days and render the 7 day indicators
+        // Observe study days and update the 7 day ImageButtons in the layout
         homeViewModel.getStudyDays().observe(getViewLifecycleOwner(), activeList -> {
-            if (rowDays == null) return;
-            rowDays.removeAllViews();
+            if (rowDays == null) return; // layout not ready
 
-            for (String day : WEEK_DAYS) {
-                boolean isActive = activeList != null && activeList.contains(day);
+            // Find the ImageButtons defined in fragment_home.xml
+            ImageButton mon = root.findViewById(R.id.day_mon);
+            ImageButton tue = root.findViewById(R.id.day_tue);
+            ImageButton wed = root.findViewById(R.id.day_wed);
+            ImageButton thu = root.findViewById(R.id.day_thu);
+            ImageButton fri = root.findViewById(R.id.day_fri);
+            ImageButton sat = root.findViewById(R.id.day_sat);
+            ImageButton sun = root.findViewById(R.id.day_sun);
 
-                // create container
-                LinearLayout containerDay = new LinearLayout(requireContext());
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-                lp.setMarginEnd((int) (8 * requireContext().getResources().getDisplayMetrics().density));
-                containerDay.setLayoutParams(lp);
-                containerDay.setOrientation(LinearLayout.VERTICAL);
-                containerDay.setGravity(android.view.Gravity.CENTER);
+            List<ImageButton> buttons = Arrays.asList(mon, tue, wed, thu, fri, sat, sun);
+            List<String> keys = Arrays.asList("mo", "tu", "we", "th", "fr", "sa", "su");
 
-                // circle frame (rounded tile)
-                FrameLayout circle = new FrameLayout(requireContext());
-                int sizePx = (int) (48 * requireContext().getResources().getDisplayMetrics().density);
-                LinearLayout.LayoutParams circleLp = new LinearLayout.LayoutParams(sizePx, sizePx);
-                circle.setLayoutParams(circleLp);
-                circle.setPadding(8, 8, 8, 8);
-
-                // background rounded rect depends on active
-                circle.setBackgroundResource(isActive ? R.drawable.rounded_rect_purple : R.drawable.rounded_rect_gray);
-
-                // Centered check icon directly on the rounded rect
-                ImageView check = new ImageView(requireContext());
-                FrameLayout.LayoutParams checkLp = new FrameLayout.LayoutParams(
-                        (int) (24 * requireContext().getResources().getDisplayMetrics().density),
-                        (int) (24 * requireContext().getResources().getDisplayMetrics().density));
-                checkLp.gravity = android.view.Gravity.CENTER;
-                check.setLayoutParams(checkLp);
-                check.setImageResource(R.drawable.ic_check);
-                if (isActive) {
-                    check.setColorFilter(Color.WHITE);
-                    check.setAlpha(1f);
-                } else {
-                    check.setColorFilter(ContextCompat.getColor(requireContext(), R.color.light_gray));
-                    check.setAlpha(0.35f);
+            // Normalize backend strings to short keys (mo, tu, ...)
+            Set<String> normalized = new HashSet<>();
+            if (activeList != null) {
+                for (String s : activeList) {
+                    if (s == null) continue;
+                    String n = s.toLowerCase(Locale.ROOT).trim();
+                    // handle common formats: Mon, Mon., Monday, mo, etc.
+                    if (n.startsWith("mo")) normalized.add("mo");
+                    else if (n.startsWith("tu")) normalized.add("tu");
+                    else if (n.startsWith("we")) normalized.add("we");
+                    else if (n.startsWith("th")) normalized.add("th");
+                    else if (n.startsWith("fr")) normalized.add("fr");
+                    else if (n.startsWith("sa")) normalized.add("sa");
+                    else if (n.startsWith("su")) normalized.add("su");
                 }
-                circle.addView(check);
+            }
 
-                // label under the tile (Mo, Tu...); always dark text per design
-                TextView label = new TextView(requireContext());
-                LinearLayout.LayoutParams labelLp = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                label.setLayoutParams(labelLp);
-                label.setText(day);
-                label.setTextSize(12);
-                label.setTextColor(Color.BLACK);
-                label.setPadding(0, 6, 0, 0);
-
-                containerDay.addView(circle);
-                containerDay.addView(label);
-
-                rowDays.addView(containerDay);
+            // Update each button's image depending on whether it's active
+            for (int i = 0; i < buttons.size(); i++) {
+                ImageButton b = buttons.get(i);
+                String key = keys.get(i);
+                if (b == null) continue;
+                if (normalized.contains(key)) {
+                    b.setImageResource(R.drawable.daycheck_yes);
+                    b.setAlpha(1f);
+                } else {
+                    b.setImageResource(R.drawable.daycheck_no);
+                    b.setAlpha(0.95f);
+                }
             }
         });
 

@@ -223,15 +223,19 @@
                                         android:textSize="12sp"
                                         android:textColor="#7A7A7A" />
 
-                                    <TextView
+                                    <EditText
                                         android:id="@+id/expanded_username"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="@string/account_name"
+                                        android:inputType="textPersonName"
+                                        android:hint="Enter your name"
                                         android:textSize="14sp"
                                         android:textColor="#111214"
                                         android:paddingTop="6dp"
-                                        android:paddingBottom="10dp" />
+                                        android:paddingBottom="10dp"
+                                        android:background="@android:drawable/edit_text"
+                                        android:paddingLeft="8dp"
+                                        android:paddingRight="8dp" />
 
                                     <!-- Email row -->
                                     <TextView
@@ -241,15 +245,19 @@
                                         android:textSize="12sp"
                                         android:textColor="#7A7A7A" />
 
-                                    <TextView
+                                    <EditText
                                         android:id="@+id/expanded_email"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="@string/account_email"
+                                        android:inputType="textEmailAddress"
+                                        android:hint="you@example.com"
                                         android:textSize="14sp"
                                         android:textColor="#111214"
                                         android:paddingTop="6dp"
-                                        android:paddingBottom="10dp" />
+                                        android:paddingBottom="10dp"
+                                        android:background="@android:drawable/edit_text"
+                                        android:paddingLeft="8dp"
+                                        android:paddingRight="8dp" />
 
                                     <!-- Password row -->
                                     <TextView
@@ -267,22 +275,31 @@
                                         android:paddingTop="6dp"
                                         android:paddingBottom="8dp">
 
-                                        <TextView
+                                        <EditText
                                             android:id="@+id/expanded_password"
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
-                                            android:text="***********"
+                                            android:inputType="textPassword"
+                                            android:hint="Enter password"
                                             android:textSize="14sp"
-                                            android:textColor="#111214" />
+                                            android:textColor="#111214"
+                                            android:background="@android:drawable/edit_text"
+                                            android:paddingLeft="8dp"
+                                            android:paddingTop="8dp"
+                                            android:paddingBottom="8dp"
+                                            android:paddingRight="8dp" />
 
-                                        <ImageView
+                                        <ImageButton
                                             android:id="@+id/expanded_password_toggle"
-                                            android:layout_width="22dp"
-                                            android:layout_height="22dp"
-                                            android:src="@drawable/see_more"
-                                            app:tint="#7A7A7A"
-                                            android:contentDescription="@string/toggle_password_visibility" />
+                                            android:layout_width="42dp"
+                                            android:layout_height="42dp"
+                                            android:layout_marginStart="8dp"
+                                            android:background="?attr/selectableItemBackgroundBorderless"
+                                            android:src="@drawable/eye_closed"
+                                            android:contentDescription="@string/toggle_password_visibility"
+                                            android:scaleType="centerInside"
+                                            android:padding="8dp" />
 
                                     </LinearLayout>
 
