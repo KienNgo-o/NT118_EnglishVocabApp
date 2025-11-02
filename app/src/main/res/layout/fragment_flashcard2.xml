@@ -100,16 +100,17 @@
                     android:id="@+id/textTerm"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Watermelon (noun)"
+                    android:text="Watermelon (n)"
                     android:textColor="#6A0DAD"
-                    android:textSize="28sp"
+                    android:textSize="32sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/textDefinition"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="18dp"
+                    android:textColor="@color/black"
                     android:text="Definition: A large, round or oval-shaped fruit..."
                     android:textSize="16sp"/>
 
@@ -117,7 +118,8 @@
                     android:id="@+id/textExample"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="18dp"
+                    android:textColor="@color/black"
                     android:text="Example: Watermelon is my favorite fruit..."
                     android:textSize="16sp"
                     android:textStyle="italic"/>
@@ -140,14 +142,15 @@
                     android:layout_height="wrap_content"
                     android:text="Dưa hấu (danh từ)"
                     android:textColor="#6A0DAD"
-                    android:textSize="28sp"
+                    android:textSize="32sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/textVietnameseDefinition"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:textColor="@color/black"
+                    android:layout_marginTop="18dp"
                     android:text="Định nghĩa: Một loại quả to hình tròn hoặc oval..."
                     android:textSize="16sp"/>
             </LinearLayout>

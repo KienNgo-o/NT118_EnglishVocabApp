@@ -22,13 +22,14 @@
 
     <!-- Auth strings -->
     <string name="cd_illustration">Sign in illustration</string>
-    <string name="sign_in_heading">For free, join now and start learning</string>
+    <string name="sign_in_heading">For free, join now and start learning!</string>
     <string name="email_label">Email Address</string>
     <string name="email_hint">Email</string>
     <string name="password_label">Password</string>
     <string name="password_hint">Password</string>
     <string name="forgot_password">Forgot Password</string>
     <string name="continue_label">Continue</string>
+    <string name="return_to_signin_label">Return to Sign In</string>
     <string name="or_label">Or</string>
     <string name="cd_facebook">Facebook logo</string>
     <string name="cd_google">Google logo</string>

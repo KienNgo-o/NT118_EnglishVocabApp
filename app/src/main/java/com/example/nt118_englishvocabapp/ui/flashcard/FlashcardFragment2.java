@@ -224,7 +224,7 @@ public class FlashcardFragment2 extends Fragment {
         if (topicIdx == 1) { // Chỉ mục Fruits
             list.add(new FlashcardItem(
                     "Watermelon",
-                    "noun",
+                    "n",
                     "A large, round or oval-shaped fruit with dark green skin, sweet pink flesh, and a lot of black seeds.",
                     "Example: Watermelon is my favorite fruit in the summer.",
                     "Dưa hấu", // Tiêu đề tiếng Việt
@@ -232,7 +232,7 @@ public class FlashcardFragment2 extends Fragment {
             ));
             list.add(new FlashcardItem(
                     "Tomato",
-                    "noun",
+                    "n",
                     "A round, red fruit with a lot of seeds, eaten cooked or uncooked as a vegetable, for example in salads or sauces.",
                     "Example: Cut the tomato in half and scoop out the seeds.",
                     "Cà chua", // Tiêu đề tiếng Việt

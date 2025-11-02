@@ -36,6 +36,7 @@ public class SignInFragment extends Fragment {
                     .replace(R.id.fragment_container_view_auth, new SignUpFragment())
                     .addToBackStack(null)
                     .commit();
+            Toast.makeText(getContext(), "Ok!", Toast.LENGTH_SHORT).show();
         });
 
         // Nút chuyển sang màn hình Forgot password 1
@@ -44,6 +45,7 @@ public class SignInFragment extends Fragment {
                     .replace(R.id.fragment_container_view_auth, new ForgotPasswordFragment())
                     .addToBackStack(null)
                     .commit();
+            Toast.makeText(getContext(), "Ok!", Toast.LENGTH_SHORT).show();
         });
 
         // Social placeholders
