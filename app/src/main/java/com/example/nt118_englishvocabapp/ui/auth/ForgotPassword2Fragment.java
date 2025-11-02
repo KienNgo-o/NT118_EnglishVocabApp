@@ -1,3 +1,4 @@
+// ForgotPassword2Fragment.java
 package com.example.nt118_englishvocabapp.ui.auth;
 
 import android.os.Bundle;
@@ -9,7 +10,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation; // <-- Import NavController
+
+import com.example.nt118_englishvocabapp.LoginActivity;
 import com.example.nt118_englishvocabapp.R;
 
 public class ForgotPassword2Fragment extends Fragment {
@@ -36,16 +40,13 @@ public class ForgotPassword2Fragment extends Fragment {
                 confirm.setError("Passwords do not match");
                 return;
             }
-            // simulate success -> show congratulation dialog
-            CongratulationDialogFragment dlg = new CongratulationDialogFragment();
 
+            CongratulationDialogFragment dlg = new CongratulationDialogFragment();
             dlg.setListener(() -> {
-                requireActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(((ViewGroup)requireActivity().findViewById(android.R.id.content)).getId(),
-                                new SignInFragment())
-                        .addToBackStack(null)
-                        .commit();
+                // Thay vì tự xử lý, hãy gọi một phương thức trên LoginActivity
+                if (getActivity() instanceof LoginActivity) {
+                    ((LoginActivity) getActivity()).returnToSignInScreen();
+                }
             });
             dlg.show(getParentFragmentManager(), "congrats");
         });
