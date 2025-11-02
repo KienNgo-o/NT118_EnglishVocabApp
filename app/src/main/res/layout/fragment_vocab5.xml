@@ -16,6 +16,7 @@
         android:layout_weight="2"
         android:orientation="vertical">
 
+        <!-- Top half: toolbar + divider -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -60,7 +61,7 @@
                 android:background="@color/dark_purple" />
         </LinearLayout>
 
-        <!-- Tabs row: mark "Synonyms" as active -->
+        <!-- Bottom half: tabs row (styled rounded container with active pill) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -171,9 +172,221 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
+                <!-- orange line to the right of the pill (same as fragment_vocab3) -->
+                <View
+                    android:layout_width="120dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="-5dp"
+                    android:layout_marginTop="0dp"
+                    android:background="@drawable/orange_line" />
+
             </LinearLayout>
 
         </LinearLayout>
+
+        <!-- Add scrollable content: Synonyms and Acronyms sections -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="12dp"
+                android:paddingBottom="24dp">
+
+                <!-- Section header: Synonyms (pill on left, line to the right) -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="8dp"
+                    android:paddingStart="6dp"
+                    android:paddingEnd="6dp">
+
+                    <TextView
+                        android:id="@+id/pill_synonyms"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:background="@drawable/rounded_rect_green"
+                        android:gravity="center"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp"
+                        android:text="Từ đồng nghĩa (Synonyms)"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="6dp"
+                        android:layout_toEndOf="@id/pill_synonyms"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="0dp"
+                        android:background="@color/green_700" />
+
+                </RelativeLayout>
+
+                <!-- Card 1 under Synonyms -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@android:color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Most suitable"
+                            android:textColor="@color/purple_700"
+                            android:textStyle="bold"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Melon"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp"
+                            android:layout_marginTop="6dp"
+                            android:textStyle="bold" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="12dp"
+                            android:background="@color/light_gray" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Suitable"
+                            android:textColor="@color/purple_700"
+                            android:textStyle="bold"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="None."
+                            android:textColor="@color/purple_700"
+                            android:textSize="14sp"
+                            android:layout_marginTop="6dp" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Section header: Antonyms/Acronyms -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="8dp"
+                    android:paddingStart="6dp"
+                    android:paddingEnd="6dp">
+
+                    <TextView
+                        android:id="@+id/pill_antonyms"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:background="@drawable/rounded_rect_dark"
+                        android:gravity="center"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp"
+                        android:text="Từ trái nghĩa (Acronyms)"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="6dp"
+                        android:layout_toEndOf="@id/pill_antonyms"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="0dp"
+                        android:background="@color/dark" />
+
+                </RelativeLayout>
+
+                <!-- Card 1 under Antonyms -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@android:color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Most suitable"
+                            android:textColor="@color/purple_700"
+                            android:textStyle="bold"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="None."
+                            android:textColor="@color/purple_700"
+                            android:textSize="14sp"
+                            android:layout_marginTop="6dp" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="12dp"
+                            android:background="@color/light_gray" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Suitable"
+                            android:textColor="@color/purple_700"
+                            android:textStyle="bold"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="None."
+                            android:textColor="@color/purple_700"
+                            android:textSize="14sp"
+                            android:layout_marginTop="6dp" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Additional space at bottom -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp" />
+
+            </LinearLayout>
+
+        </ScrollView>
 
     </LinearLayout>
 
