@@ -1,38 +1,55 @@
 package com.example.nt118_englishvocabapp.ui.auth;
 
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
 
 import com.example.nt118_englishvocabapp.R;
 
 public class CongratulationDialogFragment extends DialogFragment {
 
-    @Nullable
+    public interface CongratsListener { void onReturnToSignIn(); }
+    private CongratsListener listener;
+    public void setListener(CongratsListener l) { listener = l; }
+
+    // flag to request navigation after dialog is dismissed
+    private boolean navigateAfterDismiss = false;
+
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.dialog_congratulation, container, false);
-        setCancelable(false); // Ngăn người dùng đóng dialog
-
-        view.findViewById(R.id.button_return_to_sign_in).setOnClickListener(v -> {
-            // 1. Đóng dialog
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.dialog_congratulation, container, false);
+        Button btn = v.findViewById(R.id.button_return_sign_in);
+        btn.setOnClickListener(view -> {
+            // mark navigation and dismiss; actual navigation happens in onDismiss
+            navigateAfterDismiss = true;
             dismiss();
-
-            // 2. Xóa hết các fragment trong back stack để quay về màn hình đầu tiên (SignIn)
-            getParentFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
-            // 3. Thay thế container bằng một SignInFragment mới
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container_view_auth, new SignInFragment())
-                    .commit();
         });
+        return v;
+    }
 
-        return view;
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        if (navigateAfterDismiss && listener != null) {
+            listener.onReturnToSignIn();
+        }
+        navigateAfterDismiss = false;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
     }
 }

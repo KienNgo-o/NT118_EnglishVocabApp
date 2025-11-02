@@ -21,21 +21,27 @@ public class SignUpFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sign_up, container, false);
 
-        // Continue -> go to MainActivity for now (no backend yet)
-        view.findViewById(R.id.button_sign_up_continue).setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
+        // Continue -> quay lại Sign In (no backend yet)
+        view.findViewById(R.id.button_sign_up).setOnClickListener(v -> {
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container_view_auth, new SignInFragment())
+                    .addToBackStack(null)
+                    .commit();
+            Toast.makeText(getContext(), "Account Registration Successful!", Toast.LENGTH_SHORT).show();
         });
 
-        // Nút quay lại màn hình đăng nhập
-        view.findViewById(R.id.button_sign_up_back_to_sign_in).setOnClickListener(v -> {
-            // Quay lại fragment trước đó trong back stack
-            getParentFragmentManager().popBackStack();
+        // Nút chuyển sang màn hình Sign in
+        view.findViewById(R.id.button_go_to_sign_in).setOnClickListener(v -> {
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container_view_auth, new SignInFragment())
+                    .addToBackStack(null)
+                    .commit();
+            Toast.makeText(getContext(), "Ok!", Toast.LENGTH_SHORT).show();
         });
 
-        ImageButton fb = view.findViewById(R.id.social_facebook);
-        ImageButton g = view.findViewById(R.id.social_google);
+
+        ImageButton fb = view.findViewById(R.id.social_facebook_sign_up);
+        ImageButton g = view.findViewById(R.id.social_google_sign_up);
         fb.setOnClickListener(v -> Toast.makeText(getContext(), "Facebook sign-up not implemented", Toast.LENGTH_SHORT).show());
         g.setOnClickListener(v -> Toast.makeText(getContext(), "Google sign-up not implemented", Toast.LENGTH_SHORT).show());
 
