@@ -90,16 +90,28 @@ public class QuizFragment extends Fragment {
             );
         };
 
-        Runnable fallback = () -> {
-            if (!isAdded()) return;
-            AppCompatActivity activity = (AppCompatActivity) requireActivity();
-            activity.getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.frame_layout, new HomeFragment())
-                    .commitAllowingStateLoss();
-        };
+        // Make sure to return to home fragment properly
+        binding.btnReturn.setOnClickListener(v -> {
+            keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
+                    requireActivity(), v, keyboardRootView, keyboardListener);
 
-        ReturnButtonHelper.bind(binding.getRoot(), this, preClick, fallback);
+            // prefer using MainActivity helper to keep BottomNavigationView state in sync
+            if (requireActivity() instanceof com.example.nt118_englishvocabapp.MainActivity) {
+                ((com.example.nt118_englishvocabapp.MainActivity) requireActivity()).navigateToHome();
+                return;
+            }
+
+            // fallback (should rarely run)
+            if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                getParentFragmentManager().popBackStack();
+            } else {
+                AppCompatActivity activity = (AppCompatActivity) requireActivity();
+                activity.getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.frame_layout, new com.example.nt118_englishvocabapp.ui.home.HomeFragment())
+                        .commitAllowingStateLoss();
+            }
+        });
 
         // Populate the vertical zig-zag list of quiz stages
         setupStages();

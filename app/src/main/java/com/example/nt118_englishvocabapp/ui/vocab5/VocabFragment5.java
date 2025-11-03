@@ -1,9 +1,11 @@
 package com.example.nt118_englishvocabapp.ui.vocab5;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,9 +14,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.nt118_englishvocabapp.R;
+import com.example.nt118_englishvocabapp.ui.vocab2.VocabFragment2;
 import com.example.nt118_englishvocabapp.ui.vocab3.VocabFragment3;
 import com.example.nt118_englishvocabapp.ui.vocab4.VocabFragment4;
 import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class VocabFragment5 extends Fragment {
 
@@ -77,8 +81,15 @@ public class VocabFragment5 extends Fragment {
             // already on Synonyms - no-op
         });
 
-        // Bind standardized return button behavior
+        // Bind standardized return button behavior (make sure to return to vocabfragment2)
         ReturnButtonHelper.bind(root, this);
+        View btnReturn = root.findViewById(R.id.btn_return);
+        if (btnReturn != null) {
+            btnReturn.setOnClickListener(v -> {
+                String backStackName = "VocabFragment2_BackStack";
+                getParentFragmentManager().popBackStack(backStackName, 0);
+            });
+        }
         Toast.makeText(getContext(), "Vocab Fragment 5 Opened!", Toast.LENGTH_SHORT).show();
         return root;
     }

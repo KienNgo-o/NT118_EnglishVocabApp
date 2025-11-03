@@ -65,4 +65,13 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
     }
+
+    // Public helper so fragments can ensure navigation UI is consistent
+    public void navigateToHome() {
+        replaceFragment(new HomeFragment());
+        // update bottom navigation selection so the highlighted icon matches the shown fragment
+        if (binding != null && binding.bottomNavigationView != null) {
+            binding.bottomNavigationView.setSelectedItemId(R.id.home);
+        }
+    }
 }
