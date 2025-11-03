@@ -1,7 +1,6 @@
 package com.example.nt118_englishvocabapp.ui.quiz;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -43,6 +42,7 @@ public class MatchingQuizFragment extends Fragment {
     private int selectedIndex = -1; // index of first selected card
     private List<Pair<Integer, Integer>> connections = new ArrayList<>();
     private Map<Integer, Integer> matched = new HashMap<>();
+    private boolean isConfirmed = false; // when true, lock UI and show final colors
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -107,6 +107,9 @@ public class MatchingQuizFragment extends Fragment {
                 final int idx = cardViews.size();
                 cardViews.add(v);
                 v.setOnClickListener(view -> onCardClicked(idx));
+                // ensure default visuals are the rounded white drawable
+                v.setBackgroundResource(R.drawable.rounded_white);
+                ((Button) v).setTextColor(ContextCompat.getColor(requireContext(), R.color.dark_purple));
             }
         }
 
@@ -134,59 +137,146 @@ public class MatchingQuizFragment extends Fragment {
     }
 
     private void onCardClicked(int idx) {
-        // ignore clicks on already matched cards
-        if (matched.containsKey(idx) || matched.containsValue(idx)) return;
+        if (isConfirmed) return; // lock interactions after confirm
+
+        // If this card is already matched, tapping it should undo the match (allow rechoice)
+        if (matched.containsKey(idx)) {
+            Integer partnerObj = matched.get(idx);
+            if (partnerObj != null) {
+                int partner = partnerObj;
+                removeConnectionBetween(partner, idx);
+                // reset visuals and re-enable
+                View v1 = cardViews.get(partner);
+                View v2 = cardViews.get(idx);
+                v1.setEnabled(true);
+                v2.setEnabled(true);
+                v1.setBackgroundResource(R.drawable.rounded_white);
+                v2.setBackgroundResource(R.drawable.rounded_white);
+                ((Button) v1).setTextColor(ContextCompat.getColor(requireContext(), R.color.dark_purple));
+                ((Button) v2).setTextColor(ContextCompat.getColor(requireContext(), R.color.dark_purple));
+                Toast.makeText(requireContext(), "Match removed", Toast.LENGTH_SHORT).show();
+            }
+            selectedIndex = -1;
+            return;
+        }
 
         View v = cardViews.get(idx);
 
         if (selectedIndex == -1) {
-            // select first
+            // select first - use orange drawable
             selectedIndex = idx;
-            // visual: tint background to indicate selection
-            v.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.correct_green));
-            ((Button) v).setTextColor(Color.WHITE);
-            // ensure overlay shows a temporary glow (optional)
+            v.setBackgroundResource(R.drawable.rounded_orange);
+            ((Button) v).setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
         } else if (selectedIndex == idx) {
             // deselect
             v.setBackgroundResource(R.drawable.rounded_white);
             ((Button) v).setTextColor(ContextCompat.getColor(requireContext(), R.color.dark_purple));
             selectedIndex = -1;
         } else {
-            // second selection: create a connection between selectedIndex and idx
+            // second selection: before creating connection, ensure not same column
             int first = selectedIndex;
-            int second = idx;
-            connections.add(new Pair<>(first, second));
-            matched.put(first, second);
-            matched.put(second, first);
+            // int second = idx; // redundant
+            int colFirst = columnOfCard(first);
+            int colSecond = columnOfCard(idx);
+            // if we can't determine column for either (returned -1), allow the match; otherwise disallow same-column matches
+            if (colFirst != -1 && colSecond != -1 && colFirst == colSecond) {
+                // same column - reject
+                Toast.makeText(requireContext(), "Cannot match two cards in the same column", Toast.LENGTH_SHORT).show();
+                // keep the first selected so user can pick a correct pair
+                return;
+            }
 
-            // disable matched buttons to avoid reuse
+            // create connection between first and second
+            connections.add(new Pair<>(first, idx));
+            matched.put(first, idx);
+            matched.put(idx, first);
+
+            // mark matched visuals with orange (still considered matched but not yet graded)
             View v1 = cardViews.get(first);
-            View v2 = cardViews.get(second);
-            v1.setEnabled(false);
-            v2.setEnabled(false);
-
-            // reset visual selection for first (we will keep a colored state for matched)
-            // set matched background to a semi-transparent green
-            int green = ContextCompat.getColor(requireContext(), R.color.correct_green);
-            v1.setBackgroundColor(green);
-            ((Button) v1).setTextColor(Color.WHITE);
-            v2.setBackgroundColor(green);
-            ((Button) v2).setTextColor(Color.WHITE);
+            View v2 = cardViews.get(idx);
+            // Keep matched buttons enabled/clickable so user can tap to undo the match and rechoose
+            v1.setEnabled(true);
+            v2.setEnabled(true);
+            v1.setBackgroundResource(R.drawable.rounded_orange);
+            v2.setBackgroundResource(R.drawable.rounded_orange);
+            ((Button) v1).setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+            ((Button) v2).setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
 
             // add line to overlay and redraw
-            lineOverlay.addConnection(first, second);
+            lineOverlay.addConnection(first, idx);
 
             // clear selection state
             selectedIndex = -1;
         }
     }
 
-    private void onConfirm() {
-        // For now, just show a toast with number of connections
-        String msg = "Connections: " + connections.size();
-        Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
+    /** Return column index (0-based) for a card, or -1 if cannot determine. Use card center relative to grid width. */
+    private int columnOfCard(int idx) {
+        if (idx < 0 || idx >= cardViews.size()) return -1;
+        View v = cardViews.get(idx);
+        if (!v.isShown()) return -1;
+        int[] gridLoc = new int[2];
+        gridCards.getLocationOnScreen(gridLoc);
+        float gridLeft = gridLoc[0];
+        float gridWidth = gridCards.getWidth();
+        int[] loc = new int[2];
+        v.getLocationOnScreen(loc);
+        float centerX = loc[0] - gridLeft + v.getWidth() / 2f;
+        if (gridWidth <= 0) return -1;
+        return (centerX < gridWidth / 2f) ? 0 : 1;
+    }
 
-        // TODO: validate correctness against expected answers and provide feedback
+    private void removeConnectionBetween(int a, int b) {
+        // remove from connections list (order-insensitive)
+        for (int i = connections.size() - 1; i >= 0; i--) {
+            Pair<Integer, Integer> p = connections.get(i);
+            if ((p.first == a && p.second == b) || (p.first == b && p.second == a)) {
+                connections.remove(i);
+            }
+        }
+        // remove matched mapping both ways
+        matched.remove(a);
+        matched.remove(b);
+        // request overlay to remove visual line
+        lineOverlay.removeConnection(a, b);
+    }
+
+    private void onConfirm() {
+        if (isConfirmed) return;
+        isConfirmed = true;
+
+        // evaluate each connection: compare tags on the two buttons
+        for (Pair<Integer, Integer> p : new ArrayList<>(connections)) {
+            int a = p.first;
+            int b = p.second;
+            if (a < 0 || b < 0 || a >= cardViews.size() || b >= cardViews.size()) continue;
+            View va = cardViews.get(a);
+            View vb = cardViews.get(b);
+            String tagA = (va.getTag() != null) ? va.getTag().toString() : null;
+            String tagB = (vb.getTag() != null) ? vb.getTag().toString() : null;
+            boolean correct = tagA != null && tagA.equals(tagB);
+
+            if (correct) {
+                // green for correct - use drawable so stroke/corner consistent
+                va.setBackgroundResource(R.drawable.rounded_green);
+                vb.setBackgroundResource(R.drawable.rounded_green);
+                ((Button) va).setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+                ((Button) vb).setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+            } else {
+                // red for wrong - use drawable
+                va.setBackgroundResource(R.drawable.rounded_red);
+                vb.setBackgroundResource(R.drawable.rounded_red);
+                ((Button) va).setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+                ((Button) vb).setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+            }
+        }
+
+        // After grading, lock all card interactions
+        for (View c : cardViews) {
+            c.setEnabled(false);
+        }
+
+        Toast.makeText(requireContext(), "Answers checked", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -202,7 +292,8 @@ public class MatchingQuizFragment extends Fragment {
     /* Inner view that draws lines between the centers of two card views */
     private class LineOverlay extends View {
         private final Paint paint;
-        private final List<Pair<PointF, PointF>> lines = new ArrayList<>();
+        // store pairs of indices rather than precomputed points so we can recalc on layout changes
+        private final List<Pair<Integer, Integer>> indexPairs = new ArrayList<>();
 
         public LineOverlay(@NonNull android.content.Context ctx) {
             super(ctx);
@@ -215,14 +306,22 @@ public class MatchingQuizFragment extends Fragment {
 
         void addConnection(int idx1, int idx2) {
             if (idx1 < 0 || idx2 < 0 || idx1 >= cardViews.size() || idx2 >= cardViews.size()) return;
-
-            // compute centers relative to this overlay
-            PointF p1 = centerOfView(cardViews.get(idx1));
-            PointF p2 = centerOfView(cardViews.get(idx2));
-            if (p1 != null && p2 != null) {
-                lines.add(new Pair<>(p1, p2));
-                invalidate();
+            // avoid duplicates
+            for (Pair<Integer, Integer> p : indexPairs) {
+                if ((p.first == idx1 && p.second == idx2) || (p.first == idx2 && p.second == idx1)) return;
             }
+            indexPairs.add(new Pair<>(idx1, idx2));
+            invalidate();
+        }
+
+        void removeConnection(int idx1, int idx2) {
+            for (int i = indexPairs.size() - 1; i >= 0; i--) {
+                Pair<Integer, Integer> p = indexPairs.get(i);
+                if ((p.first == idx1 && p.second == idx2) || (p.first == idx2 && p.second == idx1)) {
+                    indexPairs.remove(i);
+                }
+            }
+            invalidate();
         }
 
         private PointF centerOfView(View v) {
@@ -239,8 +338,16 @@ public class MatchingQuizFragment extends Fragment {
         @Override
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
-            for (Pair<PointF, PointF> p : lines) {
-                canvas.drawLine(p.first.x, p.first.y, p.second.x, p.second.y, paint);
+            // draw lines by computing centers now (handles layout changes)
+            for (Pair<Integer, Integer> p : indexPairs) {
+                int a = p.first;
+                int b = p.second;
+                if (a < 0 || b < 0 || a >= cardViews.size() || b >= cardViews.size()) continue;
+                PointF p1 = centerOfView(cardViews.get(a));
+                PointF p2 = centerOfView(cardViews.get(b));
+                if (p1 != null && p2 != null) {
+                    canvas.drawLine(p1.x, p1.y, p2.x, p2.y, paint);
+                }
             }
         }
     }

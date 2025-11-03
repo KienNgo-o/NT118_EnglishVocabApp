@@ -42,7 +42,8 @@ public class HomeFragment extends Fragment {
         TextView vocabProgress2 = root.findViewById(R.id.text_vocab_progress2);
         TextView quizProgress1 = root.findViewById(R.id.text_quiz_progress);
         TextView quizProgress2 = root.findViewById(R.id.text_quiz_progress2);
-        TextView flashProgress = root.findViewById(R.id.text_flash_sub);
+        TextView flashProgress = root.findViewById(R.id.text_flash_progress);
+        TextView flashProgress2 = root.findViewById(R.id.text_flash_progress2);
         ImageView avatar = root.findViewById(R.id.image_avatar);
         LinearLayout rowDays = root.findViewById(R.id.row_days);
 
