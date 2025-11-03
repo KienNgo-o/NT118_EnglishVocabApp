@@ -96,8 +96,8 @@
                 android:id="@+id/chip_group_type"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:singleSelection="true"
-                android:chipSpacing="12dp"
+                app:singleSelection="true"
+                app:chipSpacing="12dp"
                 app:singleLine="true">
 
                 <com.google.android.material.chip.Chip
