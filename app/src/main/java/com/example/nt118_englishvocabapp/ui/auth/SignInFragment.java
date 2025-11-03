@@ -1,33 +1,76 @@
 package com.example.nt118_englishvocabapp.ui.auth;
 
+// Thêm các import này
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+// Imports cho network
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.nt118_englishvocabapp.MainActivity;
 import com.example.nt118_englishvocabapp.R;
+import com.example.nt118_englishvocabapp.network.ApiService; // Thay package
+import com.example.nt118_englishvocabapp.network.RetrofitClient; // Thay package
+import com.example.nt118_englishvocabapp.network.SessionManager; // Thay package
+import com.example.nt118_englishvocabapp.network.SignInRequest; // Thay package
+import com.example.nt118_englishvocabapp.network.SignInResponse; // Thay package
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 public class SignInFragment extends Fragment {
+
+    // Khai báo views
+    private EditText etUsername, etPassword;
+    private Button btnSignIn;
+    private ProgressBar progressBar;
+    private ApiService apiService;
+    private SessionManager sessionManager;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sign_in, container, false);
 
-        // Nút đăng nhập vào màn MainActivity
-        view.findViewById(R.id.button_sign_in_to_main).setOnClickListener(v -> {
-            // NOTE: no backend yet — accept any input and go to MainActivity so UX can be tested.
-            Intent intent = new Intent(getActivity(), MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
+        // Khởi tạo ApiService và SessionManager
+        apiService = RetrofitClient.getApiService(getContext());
+        sessionManager = SessionManager.getInstance(getContext());
+
+        // Ánh xạ views
+        etUsername = view.findViewById(R.id.input_username); // Thay R.id của bạn
+        etPassword = view.findViewById(R.id.input_password); // Thay R.id của bạn
+        btnSignIn = view.findViewById(R.id.button_sign_in_to_main);
+        //progressBar = view.findViewById(R.id.progress_bar_sign_in); // Thêm ProgressBar vào layout
+        //progressBar.setVisibility(View.GONE); // Ẩn đi lúc đầu
+
+        // Nút đăng nhập
+        btnSignIn.setOnClickListener(v -> {
+            String username = etUsername.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
+
+            if (username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(getContext(), "Vui lòng nhập username và password", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Hiển thị ProgressBar, vô hiệu hoá nút
+            showLoading(true);
+
+            // Gọi API
+            signInUser(username, password);
         });
 
         // Nút chuyển sang màn hình Sign up
@@ -54,6 +97,59 @@ public class SignInFragment extends Fragment {
         fb.setOnClickListener(v -> Toast.makeText(getContext(), "Facebook sign-in not implemented", Toast.LENGTH_SHORT).show());
         g.setOnClickListener(v -> Toast.makeText(getContext(), "Google sign-in not implemented", Toast.LENGTH_SHORT).show());
 
+
         return view;
+    }
+
+    private void signInUser(String username, String password) {
+        SignInRequest request = new SignInRequest(username, password);
+
+        // Retrofit tự động chạy call này trên background thread
+        // và trả kết quả về main thread qua onResponse/onFailure
+        apiService.signIn(request).enqueue(new Callback<SignInResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<SignInResponse> call, @NonNull Response<SignInResponse> response) {
+                showLoading(false); // Ẩn loading
+
+                if (response.isSuccessful() && response.body() != null) {
+                    // Đăng nhập THÀNH CÔNG
+                    SignInResponse signInResponse = response.body();
+
+                    // Lưu token
+                    sessionManager.saveAuthTokens(
+                            signInResponse.getAccessToken(),
+                            signInResponse.getRefreshToken()
+                    );
+
+                    // Chuyển sang MainActivity (logic cũ của bạn đã RẤT TỐT)
+                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+
+                } else {
+                    // Đăng nhập THẤT BẠI (ví dụ: 401 - Sai pass)
+                    Toast.makeText(getContext(), "Username hoặc password không chính xác", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<SignInResponse> call, @NonNull Throwable t) {
+                showLoading(false); // Ẩn loading
+
+                // Lỗi mạng hoặc server sập
+                Log.e("SignInError", "onFailure: " + t.getMessage());
+                Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void showLoading(boolean isLoading) {
+        if (isLoading) {
+//            progressBar.setVisibility(View.VISIBLE);
+            btnSignIn.setEnabled(false);
+        } else {
+      //      progressBar.setVisibility(View.GONE);
+            btnSignIn.setEnabled(true);
+        }
     }
 }

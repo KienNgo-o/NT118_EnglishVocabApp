@@ -3,10 +3,7 @@ package com.example.nt118_englishvocabapp;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import com.example.nt118_englishvocabapp.R;
 
 import com.example.nt118_englishvocabapp.ui.auth.SignInFragment;
 public class LoginActivity extends AppCompatActivity {
@@ -24,9 +21,10 @@ public class LoginActivity extends AppCompatActivity {
                     .replace(R.id.fragment_container_view_auth, new SignInFragment())
                     .commit();
         }
+
     }
 
-    // Fix lỗi logic sau khi trở về Sign In từ CongaratulationDialogFragment
+    // Fix lỗi logic sau khi trở về Sign In từ CongratulationDialogFragment
     public void returnToSignInScreen() {
         // Lấy FragmentManager
         FragmentManager fm = getSupportFragmentManager();

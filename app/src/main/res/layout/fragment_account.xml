@@ -43,22 +43,23 @@
         android:padding="16dp">
 
         <!-- Circular avatar overlapping the top of the card -->
+
+        <!-- Small overlay button that slightly overlaps the bottom of the avatar -->
         <ImageView
             android:id="@+id/img_avatar"
             android:layout_width="112dp"
             android:layout_height="112dp"
-            android:src="@drawable/image_avatar"
-            android:background="@drawable/circle_avatar_bg"
-            android:padding="0dp"
-            android:elevation="10dp"
-
-            android:scaleType="centerCrop"
-            android:clipToOutline="true"
-            android:contentDescription="@string/cd_avatar"
             android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="0dp" />
+            android:layout_marginTop="0dp"
+            android:background="@drawable/circle_avatar_bg"
+            android:clipToOutline="true"
 
-        <!-- Small overlay button that slightly overlaps the bottom of the avatar -->
+            android:contentDescription="@string/cd_avatar"
+            android:elevation="10dp"
+            android:padding="0dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/image_avatar" />
+
         <ImageButton
             android:id="@+id/btn_avatar_action"
             android:layout_width="40dp"
