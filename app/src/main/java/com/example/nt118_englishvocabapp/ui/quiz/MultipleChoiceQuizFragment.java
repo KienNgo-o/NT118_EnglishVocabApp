@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.nt118_englishvocabapp.R;
@@ -95,6 +96,21 @@ public class MultipleChoiceQuizFragment extends Fragment {
         Button btnC = root.findViewById(R.id.btn_answer_c);
         Button btnD = root.findViewById(R.id.btn_answer_d);
 
+        // Ensure default appearance: use the rounded white drawable and remove any theme tint that may turn buttons blue
+        btnA.setBackgroundResource(R.drawable.rounded_white);
+        btnB.setBackgroundResource(R.drawable.rounded_white);
+        btnC.setBackgroundResource(R.drawable.rounded_white);
+        btnD.setBackgroundResource(R.drawable.rounded_white);
+        // Clear any background tint set by theme/styles (use ViewCompat to ensure AppCompat/Material tints are cleared)
+        btnA.setBackgroundTintList(null);
+        btnB.setBackgroundTintList(null);
+        btnC.setBackgroundTintList(null);
+        btnD.setBackgroundTintList(null);
+        ViewCompat.setBackgroundTintList(btnA, null);
+        ViewCompat.setBackgroundTintList(btnB, null);
+        ViewCompat.setBackgroundTintList(btnC, null);
+        ViewCompat.setBackgroundTintList(btnD, null);
+
         // Example: set question/index from resources (could be replaced by ViewModel/data later)
         txtIndex.setText(R.string.question_1_of_3);
         txtQuestion.setText(R.string.question_example);
@@ -106,29 +122,42 @@ public class MultipleChoiceQuizFragment extends Fragment {
 
         // Answer handling: assume answer A is correct for this example
         View.OnClickListener answerClick = v -> {
-            // disable all buttons after selection
-            btnA.setEnabled(false);
-            btnB.setEnabled(false);
-            btnC.setEnabled(false);
-            btnD.setEnabled(false);
+            // Make buttons non-clickable to prevent further clicks (avoid changing enabled state which may trigger theme tint)
+            btnA.setClickable(false);
+            btnB.setClickable(false);
+            btnC.setClickable(false);
+            btnD.setClickable(false);
 
             Button selected = (Button) v;
             // Simple correctness check: btnA is correct
-            boolean isCorrect = selected.getId() == R.id.btn_answer_a;
+            int correctId = R.id.btn_answer_a;
+            boolean isCorrect = selected.getId() == correctId;
+
+            // Reset all buttons to default white so we have deterministic visuals
+            btnA.setBackgroundResource(R.drawable.rounded_white);
+            btnB.setBackgroundResource(R.drawable.rounded_white);
+            btnC.setBackgroundResource(R.drawable.rounded_white);
+            btnD.setBackgroundResource(R.drawable.rounded_white);
+            btnA.setTextColor(ContextCompat.getColor(requireContext(), R.color.dark_purple));
+            btnB.setTextColor(ContextCompat.getColor(requireContext(), R.color.dark_purple));
+            btnC.setTextColor(ContextCompat.getColor(requireContext(), R.color.dark_purple));
+            btnD.setTextColor(ContextCompat.getColor(requireContext(), R.color.dark_purple));
 
             if (isCorrect) {
-                // green background for correct
-                int green = ContextCompat.getColor(requireContext(), R.color.correct_green);
-                selected.setBackgroundColor(green);
+                // mark selected correct
+                selected.setBackgroundResource(R.drawable.answer_button_bg_correct);
                 selected.setTextColor(Color.WHITE);
             } else {
-                // red for wrong, highlight correct one as well
-                int red = ContextCompat.getColor(requireContext(), R.color.incorrect_red);
-                selected.setBackgroundColor(red);
+                // mark selected wrong and highlight correct one
+                selected.setBackgroundResource(R.drawable.answer_button_bg_incorrect);
                 selected.setTextColor(Color.WHITE);
-                int green = ContextCompat.getColor(requireContext(), R.color.correct_green);
-                btnA.setBackgroundColor(green);
-                btnA.setTextColor(Color.WHITE);
+
+                View correctBtn = root.findViewById(correctId);
+                if (correctBtn instanceof Button) {
+                    Button c = (Button) correctBtn;
+                    c.setBackgroundResource(R.drawable.answer_button_bg_correct);
+                    c.setTextColor(Color.WHITE);
+                }
             }
         };
 

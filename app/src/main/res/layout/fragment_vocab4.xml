@@ -16,6 +16,7 @@
         android:layout_weight="2"
         android:orientation="vertical">
 
+        <!-- Top half: toolbar + divider -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -58,9 +59,10 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:background="@color/dark_purple" />
+
         </LinearLayout>
 
-        <!-- Tabs row: mark "Forms" as active -->
+        <!-- Bottom half: tabs row (styled rounded container with active pill) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -70,6 +72,7 @@
             android:padding="6dp"
             android:background="@drawable/tabs_bg">
 
+            <!-- Equal width tabs: use selector for selected / pressed states -->
             <TextView
                 android:id="@+id/tab_definition"
                 android:layout_width="0dp"
@@ -125,7 +128,7 @@
 
     </LinearLayout>
 
-    <!-- Lower part: only keep word and wordType -->
+    <!-- Lower container: fixed word row (like vocab3) + scrollable cards -->
     <LinearLayout
         android:id="@+id/lower_container"
         android:layout_width="match_parent"
@@ -134,46 +137,201 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Word row (placed same as fragment_vocab3) -->
         <LinearLayout
-            android:id="@+id/content_basic"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:baselineAligned="false"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/wordText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Watermelon"
+                android:textColor="@color/purple_700"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/wordType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/word_type_bg"
+                android:paddingStart="12dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="6dp"
+                android:text="Noun"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <!-- orange line to the right of the pill (same as fragment_vocab3) -->
+            <View
+                android:layout_width="120dp"
+                android:layout_height="6dp"
+                android:layout_marginStart="-5dp"
+                android:layout_marginTop="0dp"
+                android:background="@drawable/orange_line" />
+
+        </LinearLayout>
+
+        <!-- Scrollable card area below the fixed word row -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:baselineAligned="false"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:paddingTop="12dp"
+                android:paddingBottom="24dp">
 
-                <TextView
-                    android:id="@+id/wordText"
-                    android:layout_width="0dp"
+                <!-- Example card 1 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Watermelon"
-                    android:textColor="@color/purple_700"
-                    android:textSize="28sp"
-                    android:textStyle="bold" />
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@android:color/white">
 
-                <TextView
-                    android:id="@+id/wordType"
-                    android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <!-- Header: centered pill with lines to both sides -->
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="6dp">
+
+                            <View
+                                android:id="@+id/line_left_1"
+                                android:layout_width="match_parent"
+                                android:layout_height="6dp"
+                                android:layout_centerVertical="true"
+                                android:layout_toStartOf="@+id/pill_1"
+                                android:layout_marginEnd="8dp"
+                                android:background="@color/dark_purple" />
+
+                            <TextView
+                                android:id="@+id/pill_1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="32dp"
+                                android:layout_centerInParent="true"
+                                android:background="@drawable/rounded_rect_purple"
+                                android:gravity="center"
+                                android:paddingLeft="18dp"
+                                android:paddingRight="18dp"
+                                android:text="Động từ (Verb)"
+                                android:textColor="@android:color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <View
+                                android:id="@+id/line_right_1"
+                                android:layout_width="match_parent"
+                                android:layout_height="6dp"
+                                android:layout_centerVertical="true"
+                                android:layout_toEndOf="@+id/pill_1"
+                                android:layout_marginStart="8dp"
+                                android:background="@color/dark_purple" />
+
+                        </RelativeLayout>
+
+                        <!-- Body content -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="None."
+                            android:textColor="@color/purple_700"
+                            android:textSize="16sp"
+                            android:layout_marginTop="8dp"
+                            android:paddingBottom="8dp" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Example card 2 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/word_type_bg"
-                    android:paddingStart="12dp"
-                    android:paddingTop="6dp"
-                    android:paddingEnd="12dp"
-                    android:paddingBottom="6dp"
-                    android:text="Noun"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@android:color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="6dp">
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="6dp"
+                                android:layout_centerVertical="true"
+                                android:layout_toStartOf="@+id/pill_2"
+                                android:layout_marginEnd="8dp"
+                                android:background="@color/dark_purple" />
+
+                            <TextView
+                                android:id="@+id/pill_2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="32dp"
+                                android:layout_centerInParent="true"
+                                android:background="@drawable/rounded_rect_purple"
+                                android:gravity="center"
+                                android:paddingLeft="18dp"
+                                android:paddingRight="18dp"
+                                android:text="Tính từ (Adjective)"
+                                android:textColor="@android:color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="6dp"
+                                android:layout_centerVertical="true"
+                                android:layout_toEndOf="@+id/pill_2"
+                                android:layout_marginStart="8dp"
+                                android:background="@color/dark_purple" />
+
+                        </RelativeLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="None."
+                            android:textColor="@color/purple_700"
+                            android:textSize="16sp"
+                            android:layout_marginTop="8dp"
+                            android:paddingBottom="8dp" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Additional cards can be added here dynamically if needed -->
 
             </LinearLayout>
 
-        </LinearLayout>
+        </ScrollView>
 
     </LinearLayout>
 

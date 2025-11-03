@@ -1,4 +1,3 @@
-// app/src/main/java/com/example/nt118_englishvocabapp/ui/flashcard/FlashcardFragment.java
 package com.example.nt118_englishvocabapp.ui.flashcard;
 
 import android.graphics.Rect;
@@ -7,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,44 +60,79 @@ public class FlashcardFragment extends Fragment {
             keyboardRootView.getViewTreeObserver().addOnGlobalLayoutListener(keyboardListener);
         }
 
-        binding.searchFlashcard.setOnClickListener(v -> {
-            String q = binding.searchEditText.getText().toString().trim().toLowerCase();
+        // prepare arrays of cards and labels
+        View[] cards = new View[] {
+                binding.cardFlash1, binding.cardFlash2, binding.cardFlash3,
+                binding.cardFlash4, binding.cardFlash5, binding.cardFlash6
+        };
+
+        TextView[] labels = new TextView[] {
+                binding.txtFlash1, binding.txtFlash2, binding.txtFlash3,
+                binding.txtFlash4, binding.txtFlash5, binding.txtFlash6
+        };
+
+        // perform search logic now extracted to method-like lambda
+        Runnable[] noop = new Runnable[1]; // holder for closure use if needed (not used)
+        java.util.function.BiConsumer<String, View> performSearch = (queryRaw, triggerView) -> {
+            String q = queryRaw == null ? "" : queryRaw.trim().toLowerCase();
             if (q.isEmpty()) {
+                // show all cards and show keyboard for further input
+                for (View c : cards) if (c != null) c.setVisibility(View.VISIBLE);
                 KeyboardUtils.showKeyboard(requireActivity(), binding.searchEditText);
                 return;
             }
 
-            View[] cards = new View[] {
-                    binding.cardFlash1, binding.cardFlash2, binding.cardFlash3,
-                    binding.cardFlash4, binding.cardFlash5, binding.cardFlash6
-            };
-
-            TextView[] labels = new TextView[] {
-                    binding.txtFlash1, binding.txtFlash2, binding.txtFlash3,
-                    binding.txtFlash4, binding.txtFlash5, binding.txtFlash6
-            };
-
-            int found = -1;
+            int matchCount = 0;
+            int firstMatch = -1;
             for (int i = 0; i < labels.length; i++) {
-                if (labels[i] != null && labels[i].getText().toString().toLowerCase().contains(q)) {
-                    found = i;
-                    break;
+                TextView lbl = labels[i];
+                View card = cards[i];
+                if (lbl != null && card != null) {
+                    String title = lbl.getText().toString().toLowerCase();
+                    if (title.contains(q)) {
+                        card.setVisibility(View.VISIBLE);
+                        if (firstMatch == -1) firstMatch = i;
+                        matchCount++;
+                    } else {
+                        card.setVisibility(View.GONE);
+                    }
                 }
             }
 
-            if (found >= 0) {
+            if (matchCount == 0) {
+                // hide keyboard and restore UI then show toast
                 keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
-                        requireActivity(), v, keyboardRootView, keyboardListener);
-                View target = cards[found];
-                binding.scrollTopics.post(() -> {
-                    int top = target.getTop();
-                    binding.scrollTopics.smoothScrollTo(0, top);
-                    target.animate().alpha(0.9f).setDuration(120).withEndAction(() ->
-                            target.animate().alpha(1f).setDuration(120));
-                });
-            } else {
+                        requireActivity(), triggerView, keyboardRootView, keyboardListener);
                 Toast.makeText(requireContext(), "No topic found: " + q, Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            // if we have matches, hide keyboard and scroll to first match with animation
+            keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
+                    requireActivity(), triggerView, keyboardRootView, keyboardListener);
+            final View target = cards[firstMatch];
+            binding.scrollTopics.post(() -> {
+                int top = target.getTop();
+                binding.scrollTopics.smoothScrollTo(0, top);
+                target.animate().alpha(0.9f).setDuration(120).withEndAction(() ->
+                        target.animate().alpha(1f).setDuration(120));
+            });
+        };
+
+        // click on search icon
+        binding.searchFlashcard.setOnClickListener(v -> {
+            String q = binding.searchEditText.getText().toString();
+            performSearch.accept(q, v);
+        });
+
+        // IME search action
+        binding.searchEditText.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                String q = binding.searchEditText.getText().toString();
+                performSearch.accept(q, binding.searchFlashcard);
+                return true;
+            }
+            return false;
         });
 
         binding.searchEditText.setOnClickListener(v -> KeyboardUtils.showKeyboard(requireActivity(), binding.searchEditText));
@@ -107,10 +142,18 @@ public class FlashcardFragment extends Fragment {
                     requireActivity(), v, keyboardRootView, keyboardListener);
         });
 
+        // Make sure to return to home fragment properly
         binding.btnReturn.setOnClickListener(v -> {
             keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
                     requireActivity(), v, keyboardRootView, keyboardListener);
 
+            // prefer using MainActivity helper to keep BottomNavigationView state in sync
+            if (requireActivity() instanceof com.example.nt118_englishvocabapp.MainActivity) {
+                ((com.example.nt118_englishvocabapp.MainActivity) requireActivity()).navigateToHome();
+                return;
+            }
+
+            // fallback (should rarely run)
             if (getParentFragmentManager().getBackStackEntryCount() > 0) {
                 getParentFragmentManager().popBackStack();
             } else {

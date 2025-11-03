@@ -38,7 +38,7 @@
     <string name="sign_up_heading">Create an Account</string>
     <string name="username_label">Username</string>
     <string name="username_hint">Name</string>
-    <string name="sign_in_prompt">Already you member? Login</string>
+    <string name="sign_in_prompt">Already our member? Login</string>
 
     <!-- Added for vocab fragments -->
     <string name="title_vocabulary">Vocabulary</string>
@@ -75,6 +75,7 @@
 
     <!-- Quiz / Multiple choice strings -->
     <string name="title_quiz">Quiz</string>
+    <string name="title_quiz_stationery">Quiz - Stationery</string>
     <string name="question_1_of_3">Question 1 of 3</string>
     <string name="question_example">Which word matches the meaning: &quot;A large, juicy fruit&quot;?</string>
     <string name="answer_a">Watermelon</string>

@@ -1,19 +1,23 @@
 // java
 package com.example.nt118_englishvocabapp.ui.vocab2;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.databinding.FragmentVocab2Binding;
 import com.example.nt118_englishvocabapp.ui.vocab3.VocabFragment3;
 import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,7 +97,12 @@ public class VocabFragment2 extends Fragment {
 
         // Standardized return behavior: fall back to finishing the activity if no backstack
         ReturnButtonHelper.bind(binding.getRoot(), this, null, () -> requireActivity().finish());
-
+        View btnReturn = root.findViewById(R.id.btn_return);
+        if (btnReturn != null) {
+            btnReturn.setOnClickListener(v -> {
+                getParentFragmentManager().popBackStack();
+            });
+        }
         Toast.makeText(getContext(), "Vocab Fragment 2 Opened!", Toast.LENGTH_SHORT).show();
         return root;
     }

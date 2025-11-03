@@ -140,16 +140,28 @@ public class VocabFragment extends Fragment {
             );
         };
 
-        Runnable fallback = () -> {
-            if (!isAdded()) return;
-            AppCompatActivity activity = (AppCompatActivity) requireActivity();
-            activity.getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.frame_layout, new HomeFragment())
-                    .commitAllowingStateLoss();
-        };
+        // Make sure to return to home fragment properly
+        binding.btnReturn.setOnClickListener(v -> {
+            keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
+                    requireActivity(), v, keyboardRootView, keyboardListener);
 
-        ReturnButtonHelper.bind(binding.getRoot(), this, preClick, fallback);
+            // prefer using MainActivity helper to keep BottomNavigationView state in sync
+            if (requireActivity() instanceof com.example.nt118_englishvocabapp.MainActivity) {
+                ((com.example.nt118_englishvocabapp.MainActivity) requireActivity()).navigateToHome();
+                return;
+            }
+
+            // fallback (should rarely run)
+            if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                getParentFragmentManager().popBackStack();
+            } else {
+                AppCompatActivity activity = (AppCompatActivity) requireActivity();
+                activity.getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.frame_layout, new com.example.nt118_englishvocabapp.ui.home.HomeFragment())
+                        .commitAllowingStateLoss();
+            }
+        });
 
         // individual card clicks handled by adapter callback
 
@@ -185,12 +197,13 @@ public class VocabFragment extends Fragment {
             frag.setArguments(args);
 
             AppCompatActivity activity = (AppCompatActivity) requireActivity();
+            String backStackName = "VocabFragment2_BackStack"; // make a named back stack entry
             activity.getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.frame_layout, frag)
-                    .addToBackStack(null)
+                    // Instead of addToBackStack(null), using a named back stack entry
+                    .addToBackStack(backStackName)
                     .commitAllowingStateLoss();
-
         } catch (Exception e) {
             Log.e(TAG, "Navigation error while opening topic " + index, e);
             Toast.makeText(requireContext(), "Navigation error: " + e.getClass().getSimpleName() + " - " + e.getMessage(), Toast.LENGTH_LONG).show();

@@ -25,4 +25,10 @@
     <color name="correct_green">#2E7D32</color>
     <color name="incorrect_red">#C62828</color>
 
+    <!-- Added for vocab5 -->
+    <color name="green_700">#2E7D32</color>
+    <color name="light_divider">#E8E8F0</color>
+    <color name="dark">#304046</color>
+
+
 </resources>

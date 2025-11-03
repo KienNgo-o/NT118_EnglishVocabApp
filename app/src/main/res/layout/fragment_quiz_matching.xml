@@ -139,6 +139,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:alignmentMode="alignMargins"
+                android:columnOrderPreserved="false"
                 android:columnCount="2"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
@@ -148,104 +149,136 @@
                 <!-- Example: 8 cards (left/right matching). Texts are placeholder and can be set in code -->
                 <Button
                     android:id="@+id/card_1"
+                    android:tag="p1"
                     style="@style/Widget.AppCompat.Button"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_columnWeight="1"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
                     android:background="@drawable/rounded_white"
+                    android:backgroundTint="@null"
+                    app:backgroundTint="@null"
                     android:text="Metrics"
                     android:textAllCaps="false"
                     android:textColor="@color/dark_purple" />
 
                 <Button
                     android:id="@+id/card_2"
+                    android:tag="p1"
                     style="@style/Widget.AppCompat.Button"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_columnWeight="1"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
+                    android:layout_marginStart="8dp"
                     android:background="@drawable/rounded_white"
+                    android:backgroundTint="@null"
+                    app:backgroundTint="@null"
                     android:text="Số liệu"
                     android:textAllCaps="false"
                     android:textColor="@color/dark_purple" />
 
                 <Button
                     android:id="@+id/card_3"
+                    android:tag="p2"
                     style="@style/Widget.AppCompat.Button"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_columnWeight="1"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
                     android:background="@drawable/rounded_white"
+                    android:backgroundTint="@null"
+                    app:backgroundTint="@null"
                     android:text="Algorithm"
                     android:textAllCaps="false"
                     android:textColor="@color/dark_purple" />
 
                 <Button
                     android:id="@+id/card_4"
+                    android:tag="p3"
                     style="@style/Widget.AppCompat.Button"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_columnWeight="1"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
+                    android:layout_marginStart="8dp"
                     android:background="@drawable/rounded_white"
+                    android:backgroundTint="@null"
+                    app:backgroundTint="@null"
                     android:text="Vật thể"
                     android:textAllCaps="false"
                     android:textColor="@color/dark_purple" />
 
                 <Button
                     android:id="@+id/card_5"
+                    android:tag="p3"
                     style="@style/Widget.AppCompat.Button"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_columnWeight="1"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
                     android:background="@drawable/rounded_white"
+                    android:backgroundTint="@null"
+                    app:backgroundTint="@null"
                     android:text="Object"
                     android:textAllCaps="false"
                     android:textColor="@color/dark_purple" />
 
                 <Button
                     android:id="@+id/card_6"
+                    android:tag="p2"
                     style="@style/Widget.AppCompat.Button"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_columnWeight="1"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
+                    android:layout_marginStart="8dp"
                     android:background="@drawable/rounded_white"
+                    android:backgroundTint="@null"
+                    app:backgroundTint="@null"
                     android:text="Thuật toán"
                     android:textAllCaps="false"
                     android:textColor="@color/dark_purple" />
 
                 <Button
                     android:id="@+id/card_7"
+                    android:tag="p4"
                     style="@style/Widget.AppCompat.Button"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_columnWeight="1"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
                     android:background="@drawable/rounded_white"
+                    android:backgroundTint="@null"
+                    app:backgroundTint="@null"
                     android:text="Object"
                     android:textAllCaps="false"
                     android:textColor="@color/dark_purple" />
 
                 <Button
                     android:id="@+id/card_8"
+                    android:tag="p4"
                     style="@style/Widget.AppCompat.Button"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_columnWeight="1"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
+                    android:layout_marginStart="8dp"
                     android:background="@drawable/rounded_white"
+                    android:backgroundTint="@null"
+                    app:backgroundTint="@null"
                     android:text="Thuật toán"
                     android:textAllCaps="false"
                     android:textColor="@color/dark_purple" />
@@ -262,13 +295,15 @@
         </FrameLayout>
 
         <!-- 4) Confirm button -->
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_confirm"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
             android:text="@string/confirm"
-            android:background="@drawable/rounded_white"
+            android:background="@drawable/rounded_orange"
+            android:backgroundTint="@null"
+            app:backgroundTint="@null"
             android:textAllCaps="false"
             android:textColor="@color/white" />
 
