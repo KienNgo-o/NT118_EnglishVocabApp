@@ -13,15 +13,18 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.databinding.FragmentFlashcardBinding;
 import com.example.nt118_englishvocabapp.util.KeyboardUtils;
-
+import com.example.nt118_englishvocabapp.adapters.TopicAdapter;
 public class FlashcardFragment extends Fragment {
 
     private FragmentFlashcardBinding binding;
-    private View keyboardRootView;
+    private FlashcardViewModel viewModel;
+    private TopicAdapter topicAdapter;
+    //private View keyboardRootView;
     private ViewTreeObserver.OnGlobalLayoutListener keyboardListener;
 
     @Override
@@ -29,6 +32,7 @@ public class FlashcardFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentFlashcardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        viewModel = new ViewModelProvider(this).get(FlashcardViewModel.class);
         Toast.makeText(getContext(), "Flashcard Fragment Opened!", Toast.LENGTH_SHORT).show();
         // stable root for keyboard detection
         if (getActivity() != null) {

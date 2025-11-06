@@ -56,4 +56,8 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
     implementation("com.google.code.gson:gson:2.8.9")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    // ViewModel & LiveData
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.8.0")
+// Kiểm tra version mới nhất
+    implementation("androidx.lifecycle:lifecycle-livedata:2.8.0")
 }
