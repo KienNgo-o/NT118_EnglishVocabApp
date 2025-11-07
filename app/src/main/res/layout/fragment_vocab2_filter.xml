@@ -1,32 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="24dp"
-    android:background="@android:color/transparent">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_container_filter2"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="24dp"
         android:gravity="center"
+        app:cardBackgroundColor="@android:color/transparent"
         app:cardCornerRadius="16dp"
         app:cardElevation="10dp"
         app:cardUseCompatPadding="true"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="379dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:background="@android:color/white"
             android:gravity="center"
-            android:padding="20dp"
-            android:background="@android:color/white">
+            android:orientation="vertical"
+            android:padding="20dp">
 
             <!-- Header: close icon + title centered -->
             <RelativeLayout
@@ -40,36 +38,38 @@
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:background="@drawable/close"
-                    android:contentDescription="close" />
+                    android:contentDescription="@string/cd_close_filter" />
 
                 <TextView
                     android:id="@+id/title_filter2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:text="Search Filter"
+                    android:text="@string/title_search_filter"
+                    android:textColor="#222222"
                     android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#222222" />
+                    android:textStyle="bold" />
             </RelativeLayout>
 
-            <Space android:layout_width="match_parent" android:layout_height="8dp" />
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="8dp" />
 
             <!-- Saved row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/label_saved_2"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="Saved"
-                    android:textSize="14sp"
-                    android:textColor="#222222" />
+                    android:layout_weight="1"
+                    android:text="@string/label_favorite"
+                    android:textColor="#222222"
+                    android:textSize="14sp" />
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/switch_saved_2"
@@ -79,102 +79,106 @@
                     android:trackTint="@color/teal_200" />
             </LinearLayout>
 
-            <Space android:layout_width="match_parent" android:layout_height="16dp" />
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="16dp" />
 
             <!-- Type label -->
             <TextView
                 android:id="@+id/label_type"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Type"
-                android:textSize="14sp"
+                android:paddingBottom="8dp"
+                android:text="@string/label_type"
                 android:textColor="#222222"
-                android:paddingBottom="8dp" />
+                android:textSize="14sp" />
 
             <!-- Type chips -->
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chip_group_type"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:singleSelection="true"
                 app:chipSpacing="12dp"
-                app:singleLine="true">
+                app:singleLine="true"
+                app:singleSelection="true">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_noun"
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:text="Noun"
-                    android:textColor="#ffffff"
                     android:checked="true"
+                    android:text="@string/noun"
+                    android:textColor="#ffffff"
+                    app:checkedIconVisible="false"
                     app:chipBackgroundColor="@color/purple_700"
-                    app:chipCornerRadius="8dp"
-                    app:checkedIconVisible="false" />
+                    app:chipCornerRadius="8dp" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_verb"
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:text="Verb"
+                    android:text="@string/verb"
                     android:textColor="#8a8a8a"
+                    app:checkedIconVisible="false"
                     app:chipBackgroundColor="#F2F2F7"
-                    app:chipCornerRadius="8dp"
-                    app:checkedIconVisible="false" />
+                    app:chipCornerRadius="8dp" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_adjective"
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:text="Adjective"
+                    android:text="@string/adjective"
                     android:textColor="#8a8a8a"
+                    app:checkedIconVisible="false"
                     app:chipBackgroundColor="#F2F2F7"
-                    app:chipCornerRadius="8dp"
-                    app:checkedIconVisible="false" />
+                    app:chipCornerRadius="8dp" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_adverb"
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:text="Adverb"
+                    android:text="@string/adverb"
                     android:textColor="#8a8a8a"
+                    app:checkedIconVisible="false"
                     app:chipBackgroundColor="#F2F2F7"
-                    app:chipCornerRadius="8dp"
-                    app:checkedIconVisible="false" />
+                    app:chipCornerRadius="8dp" />
             </com.google.android.material.chip.ChipGroup>
 
-            <Space android:layout_width="match_parent" android:layout_height="20dp" />
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
 
             <!-- Bottom actions -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_clear_filter2"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="44dp"
-                    android:text="Clear"
-                    android:textColor="@color/purple_700"
+                    android:layout_marginEnd="12dp"
+                    android:layout_weight="1"
                     android:strokeWidth="2"
-                    app:strokeColor="@color/purple_700"
-                    android:layout_marginEnd="12dp" />
+                    android:text="@string/btn_clear"
+                    android:textColor="@color/purple_700"
+                    app:strokeColor="@color/purple_700" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_apply_filter2"
                     android:layout_width="0dp"
-                    android:layout_weight="2"
                     android:layout_height="44dp"
-                    android:text="Apply Filter"
-                    android:textColor="#FFFFFF"
-                    android:backgroundTint="@color/purple_700" />
+                    android:layout_weight="2"
+                    android:backgroundTint="@color/purple_700"
+                    android:text="@string/btn_apply_filter"
+                    android:textColor="#FFFFFF" />
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

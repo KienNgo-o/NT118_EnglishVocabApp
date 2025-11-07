@@ -1,12 +1,10 @@
 // java
 package com.example.nt118_englishvocabapp.ui.vocab2;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,7 +15,6 @@ import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.databinding.FragmentVocab2Binding;
 import com.example.nt118_englishvocabapp.ui.vocab3.VocabFragment3;
 import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -92,19 +89,79 @@ public class VocabFragment2 extends Fragment {
             adapter.updateList(filtered);
         });
 
-        // Filter icon - simple feedback for now
-        binding.filter.setOnClickListener(v -> Toast.makeText(requireContext(), "Filter clicked", Toast.LENGTH_SHORT).show());
+        // Listen for filter results from the vocab2 filter dialog (same key as VocabFragment)
+        getParentFragmentManager().setFragmentResultListener("vocabFilter", this, (requestKey, bundle) -> {
+            if (bundle == null) return;
+            boolean savedOnly = bundle.getBoolean("savedOnly", false);
+            String difficulty = bundle.getString("difficulty", null);
+            applyFilters(savedOnly, difficulty);
+        });
+
+        // Filter icon - show vocab2 filter bottom sheet
+        binding.filter.setOnClickListener(v -> {
+            // Show the vocab2 FilterDialog (bottom sheet)
+            FilterDialog filterSheet = new FilterDialog();
+            try {
+                if (getActivity() != null) {
+                    filterSheet.show(getActivity().getSupportFragmentManager(), "Vocab2FilterSheet");
+                } else {
+                    filterSheet.show(getParentFragmentManager(), "Vocab2FilterSheet");
+                }
+            } catch (Exception e) {
+                Toast.makeText(requireContext(), "Error opening filter: " + e.getClass().getSimpleName(), Toast.LENGTH_LONG).show();
+            }
+        });
 
         // Standardized return behavior: fall back to finishing the activity if no backstack
         ReturnButtonHelper.bind(binding.getRoot(), this, null, () -> requireActivity().finish());
         View btnReturn = root.findViewById(R.id.btn_return);
         if (btnReturn != null) {
-            btnReturn.setOnClickListener(v -> {
-                getParentFragmentManager().popBackStack();
-            });
+            btnReturn.setOnClickListener(v -> getParentFragmentManager().popBackStack());
         }
         Toast.makeText(getContext(), "Vocab Fragment 2 Opened!", Toast.LENGTH_SHORT).show();
         return root;
+    }
+
+    private void applyFilters(boolean savedOnly, String difficulty) {
+        if (fullTopics == null) return;
+        List<Topic> filtered = new ArrayList<>();
+
+        String wantedForm = difficulty == null ? null : difficulty.trim().toLowerCase();
+
+        for (Topic t : fullTopics) {
+            boolean matchesSaved = !savedOnly || t.isFavorite(); // treat favorite as "saved"
+
+            boolean matchesForm = true;
+            if (wantedForm != null && !wantedForm.isEmpty()) {
+                String normalized = normalizeWordForm(t.getWordType());
+                matchesForm = normalized != null && normalized.equals(wantedForm.toLowerCase());
+            }
+
+            if (matchesSaved && matchesForm) filtered.add(t);
+        }
+
+        adapter.updateList(filtered);
+        String label = "Filters applied";
+        if (savedOnly) label += ": favorite";
+        if (difficulty != null) label += ", form=" + difficulty;
+        Toast.makeText(requireContext(), label, Toast.LENGTH_SHORT).show();
+    }
+
+    // Normalize examples like "(n.)", "n.", "noun", "(adj.)" into: "noun","verb","adjective","adverb".
+    private String normalizeWordForm(String raw) {
+        if (raw == null) return null;
+        String s = raw.toLowerCase().replaceAll("[^a-z]", ""); // remove non-letters
+        if (s.isEmpty()) return null;
+        if (s.startsWith("n")) return "noun"; // covers n, noun
+        if (s.startsWith("v")) return "verb"; // covers v, verb
+        if (s.startsWith("adj")) return "adjective"; // covers adj, adjective
+        if (s.startsWith("adv")) return "adverb"; // covers adv, adverb
+        // fallback: try full words
+        if (s.contains("noun")) return "noun";
+        if (s.contains("verb")) return "verb";
+        if (s.contains("adjective")) return "adjective";
+        if (s.contains("adverb")) return "adverb";
+        return s; // return whatever remains
     }
 
     @Override

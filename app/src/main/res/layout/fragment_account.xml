@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_purple"
+    android:background="@color/screen_background"
     android:orientation="vertical"
     android:weightSum="10"
     tools:context=".ui.vocab.VocabFragment">
@@ -80,6 +80,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="56dp"
+            app:cardBackgroundColor="@color/card_background"
             app:cardCornerRadius="20dp"
             app:cardUseCompatPadding="true"
             app:cardElevation="6dp">
@@ -106,7 +107,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/account_name"
                         android:textAlignment="center"
-                        android:textColor="#111214"
+                        android:textColor="@color/text_primary"
                         android:textStyle="bold"
                         android:textSize="18sp" />
 
@@ -116,7 +117,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/account_email"
                         android:textAlignment="center"
-                        android:textColor="#7A7A7A"
+                        android:textColor="@color/text_secondary"
                         android:textSize="13sp"
                         android:layout_marginTop="6dp" />
 
@@ -165,7 +166,7 @@
                                     android:layout_width="28dp"
                                     android:layout_height="28dp"
                                     android:src="@drawable/profile"
-                                    app:tint="#4C4C4C"
+                                    app:tint="@color/row_icon_tint"
                                     android:contentDescription="@string/cd_edit" />
 
                                 <TextView
@@ -175,7 +176,7 @@
                                     android:layout_weight="1"
                                     android:layout_marginStart="14dp"
                                     android:text="@string/edit_profile"
-                                    android:textColor="#111214"
+                                    android:textColor="@color/text_primary"
                                     android:textSize="15sp" />
 
                                 <ImageView
@@ -183,7 +184,7 @@
                                     android:layout_width="22dp"
                                     android:layout_height="22dp"
                                     android:src="@drawable/see_more"
-                                    app:tint="#7A7A7A"
+                                    app:tint="@color/text_secondary"
                                     android:contentDescription="@string/cd_chevron" />
 
                             </LinearLayout>
@@ -195,6 +196,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
+                                app:cardBackgroundColor="@color/card_background"
                                 android:visibility="gone"
                                 app:cardCornerRadius="12dp"
                                 app:cardElevation="4dp"
@@ -204,7 +206,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical"
-                                    android:padding="12dp">
+                                    android:padding="16dp">
 
                                     <TextView
                                         android:id="@+id/expanded_card_title"
@@ -213,68 +215,75 @@
                                         android:text="@string/edit_profile"
                                         android:textStyle="bold"
                                         android:textSize="16sp"
-                                        android:textColor="#111214"
-                                        android:paddingBottom="8dp" />
+                                        android:textColor="@color/text_primary"
+                                        android:paddingBottom="12dp" />
 
                                     <!-- Username row -->
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="Username"
+                                        android:text="@string/username_label"
                                         android:textSize="12sp"
-                                        android:textColor="#7A7A7A" />
+                                        android:textColor="@color/text_secondary"
+                                        android:layout_marginTop="8dp" />
 
                                     <EditText
                                         android:id="@+id/expanded_username"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:inputType="textPersonName"
-                                        android:hint="Enter your name"
+                                        android:hint="@string/hint_enter_name"
                                         android:textSize="14sp"
-                                        android:textColor="#111214"
-                                        android:paddingTop="6dp"
-                                        android:paddingBottom="10dp"
-                                        android:background="@android:drawable/edit_text"
+                                        android:textColor="@color/text_primary"
+                                        android:textColorHint="@color/text_secondary"
+                                        android:layout_marginTop="4dp"
+                                        android:layout_marginBottom="12dp"
+                                        android:background="@drawable/edit_text_bg"
                                         android:paddingLeft="8dp"
-                                        android:paddingRight="8dp" />
+                                        android:paddingRight="8dp"
+                                        android:autofillHints="name" />
 
                                     <!-- Email row -->
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="Email"
+                                        android:text="@string/email_label"
                                         android:textSize="12sp"
-                                        android:textColor="#7A7A7A" />
+                                        android:textColor="@color/text_secondary"
+                                        android:layout_marginTop="8dp" />
 
                                     <EditText
                                         android:id="@+id/expanded_email"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:inputType="textEmailAddress"
-                                        android:hint="you@example.com"
+                                        android:hint="@string/hint_email"
                                         android:textSize="14sp"
-                                        android:textColor="#111214"
-                                        android:paddingTop="6dp"
-                                        android:paddingBottom="10dp"
-                                        android:background="@android:drawable/edit_text"
+                                        android:textColor="@color/text_primary"
+                                        android:textColorHint="@color/text_secondary"
+                                        android:layout_marginTop="4dp"
+                                        android:layout_marginBottom="12dp"
+                                        android:background="@drawable/edit_text_bg"
                                         android:paddingLeft="8dp"
-                                        android:paddingRight="8dp" />
+                                        android:paddingRight="8dp"
+                                        android:autofillHints="emailAddress" />
 
                                     <!-- Password row -->
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="Password"
+                                        android:text="@string/password_label"
                                         android:textSize="12sp"
-                                        android:textColor="#7A7A7A" />
+                                        android:textColor="@color/text_secondary"
+                                        android:layout_marginTop="8dp" />
 
                                     <LinearLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:orientation="horizontal"
                                         android:gravity="center_vertical"
-                                        android:paddingTop="6dp"
-                                        android:paddingBottom="8dp">
+                                        android:layout_marginTop="4dp"
+                                        android:layout_marginBottom="12dp">
 
                                         <EditText
                                             android:id="@+id/expanded_password"
@@ -282,20 +291,23 @@
                                             android:layout_height="wrap_content"
                                             android:layout_weight="1"
                                             android:inputType="textPassword"
-                                            android:hint="Enter password"
+                                            android:hint="@string/hint_password"
                                             android:textSize="14sp"
-                                            android:textColor="#111214"
-                                            android:background="@android:drawable/edit_text"
+                                            android:textColor="@color/text_primary"
+                                            android:textColorHint="@color/text_secondary"
+                                            android:background="@drawable/edit_text_bg"
                                             android:paddingLeft="8dp"
                                             android:paddingTop="8dp"
                                             android:paddingBottom="8dp"
-                                            android:paddingRight="8dp" />
+                                            android:paddingRight="8dp"
+                                            android:autofillHints="password" />
 
                                         <ImageButton
                                             android:id="@+id/expanded_password_toggle"
                                             android:layout_width="42dp"
                                             android:layout_height="42dp"
                                             android:layout_marginStart="8dp"
+                                            android:layout_gravity="center_vertical"
                                             android:background="?attr/selectableItemBackgroundBorderless"
                                             android:src="@drawable/eye_closed"
                                             android:contentDescription="@string/toggle_password_visibility"
@@ -310,18 +322,20 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/apply"
-                                        android:textColor="#2A7BFF"
+                                        android:textColor="@color/blue_button"
                                         android:textSize="14sp"
                                         android:layout_gravity="end"
-                                        android:paddingTop="6dp"
+                                        android:layout_marginTop="12dp"
+                                        android:paddingLeft="12dp"
+                                        android:paddingRight="12dp"
+                                        android:paddingTop="8dp"
+                                        android:paddingBottom="8dp"
                                         android:clickable="true"
                                         android:focusable="true" />
 
                                 </LinearLayout>
 
                             </androidx.cardview.widget.CardView>
-
-                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F1F1" />
 
                             <LinearLayout
                                 android:id="@+id/row_notifications"
@@ -336,7 +350,7 @@
                                     android:layout_width="28dp"
                                     android:layout_height="28dp"
                                     android:src="@drawable/notification"
-                                    app:tint="#4C4C4C"
+                                    app:tint="@color/row_icon_tint"
                                     android:contentDescription="@string/cd_notifications" />
 
                                 <TextView
@@ -345,7 +359,7 @@
                                     android:layout_weight="1"
                                     android:layout_marginStart="14dp"
                                     android:text="@string/notifications_label"
-                                    android:textColor="#111214"
+                                    android:textColor="@color/text_primary"
                                     android:textSize="15sp" />
 
                                 <ImageView
@@ -353,7 +367,7 @@
                                     android:layout_width="22dp"
                                     android:layout_height="22dp"
                                     android:src="@drawable/see_more"
-                                    app:tint="#7A7A7A"
+                                    app:tint="@color/text_secondary"
                                     android:contentDescription="@string/cd_chevron" />
 
                             </LinearLayout>
@@ -365,6 +379,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
+                                app:cardBackgroundColor="@color/card_background"
                                 android:visibility="gone"
                                 app:cardCornerRadius="12dp"
                                 app:cardElevation="4dp"
@@ -392,7 +407,7 @@
                                             android:text="@string/notifications_label"
                                             android:textSize="16sp"
                                             android:textStyle="bold"
-                                            android:textColor="#111214" />
+                                            android:textColor="@color/text_primary" />
 
                                         <androidx.appcompat.widget.SwitchCompat
                                             android:id="@+id/switch_notifications_toggle"
@@ -440,7 +455,7 @@
 
                             </androidx.cardview.widget.CardView>
 
-                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F1F1" />
+                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -452,7 +467,7 @@
                                     android:layout_width="28dp"
                                     android:layout_height="28dp"
                                     android:src="@drawable/language"
-                                    app:tint="#4C4C4C"
+                                    app:tint="@color/row_icon_tint"
                                     android:contentDescription="@string/cd_language" />
 
                                 <TextView
@@ -461,20 +476,20 @@
                                     android:layout_weight="1"
                                     android:layout_marginStart="14dp"
                                     android:text="@string/language_label"
-                                    android:textColor="#111214"
+                                    android:textColor="@color/text_primary"
                                     android:textSize="15sp" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/english_us"
-                                    android:textColor="#2A7BFF"
+                                    android:textColor="@color/blue_button"
                                     android:textSize="13sp"
                                     android:layout_marginEnd="8dp" />
 
                             </LinearLayout>
 
-                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F1F1" />
+                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -486,7 +501,7 @@
                                     android:layout_width="28dp"
                                     android:layout_height="28dp"
                                     android:src="@drawable/dark_mode"
-                                    app:tint="#4C4C4C"
+                                    app:tint="@color/row_icon_tint"
                                     android:contentDescription="@string/cd_dark_mode" />
 
                                 <TextView
@@ -495,7 +510,7 @@
                                     android:layout_weight="1"
                                     android:layout_marginStart="14dp"
                                     android:text="@string/dark_mode"
-                                    android:textColor="#111214"
+                                    android:textColor="@color/text_primary"
                                     android:textSize="15sp" />
 
                                 <androidx.appcompat.widget.SwitchCompat
@@ -508,7 +523,7 @@
 
                             </LinearLayout>
 
-                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F1F1" />
+                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -520,7 +535,7 @@
                                     android:layout_width="28dp"
                                     android:layout_height="28dp"
                                     android:src="@drawable/log_out"
-                                    app:tint="#4C4C4C"
+                                    app:tint="@color/row_icon_tint"
                                     android:contentDescription="@string/cd_logout" />
 
                                 <TextView
@@ -529,19 +544,19 @@
                                     android:layout_weight="1"
                                     android:layout_marginStart="14dp"
                                     android:text="@string/logout"
-                                    android:textColor="#111214"
+                                    android:textColor="@color/text_primary"
                                     android:textSize="15sp" />
 
                                 <ImageView
                                     android:layout_width="22dp"
                                     android:layout_height="22dp"
                                     android:src="@drawable/see_more"
-                                    app:tint="#7A7A7A"
+                                    app:tint="@color/text_secondary"
                                     android:contentDescription="@string/cd_chevron" />
 
                             </LinearLayout>
 
-                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F1F1F1" />
+                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -553,7 +568,7 @@
                                     android:layout_width="28dp"
                                     android:layout_height="28dp"
                                     android:src="@drawable/delete_account"
-                                    app:tint="#4C4C4C"
+                                    app:tint="@color/row_icon_tint"
                                     android:contentDescription="@string/cd_delete" />
 
                                 <TextView
@@ -562,14 +577,14 @@
                                     android:layout_weight="1"
                                     android:layout_marginStart="14dp"
                                     android:text="@string/delete_account"
-                                    android:textColor="#111214"
+                                    android:textColor="@color/text_primary"
                                     android:textSize="15sp" />
 
                                 <ImageView
                                     android:layout_width="22dp"
                                     android:layout_height="22dp"
                                     android:src="@drawable/see_more"
-                                    app:tint="#7A7A7A"
+                                    app:tint="@color/text_secondary"
                                     android:contentDescription="@string/cd_chevron" />
 
                             </LinearLayout>

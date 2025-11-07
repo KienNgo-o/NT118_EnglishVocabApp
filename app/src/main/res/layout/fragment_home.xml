@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_purple"
+    android:background="@color/screen_background"
     tools:context=".ui.home.HomeFragment">
 
     <!-- Header: 20% height (~2/10) -->
@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Hi, Pham Khoi"
-                android:textColor="@android:color/white"
+                android:textColor="@color/on_purple"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -48,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Let's start learning"
-                android:textColor="@android:color/white"
+                android:textColor="@color/on_purple"
                 android:textSize="14sp"
                 android:layout_marginTop="4dp" />
         </LinearLayout>
@@ -84,7 +84,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="3"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/on_purple"
                     android:textStyle="bold"
                     android:layout_marginStart="6dp" />
             </LinearLayout>
@@ -115,7 +115,7 @@
         android:translationZ="12dp"
         app:cardCornerRadius="12dp"
         app:cardElevation="12dp"
-        app:cardBackgroundColor="@color/white_gray"
+        app:cardBackgroundColor="@color/card_background"
         app:layout_constraintTop_toBottomOf="@id/header"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -135,7 +135,7 @@
                 android:layout_height="wrap_content"
                 android:text="Today's Quote"
                 android:textSize="12sp"
-                android:textColor="@android:color/black"
+                android:textColor="@color/text_primary"
                 android:layout_marginBottom="3dp" />
 
             <TextView
@@ -146,7 +146,7 @@
                 android:maxLines="4"
                 android:paddingTop="3dp"
                 android:text="@string/today_quote"
-                android:textColor="@android:color/black"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp" />
 
         </LinearLayout>
@@ -162,10 +162,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:clipToPadding="false"
-        android:paddingTop="1dp"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp">
+        android:clipToPadding="false">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -178,7 +175,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="8dp"
-                android:background="@color/white_gray"
+                android:background="@color/card_background"
                 android:layout_marginTop="1dp">
 
                 <TextView
@@ -189,7 +186,8 @@
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginStart="8dp" />
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/text_primary" />
 
                 <LinearLayout
                     android:id="@+id/row_days"
@@ -410,7 +408,7 @@
                         android:layout_height="wrap_content"
                         android:text="1 Active day"
                         android:layout_marginStart="8dp"
-                        android:textColor="@color/gray" />
+                        android:textColor="@color/text_secondary" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -421,8 +419,11 @@
                 android:layout_width="match_parent"
                 android:layout_marginTop="12dp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="6dp">
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@color/card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -434,9 +435,11 @@
                         android:id="@+id/text_vocab_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
                         android:text="Vocab learning"
                         android:textStyle="bold"
-                        android:textSize="16sp" />
+                        android:textSize="18sp"
+                        android:textColor="@color/text_primary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -451,8 +454,8 @@
                             android:gravity="center_vertical">
 
                             <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
                                 android:src="@drawable/vocab_color"
                                 android:contentDescription="icon" />
 
@@ -461,14 +464,17 @@
                                 android:layout_weight="1"
                                 android:layout_height="wrap_content"
                                 android:text="Fruits"
-                                android:layout_marginStart="8dp" />
+                                android:layout_marginStart="8dp"
+                                android:textColor="@color/text_primary"
+                                android:textSize="15sp" />
 
                             <TextView
                                 android:id="@+id/text_vocab_progress"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="40/48"
-                                android:textColor="#9E9E9E" />
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp" />
 
                         </LinearLayout>
 
@@ -480,8 +486,8 @@
                             android:paddingTop="6dp">
 
                             <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
                                 android:src="@drawable/vocab_color"
                                 android:contentDescription="icon" />
 
@@ -490,14 +496,17 @@
                                 android:layout_weight="1"
                                 android:layout_height="wrap_content"
                                 android:text="Education"
-                                android:layout_marginStart="8dp" />
+                                android:layout_marginStart="8dp"
+                                android:textColor="@color/text_primary"
+                                android:textSize="15sp" />
 
                             <TextView
                                 android:id="@+id/text_vocab_progress2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="6/24"
-                                android:textColor="#9E9E9E" />
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp" />
 
                         </LinearLayout>
 
@@ -512,8 +521,11 @@
                 android:layout_width="match_parent"
                 android:layout_marginTop="12dp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="6dp">
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@color/card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -525,9 +537,11 @@
                         android:id="@+id/text_quiz_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
                         android:text="Quiz taken"
                         android:textStyle="bold"
-                        android:textSize="16sp" />
+                        android:textSize="18sp"
+                        android:textColor="@color/text_primary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -542,8 +556,8 @@
                             android:gravity="center_vertical">
 
                             <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
                                 android:src="@drawable/quiz_color"
                                 android:contentDescription="icon" />
 
@@ -552,14 +566,17 @@
                                 android:layout_weight="1"
                                 android:layout_height="wrap_content"
                                 android:text="Business"
-                                android:layout_marginStart="8dp" />
+                                android:layout_marginStart="8dp"
+                                android:textColor="@color/text_primary"
+                                android:textSize="15sp" />
 
                             <TextView
                                 android:id="@+id/text_quiz_progress"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="40/48"
-                                android:textColor="#9E9E9E" />
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp" />
 
                         </LinearLayout>
 
@@ -571,8 +588,8 @@
                             android:paddingTop="6dp">
 
                             <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
                                 android:src="@drawable/quiz_color"
                                 android:contentDescription="icon" />
 
@@ -581,14 +598,17 @@
                                 android:layout_weight="1"
                                 android:layout_height="wrap_content"
                                 android:text="Relationship"
-                                android:layout_marginStart="8dp" />
+                                android:layout_marginStart="8dp"
+                                android:textColor="@color/text_primary"
+                                android:textSize="15sp" />
 
                             <TextView
                                 android:id="@+id/text_quiz_progress2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="6/24"
-                                android:textColor="#9E9E9E" />
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp" />
 
                         </LinearLayout>
 
@@ -603,10 +623,13 @@
                 android:id="@+id/card_flash"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="6dp"
                 android:layout_marginTop="12dp"
-                android:layout_marginBottom="24dp">
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="@color/card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -618,9 +641,11 @@
                         android:id="@+id/text_flash_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
                         android:text="Flash card learning"
-                        android:textStyle="bold"
-                        android:textSize="16sp" />
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -631,57 +656,63 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
                             <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:src="@drawable/flashcard_color"
-                                android:contentDescription="icon" />
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:contentDescription="icon"
+                                android:src="@drawable/flashcard_color" />
 
                             <TextView
                                 android:layout_width="0dp"
-                                android:layout_weight="1"
                                 android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:layout_weight="1"
                                 android:text="Fruits"
-                                android:layout_marginStart="8dp" />
+                                android:textColor="@color/text_primary"
+                                android:textSize="15sp" />
 
                             <TextView
                                 android:id="@+id/text_flash_progress"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0/0"
-                                android:textColor="#9E9E9E" />
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp" />
 
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
                             android:gravity="center_vertical"
+                            android:orientation="horizontal"
                             android:paddingTop="6dp">
 
                             <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:src="@drawable/flashcard_color"
-                                android:contentDescription="icon" />
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:contentDescription="icon"
+                                android:src="@drawable/flashcard_color" />
 
                             <TextView
                                 android:layout_width="0dp"
-                                android:layout_weight="1"
                                 android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:layout_weight="1"
                                 android:text="Sample set 2"
-                                android:layout_marginStart="8dp" />
+                                android:textColor="@color/text_primary"
+                                android:textSize="15sp" />
 
                             <TextView
                                 android:id="@+id/text_flash_progress2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0/0"
-                                android:textColor="#9E9E9E" />
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp" />
 
                         </LinearLayout>
                     </LinearLayout>

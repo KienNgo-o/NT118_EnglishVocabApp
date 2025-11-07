@@ -98,8 +98,8 @@
                     android:layout_toEndOf="@id/filter"
                     android:background="@android:color/transparent"
                     android:hint="Search topic..."
-                    android:textColorHint="@android:color/darker_gray"
-                    android:textColor="@android:color/black"
+                    android:textColorHint="@color/text_secondary"
+                    android:textColor="@color/text_primary"
                     android:padding="12dp" />
 
                 <ImageView
@@ -109,7 +109,10 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="5dp"
-                    android:src="@drawable/search_topic" />
+                    android:src="@drawable/search_topic"
+                    app:tint="@color/search_icon_color"
+                    app:tintMode="src_in"
+                    android:contentDescription="@string/cd_search_topic" />
             </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
@@ -158,7 +161,7 @@
                             android:layout_centerHorizontal="true"
                             android:text="Fruits"
                             android:textStyle="bold"
-                            android:textColor="@android:color/black" />
+                            android:textColor="@color/text_primary" />
 
                         <ImageView
                             android:id="@+id/img_flash_1"
@@ -195,7 +198,7 @@
                             android:layout_centerHorizontal="true"
                             android:text="Animals"
                             android:textStyle="bold"
-                            android:textColor="@android:color/black" />
+                            android:textColor="@color/text_primary" />
 
                         <ImageView
                             android:id="@+id/img_flash_2"
@@ -241,7 +244,7 @@
                             android:layout_centerHorizontal="true"
                             android:text="Personalities"
                             android:textStyle="bold"
-                            android:textColor="@android:color/black" />
+                            android:textColor="@color/text_primary" />
 
                         <ImageView
                             android:id="@+id/img_flash_3"
@@ -278,7 +281,7 @@
                             android:layout_centerHorizontal="true"
                             android:text="Careers"
                             android:textStyle="bold"
-                            android:textColor="@android:color/black" />
+                            android:textColor="@color/text_primary" />
 
                         <ImageView
                             android:id="@+id/img_flash_4"
@@ -324,7 +327,7 @@
                             android:layout_centerHorizontal="true"
                             android:text="Appearances"
                             android:textStyle="bold"
-                            android:textColor="@android:color/black" />
+                            android:textColor="@color/text_primary" />
 
                         <ImageView
                             android:id="@+id/img_flash_5"
@@ -361,7 +364,7 @@
                             android:layout_centerHorizontal="true"
                             android:text="Travel"
                             android:textStyle="bold"
-                            android:textColor="@android:color/black" />
+                            android:textColor="@color/text_primary" />
 
                         <ImageView
                             android:id="@+id/img_flash_6"

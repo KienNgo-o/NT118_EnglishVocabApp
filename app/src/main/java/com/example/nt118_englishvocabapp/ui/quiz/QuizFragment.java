@@ -2,29 +2,30 @@ package com.example.nt118_englishvocabapp.ui.quiz;
 
 import android.annotation.SuppressLint;
 import android.graphics.Rect;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.databinding.FragmentQuizBinding;
-import com.example.nt118_englishvocabapp.ui.home.HomeFragment;
 import com.example.nt118_englishvocabapp.util.KeyboardUtils;
-import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QuizFragment extends Fragment {
 
@@ -40,224 +41,166 @@ public class QuizFragment extends Fragment {
         binding = FragmentQuizBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Optional toast to match other fragments' behavior
-        Toast.makeText(getContext(), "Quiz Fragment Opened!", Toast.LENGTH_SHORT).show();
+        try {
+            Toast.makeText(getContext(), "Quiz Fragment Opened!", Toast.LENGTH_SHORT).show();
 
-        // Use Activity content view as stable root for keyboard detection
-        if (getActivity() != null) {
-            keyboardRootView = requireActivity().findViewById(android.R.id.content);
-        } else {
-            keyboardRootView = root; // fallback
-        }
-
-        // Keyboard visibility listener: hide bottom menu and FAB when keyboard is shown
-        keyboardListener = new ViewTreeObserver.OnGlobalLayoutListener() {
-            private boolean lastStateVisible = false;
-
-            @Override
-            public void onGlobalLayout() {
-                if (keyboardRootView == null || getActivity() == null) return;
-
-                Rect r = new Rect();
-                keyboardRootView.getWindowVisibleDisplayFrame(r);
-                int screenHeight = keyboardRootView.getRootView().getHeight();
-                int keypadHeight = screenHeight - r.bottom;
-                boolean isKeyboardVisible = keypadHeight > screenHeight * 0.15;
-
-                if (isKeyboardVisible == lastStateVisible) return; // no change
-                lastStateVisible = isKeyboardVisible;
-
-                View bottomAppBar = requireActivity().findViewById(R.id.bottomAppBar);
-                View fab = requireActivity().findViewById(R.id.fab);
-
-                if (bottomAppBar != null) bottomAppBar.setVisibility(isKeyboardVisible ? View.GONE : View.VISIBLE);
-                if (fab != null) fab.setVisibility(isKeyboardVisible ? View.GONE : View.VISIBLE);
-            }
-        };
-
-        if (keyboardRootView != null) {
-            keyboardRootView.getViewTreeObserver().addOnGlobalLayoutListener(keyboardListener);
-        }
-
-        // Standardized return behavior: hide keyboard first, then pop backstack or navigate home as a fallback
-        View.OnClickListener preClick = v -> {
-            if (!isAdded()) return;
-            keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
-                    requireActivity(),
-                    v,
-                    keyboardRootView,
-                    keyboardListener
-            );
-        };
-
-        // Make sure to return to home fragment properly
-        binding.btnReturn.setOnClickListener(v -> {
-            keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
-                    requireActivity(), v, keyboardRootView, keyboardListener);
-
-            // prefer using MainActivity helper to keep BottomNavigationView state in sync
-            if (requireActivity() instanceof com.example.nt118_englishvocabapp.MainActivity) {
-                ((com.example.nt118_englishvocabapp.MainActivity) requireActivity()).navigateToHome();
-                return;
-            }
-
-            // fallback (should rarely run)
-            if (getParentFragmentManager().getBackStackEntryCount() > 0) {
-                getParentFragmentManager().popBackStack();
+            // Use Activity content view as stable root for keyboard detection
+            if (getActivity() != null) {
+                keyboardRootView = requireActivity().findViewById(android.R.id.content);
             } else {
-                AppCompatActivity activity = (AppCompatActivity) requireActivity();
-                activity.getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.frame_layout, new com.example.nt118_englishvocabapp.ui.home.HomeFragment())
-                        .commitAllowingStateLoss();
+                keyboardRootView = root; // fallback
             }
-        });
 
-        // Populate the vertical zig-zag list of quiz stages
-        setupStages();
+            // Keyboard visibility listener: hide bottom menu and FAB when keyboard is shown
+            keyboardListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+                private boolean lastStateVisible = false;
+
+                @Override
+                public void onGlobalLayout() {
+                    if (keyboardRootView == null || getActivity() == null) return;
+
+                    Rect r = new Rect();
+                    keyboardRootView.getWindowVisibleDisplayFrame(r);
+                    int screenHeight = keyboardRootView.getRootView().getHeight();
+                    int keypadHeight = screenHeight - r.bottom;
+                    boolean isKeyboardVisible = keypadHeight > screenHeight * 0.15;
+
+                    if (isKeyboardVisible == lastStateVisible) return; // no change
+                    lastStateVisible = isKeyboardVisible;
+
+                    View bottomAppBar = requireActivity().findViewById(R.id.bottomAppBar);
+                    View fab = requireActivity().findViewById(R.id.fab);
+
+                    if (bottomAppBar != null) bottomAppBar.setVisibility(isKeyboardVisible ? View.GONE : View.VISIBLE);
+                    if (fab != null) fab.setVisibility(isKeyboardVisible ? View.GONE : View.VISIBLE);
+                }
+            };
+
+            if (keyboardRootView != null) {
+                keyboardRootView.getViewTreeObserver().addOnGlobalLayoutListener(keyboardListener);
+            }
+
+            // Standardized return behavior handled inline where needed (keyboard hide is called before navigation)
+
+            // Make sure to return to home fragment properly
+            if (binding.btnReturn != null) {
+                binding.btnReturn.setOnClickListener(v -> {
+                    keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
+                            requireActivity(), v, keyboardRootView, keyboardListener);
+
+                    // prefer using MainActivity helper to keep BottomNavigationView state in sync
+                    if (requireActivity() instanceof com.example.nt118_englishvocabapp.MainActivity) {
+                        ((com.example.nt118_englishvocabapp.MainActivity) requireActivity()).navigateToHome();
+                        return;
+                    }
+
+                    // fallback (should rarely run)
+                    if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                        getParentFragmentManager().popBackStack();
+                    } else {
+                        AppCompatActivity activity = (AppCompatActivity) requireActivity();
+                        activity.getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.frame_layout, new com.example.nt118_englishvocabapp.ui.home.HomeFragment())
+                                .commitAllowingStateLoss();
+                    }
+                });
+            } else {
+                Log.w("QuizFragment", "btnReturn view not found in binding");
+            }
+
+            // Populate the vertical zig-zag list of quiz stages
+            try {
+                setupStagesRecycler();
+            } catch (Exception e) {
+                // prevent crash and log stack trace so user can report it
+                Log.e("QuizFragment", "Error setting up stages RecyclerView", e);
+                Toast.makeText(getContext(), "Lỗi khi khởi tạo màn hình: " + e.getClass().getSimpleName() + ". Xem logcat để biết chi tiết.", Toast.LENGTH_LONG).show();
+            }
+
+        } catch (Exception e) {
+            Log.e("QuizFragment", "Unhandled error in onCreateView", e);
+            writeStackTraceToFile(e);
+            Toast.makeText(getContext(), "Lỗi nội bộ: " + e.getClass().getSimpleName() + ". Xem logcat.", Toast.LENGTH_LONG).show();
+        }
 
         //final TextView textView = binding.textQuiz;
         //quizViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 
+    private void writeStackTraceToFile(Exception e) {
+        try {
+            if (getContext() == null) return;
+            File dir = getContext().getFilesDir();
+            File out = new File(dir, "quiz_error.log");
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String content = "[" + System.currentTimeMillis() + "]\n" + sw.toString() + "\n---\n";
+            FileOutputStream fos = new FileOutputStream(out, true);
+            fos.write(content.getBytes("UTF-8"));
+            fos.close();
+        } catch (Exception ex) {
+            Log.e("QuizFragment", "Failed to write crash log", ex);
+        }
+    }
+
     @SuppressLint("DiscouragedApi")
-    private void setupStages() {
+    private void setupStagesRecycler() {
         if (binding == null || getContext() == null) return;
 
-        LinearLayout container = binding.stagesContainer;
-        container.removeAllViews();
+        RecyclerView recyclerView = binding.stagesRecycler;
+        GridLayoutManager glm = new GridLayoutManager(getContext(), 3);
+        recyclerView.setLayoutManager(glm);
+        recyclerView.setHasFixedSize(true);
 
+        // add spacing between grid items so layout is less cramped
+        final int spacingDp = 14; // reduced spacing to make parts slightly less large overall
+        final int spacingPx = dpToPx(spacingDp);
+        recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                int position = parent.getChildAdapterPosition(view); // item position
+                int spanCount = glm.getSpanCount();
+                if (position == RecyclerView.NO_POSITION) return;
+                int column = position % spanCount; // item column
+
+                // Use a common grid spacing formula to distribute spacing evenly
+                outRect.left = spacingPx - column * spacingPx / spanCount;
+                outRect.right = (column + 1) * spacingPx / spanCount;
+                outRect.top = spacingPx;
+                outRect.bottom = spacingPx;
+            }
+        });
+
+        List<StageItem> items = new ArrayList<>();
         final int totalStages = 12; // change as needed
         final int unlockedCount = 2; // demo: first two unlocked; replace with real progress logic
 
-        int imageSize = dpToPx(72);
-        // Increase horizontalOffset so both left and right items are pushed inward toward center
-        int horizontalOffset = dpToPx(80); // was 24dp; increase to move items closer to center
-        int verticalSpacing = dpToPx(20);
+        // Zig-zag pattern columns sequence: 0,1,2,1 repeating
+        int[] pattern = new int[]{0, 1, 2, 1};
 
-        for (int i = 0; i < totalStages; i++) {
-            final int stageIndex = i + 1;
-            boolean unlocked = stageIndex <= unlockedCount;
-
-            // Row that fills width
-            FrameLayout row = new FrameLayout(getContext());
-            LinearLayout.LayoutParams rowLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            rowLp.topMargin = verticalSpacing / 2;
-            rowLp.bottomMargin = verticalSpacing / 2;
-            row.setLayoutParams(rowLp);
-
-            // The stage view (image + label) -- same as before
-            LinearLayout stageCard = new LinearLayout(getContext());
-            stageCard.setOrientation(LinearLayout.VERTICAL);
-            stageCard.setGravity(Gravity.CENTER_HORIZONTAL);
-
-            LinearLayout.LayoutParams cardLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            stageCard.setLayoutParams(cardLp);
-
-            // Build a circular base and a separate image on top so the image is NOT the background.
-            FrameLayout imageFrame = new FrameLayout(getContext());
-            LinearLayout.LayoutParams imageFrameLp = new LinearLayout.LayoutParams(imageSize, imageSize);
-            imageFrameLp.gravity = Gravity.CENTER_HORIZONTAL;
-            imageFrame.setLayoutParams(imageFrameLp);
-
-            // Circular base view (background circle)
-            View baseCircle = new View(getContext());
-            FrameLayout.LayoutParams baseLp = new FrameLayout.LayoutParams(imageSize, imageSize, Gravity.CENTER);
-            baseCircle.setLayoutParams(baseLp);
-            GradientDrawable bg = new GradientDrawable();
-            bg.setShape(GradientDrawable.OVAL);
-            int bgColor = unlocked ? ContextCompat.getColor(getContext(), R.color.light_purple) : ContextCompat.getColor(getContext(), android.R.color.darker_gray);
-            bg.setColor(bgColor);
-            bg.setStroke(dpToPx(2), ContextCompat.getColor(getContext(), R.color.dark_purple));
-            baseCircle.setBackground(bg);
-            imageFrame.addView(baseCircle);
-
-            // Top image (shows the topic picture) - smaller than base so the circular rim remains visible
-            int innerPadding = dpToPx(14); // adjust if you want a bigger/smaller image inside the circle
-            int innerSize = imageSize - innerPadding * 2;
-            ImageView imgTop = new ImageView(getContext());
-            FrameLayout.LayoutParams imgLp = new FrameLayout.LayoutParams(innerSize, innerSize, Gravity.CENTER);
-            imgTop.setLayoutParams(imgLp);
-            imgTop.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-
-            // Explicit mapping requested by user: stage 1 -> "fruits", 2 -> "animals", 3 -> "careers".
-            // Drawables should be placed by you in res/drawable with those names (e.g. fruits.png)
-            String imageName;
-            switch (stageIndex) {
-                case 1:
-                    imageName = "fruits";
-                    break;
-                case 2:
-                    imageName = "animals";
-                    break;
-                case 3:
-                    imageName = "careers";
-                    break;
-                default:
-                    // fallback convention: try stage_N if you later want to name them that way
-                    imageName = "stage_" + stageIndex;
-                    break;
-            }
-
-            int drawableId = getResources().getIdentifier(imageName, "drawable", getContext().getPackageName());
-            if (drawableId != 0) {
-                imgTop.setImageResource(drawableId);
-            } else {
-                // fallback placeholder while you add the real drawables
-                imgTop.setImageResource(android.R.drawable.ic_menu_gallery);
-            }
-
-            imgTop.setContentDescription(getString(R.string.part_label, stageIndex));
-            imageFrame.addView(imgTop);
-
-            // Click behavior attached to the frame so tapping anywhere on the circular button triggers it
-            imageFrame.setClickable(true);
-            imageFrame.setOnClickListener(v -> {
-                if (unlocked) {
-                    Toast.makeText(getContext(), "Open Stage " + stageIndex, Toast.LENGTH_SHORT).show();
+        for (int i = 1; i <= totalStages; i++) {
+            int targetCol = pattern[(i - 1) % pattern.length];
+            for (int col = 0; col < 3; col++) {
+                if (col == targetCol) {
+                    boolean unlocked = i <= unlockedCount;
+                    items.add(new StageItem(true, i, unlocked, "Stage " + i));
                 } else {
-                    Toast.makeText(getContext(), "Stage " + stageIndex + " is locked", Toast.LENGTH_SHORT).show();
+                    items.add(new StageItem(false, 0, false, ""));
                 }
-            });
-
-            // Lock overlay if needed
-            if (!unlocked) {
-                ImageView lockIv = new ImageView(getContext());
-                int lockSize = dpToPx(20);
-                FrameLayout.LayoutParams lockLp = new FrameLayout.LayoutParams(lockSize, lockSize, Gravity.END | Gravity.BOTTOM);
-                int lockMargin = dpToPx(4);
-                lockLp.setMargins(0, 0, lockMargin, lockMargin);
-                lockIv.setLayoutParams(lockLp);
-                // Use framework lock icon as a fallback; you can replace with your drawable in res/drawable
-                lockIv.setImageResource(android.R.drawable.ic_lock_lock);
-                lockIv.setColorFilter(ContextCompat.getColor(getContext(), android.R.color.black));
-                imageFrame.addView(lockIv);
             }
+        }
 
-            stageCard.addView(imageFrame);
+        StageAdapter adapter = new StageAdapter(getContext(), items, this::onStageClick);
+        recyclerView.setAdapter(adapter);
+    }
 
-            TextView label = new TextView(getContext());
-            label.setText(getString(R.string.part_label, stageIndex));
-            label.setTextColor(ContextCompat.getColor(getContext(), R.color.dark_purple));
-            label.setTextSize(14f);
-            label.setGravity(Gravity.CENTER);
-            LinearLayout.LayoutParams lblParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            lblParams.topMargin = dpToPx(6);
-            label.setLayoutParams(lblParams);
-            stageCard.addView(label);
-
-            // Alternate gravity left / right for zig-zag
-            boolean alignLeft = (i % 2 == 0);
-            FrameLayout.LayoutParams stageLp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            stageLp.gravity = alignLeft ? Gravity.START | Gravity.CENTER_VERTICAL : Gravity.END | Gravity.CENTER_VERTICAL;
-
-            // Use symmetric horizontal margins so both start/end items are equally offset toward the center
-            stageLp.setMargins(horizontalOffset, 0, horizontalOffset, 0);
-
-            row.addView(stageCard, stageLp);
-
-            container.addView(row);
+    private void onStageClick(StageItem stageItem) {
+        if (stageItem.isUnlocked()) {
+            Toast.makeText(getContext(), "Open " + stageItem.getName(), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), stageItem.getName() + " is locked", Toast.LENGTH_SHORT).show();
         }
     }
 

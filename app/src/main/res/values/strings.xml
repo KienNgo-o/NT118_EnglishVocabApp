@@ -65,6 +65,7 @@
     <string name="cd_dark_mode">Dark mode toggle</string>
     <string name="cd_logout">Logout icon</string>
     <string name="cd_delete">Delete icon</string>
+    backgroundTint    <string name="cd_search_topic">Search topic icon</string>
 
     <!-- New strings added to remove hardcoded literals -->
     <string name="toggle_password_visibility">Toggle password visibility</string>
@@ -92,6 +93,20 @@
     <string name="question_match">Match the pairs</string>
     <string name="congrats_subtitle">You\'ve completed\nall flashcards.</string>
 
+    <!-- New strings for fragment_flashcard2 to replace hardcoded literals -->
+    <string name="back_to_topics">Back to topics</string>
+    <string name="topic_label">TOPIC</string>
+    <string name="progress_default">Progress: 0/0</string>
+    <string name="watermelon_term">Watermelon (n)</string>
+    <string name="watermelon_definition">Definition: A large, round or oval-shaped fruit…</string>
+    <string name="watermelon_example">Example: Watermelon is my favorite fruit…</string>
+    <string name="vietnamese_term">Dưa hấu (danh từ)</string>
+    <string name="vietnamese_definition">Định nghĩa: Một loại quả to hình tròn hoặc oval…</string>
+    <string name="congrats_title">Congratulations !</string>
+    <string name="return_label">Return →</string>
+    <string name="previous_label">Previous</string>
+    <string name="next_label">Next</string>
+
     <!-- Stage label, uses placeholder %1$d for stage number -->
     <string name="part_label">Part %1$d</string>
 
@@ -102,4 +117,43 @@
 
     <!-- Today's quote displayed on Home -->
     <string name="today_quote">"Procrastination is like a credit card: it's a lot of fun until you get the bill."</string>
+
+    <!-- Strings for the filter bottom sheet -->
+    <string name="cd_close_filter">Close filter</string>
+    <string name="title_search_filter">Search Filter</string>
+    <string name="label_saved">Saved</string>
+    <string name="label_type">Type</string>
+    <string name="noun">Noun</string>
+    <string name="verb">Verb</string>
+    <string name="adjective">Adjective</string>
+    <string name="adverb">Adverb</string>
+    <string name="btn_clear">Clear</string>
+    <string name="btn_apply_filter">Apply Filter</string>
+
+    <!-- Strings used by topic item layout -->
+    <string name="cd_topic_image">Topic image</string>
+    <string name="cd_save_topic">Save topic</string>
+    <string name="placeholder_difficulty">Easy</string>
+    <string name="placeholder_topic_title">Topic Title</string>
+    <string name="placeholder_words">10 words</string>
+    <string name="label_favorite">Favorite</string>
+    <string name="label_difficulty">Difficulty</string>
+    <string name="label_easy">Easy</string>
+    <string name="label_medium">Medium</string>
+    <string name="label_hard">Hard</string>
+
+    <!-- Hints used in Account edit fields -->
+    <string name="hint_enter_name">Enter your name</string>
+    <string name="hint_email">you@example.com</string>
+    <string name="hint_password">Enter password</string>
+
+    <!-- Notification frequency labels -->
+    <string name="notif_daily">Daily</string>
+    <string name="notif_every_2_days">Every 2 days</string>
+    <string name="notif_weekly">Weekly</string>
+
+    <!-- New string for search hint used in fragment_quiz and fragment_vocab -->
+    <string name="hint_search_topic">Search topic…</string>
+    <string name="cd_prev">Previous</string>
+    <string name="cd_next">Next</string>
 </resources>

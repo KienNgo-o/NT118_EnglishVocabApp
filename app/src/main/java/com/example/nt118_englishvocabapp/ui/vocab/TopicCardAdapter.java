@@ -3,16 +3,19 @@ package com.example.nt118_englishvocabapp.ui.vocab;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.nt118_englishvocabapp.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class TopicCardAdapter extends RecyclerView.Adapter<TopicCardAdapter.ViewHolder> {
     private List<TopicCard> items = new ArrayList<>();
@@ -47,8 +50,42 @@ public class TopicCardAdapter extends RecyclerView.Adapter<TopicCardAdapter.View
         holder.txtWords.setText(t.wordsCount + " words");
         holder.imgTopic.setImageResource(t.imageResId);
 
+        // set difficulty text color: easy=green, medium=orange, hard=red
+        String diff = t.difficulty != null ? t.difficulty.trim().toLowerCase(Locale.ROOT) : "";
+        int diffColorRes;
+        switch (diff) {
+            case "easy":
+                diffColorRes = R.color.correct_green; // green
+                break;
+            case "medium":
+                diffColorRes = R.color.orange; // orange
+                break;
+            case "hard":
+                diffColorRes = R.color.incorrect_red; // red
+                break;
+            default:
+                diffColorRes = R.color.dark_purple; // fallback
+        }
+        holder.txtDifficulty.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), diffColorRes));
+
+        // set save icon tint based on saved state
+        int tint = t.isSaved() ? ContextCompat.getColor(holder.itemView.getContext(), R.color.saved_green)
+                : ContextCompat.getColor(holder.itemView.getContext(), R.color.unsaved_gray);
+        holder.btnSave.setColorFilter(tint);
+
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(t, position);
+        });
+
+        holder.btnSave.setOnClickListener(v -> {
+            // toggle saved state
+            boolean newSaved = !t.isSaved();
+            t.setSaved(newSaved);
+            int newTint = newSaved ? ContextCompat.getColor(holder.itemView.getContext(), R.color.saved_green)
+                    : ContextCompat.getColor(holder.itemView.getContext(), R.color.unsaved_gray);
+            holder.btnSave.setColorFilter(newTint);
+            // Optionally notify item changed if you want to persist or animate
+            // notifyItemChanged(position);
         });
     }
 
@@ -62,6 +99,7 @@ public class TopicCardAdapter extends RecyclerView.Adapter<TopicCardAdapter.View
         TextView txtDifficulty;
         TextView txtTopic;
         TextView txtWords;
+        ImageButton btnSave;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -69,7 +107,7 @@ public class TopicCardAdapter extends RecyclerView.Adapter<TopicCardAdapter.View
             txtDifficulty = itemView.findViewById(R.id.txt_difficulty);
             txtTopic = itemView.findViewById(R.id.txt_topic);
             txtWords = itemView.findViewById(R.id.txt_words);
+            btnSave = itemView.findViewById(R.id.btn_save);
         }
     }
 }
-

@@ -3,87 +3,84 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_purple"
+    android:background="@color/screen_background"
     android:orientation="vertical"
     android:weightSum="10"
-    tools:context=".ui.vocab.VocabFragment">
+    tools:context=".ui.quiz.QuizFragment">  <!-- fixed tools context -->
 
-    <!-- Upper part (kept the same as fragment_vocab3) -->
+    <!-- Upper part: reserve 2 weight units to match fragment_vocab spacing -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_gravity="center"
         android:orientation="vertical">
 
-        <!-- Bottom divider line -->
+        <!-- Top half: toolbar + divider (copied from fragment_vocab) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical">
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp">
 
-            <ImageButton
-                android:id="@+id/btn_return"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:background="@null"
-                android:contentDescription="@string/cd_back"
-                android:padding="8dp"
-                android:src="@drawable/return_final" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
 
-            <TextView
-                android:id="@+id/txt_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="@string/title_quiz"
-                android:textColor="@color/dark_purple"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-        </RelativeLayout>
+                <ImageButton
+                    android:id="@+id/btn_return"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:background="@null"
+                    android:contentDescription="@string/cd_back"
+                    android:padding="8dp"
+                    android:src="@drawable/return_final" />
 
-        <View
-            android:id="@+id/top_divider"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@color/dark_purple" />
+                <TextView
+                    android:id="@+id/txt_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/title_quiz"
+                    android:textColor="@color/dark_purple"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/top_divider"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/dark_purple" />
         </LinearLayout>
+
+
     </LinearLayout>
-    <!-- Lower part: only keep word and wordType -->
+
+    <!-- Lower part: RecyclerView occupies remaining 8 weight units -->
     <LinearLayout
         android:id="@+id/lower_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="9"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:gravity="center">
 
-        <!-- Scrollable vertical list of quiz stages (for zig-zag placement) -->
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
-
-            <LinearLayout
-                android:id="@+id/stagesContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp" />
-
-        </ScrollView>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/stagesRecycler"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:clipToPadding="false"
+            android:layout_gravity="center" />
 
     </LinearLayout>
 
