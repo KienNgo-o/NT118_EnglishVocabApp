@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/flashcard_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white_gray">
 
-    <!-- Toolbar (title + back) placed as direct children of ConstraintLayout -->
     <RelativeLayout
         android:id="@+id/toolbar_layout"
         android:layout_width="match_parent"
@@ -31,13 +31,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="@string/topic_label"
+            android:textColor="@color/dark_purple"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="@color/dark_purple" />
+            tools:text="TOPIC" />
     </RelativeLayout>
 
-    <!-- Divider as direct child so other views can constrain to it -->
     <View
         android:id="@+id/top_divider"
         android:layout_width="match_parent"
@@ -47,7 +46,6 @@
         android:background="@color/dark_purple"
         app:layout_constraintTop_toBottomOf="@id/toolbar_layout" />
 
-    <!-- Progress pill -->
     <TextView
         android:id="@+id/txt_progress"
         android:layout_width="wrap_content"
@@ -77,44 +75,87 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Use MaterialCardView to get proper rounded corners and clipping -->
-        <com.google.android.material.card.MaterialCardView
+        <FrameLayout
             android:id="@+id/cardContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="6dp"
-            app:cardUseCompatPadding="true"
-            app:cardPreventCornerOverlap="false"
             android:clipToPadding="false">
 
-            <!-- Mặt trước (Tiếng Anh) -->
             <LinearLayout
                 android:id="@+id/frontView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:padding="24dp"
-                android:background="@color/flashcard_bg"
-                android:gravity="center_vertical">
+                android:background="@drawable/flashcard_front_bg"
+                android:gravity="start">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/textTerm"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/dark_purple"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        tools:text="Red" />
+
+                    <TextView
+                        android:id="@+id/textPhonetic"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:textColor="@color/dark_purple"
+                        android:textSize="20sp"
+                        tools:text="'/red/'" />
+
+                    <ImageView
+                        android:id="@+id/btnAudio"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="12dp"
+                        android:src="@drawable/ic_audio_speaker"
+
+                        android:background="?attr/selectableItemBackgroundBorderless"
+
+                        app:tint="@color/dark_purple"
+
+                        android:contentDescription="@string/play_audio"
+
+                        android:padding="4dp" />
+
+                    <ImageView
+                        android:id="@+id/imgRegion"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="8dp"
+                        tools:src="@drawable/ic_flag_us"
+                        android:contentDescription="@string/region_flag"/>
+
+                </LinearLayout>
 
                 <TextView
-                    android:id="@+id/textTerm"
+                    android:id="@+id/textPOS"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/watermelon_term"
                     android:textColor="@color/dark_purple"
-                    android:textSize="32sp"
-                    android:textStyle="bold" />
+                    android:textSize="20sp"
+                    android:textStyle="italic"
+                    tools:text="(noun)" />
 
                 <TextView
                     android:id="@+id/textDefinition"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
+                    android:layout_marginTop="24dp"
                     android:textColor="@color/flashcard_text"
-                    android:text="@string/watermelon_definition"
-                    android:textSize="16sp"/>
+                    android:textSize="18sp"
+                    tools:text="Definition: The color of blood." />
 
                 <TextView
                     android:id="@+id/textExample"
@@ -122,46 +163,45 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="18dp"
                     android:textColor="@color/flashcard_text"
-                    android:text="@string/watermelon_example"
-                    android:textSize="16sp"
-                    android:textStyle="italic"/>
+                    android:textSize="18sp"
+                    android:textStyle="italic"
+                    tools:text="Example: Red is my favorite color." />
+
             </LinearLayout>
 
-            <!-- Mặt sau (Tiếng Việt) -->
             <LinearLayout
                 android:id="@+id/backView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:padding="24dp"
-                android:background="@color/light_white_gray"
-                android:gravity="center_vertical"
+                android:background="@drawable/flashcard_back_bg"
+                android:gravity="center"
                 android:visibility="gone">
 
                 <TextView
                     android:id="@+id/textVietnameseTerm"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/vietnamese_term"
                     android:textColor="@color/dark_purple"
                     android:textSize="32sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:text="màu đỏ" />
 
                 <TextView
-                    android:id="@+id/textVietnameseDefinition"
+                    android:id="@+id/textVietnamesePOS"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/flashcard_text"
-                    android:layout_marginTop="18dp"
-                    android:text="@string/vietnamese_definition"
-                    android:textSize="16sp"/>
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/dark_purple"
+                    android:textSize="20sp"
+                    android:textStyle="italic"
+                    tools:text="(danh từ)" />
             </LinearLayout>
 
-        </com.google.android.material.card.MaterialCardView>
+        </FrameLayout>
     </FrameLayout>
 
-    <!-- Congrats container aligned over flashcard_resize -->
-    <!-- Congrats container aligned over flashcard_resizer -->
     <LinearLayout
         android:id="@+id/congrats_container"
         android:layout_width="0dp"
@@ -175,7 +215,6 @@
         app:layout_constraintEnd_toEndOf="@id/flashcard_resizer"
         android:visibility="gone">
 
-        <!-- Khung thông báo Congratulations -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -204,10 +243,8 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textAlignment="center"/>
-
         </LinearLayout>
 
-        <!-- Nút Return -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_return_after_congrats"
             android:layout_width="wrap_content"
@@ -222,10 +259,6 @@
             android:textColor="@color/dark_purple"
             app:cornerRadius="24dp"/>
     </LinearLayout>
-
-
-    <!-- Navigation buttons moved directly under card -->
-    <!-- Updated navigation buttons block in `app/src/main/res/layout/fragment_flashcard2.xml` -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/nav_buttons_group"
         android:layout_width="0dp"
@@ -270,5 +303,4 @@
             android:elevation="4dp"
             app:backgroundTint="@null" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

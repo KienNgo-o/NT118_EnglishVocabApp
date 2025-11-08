@@ -157,4 +157,7 @@
     <string name="cd_prev">Previous</string>
     <string name="cd_next">Next</string>
     <string name="topic_image">Topic Image</string>
+    <string name="play_audio">Play audio</string>
+    <string name="region_flag">Region flag</string>
+
 </resources>

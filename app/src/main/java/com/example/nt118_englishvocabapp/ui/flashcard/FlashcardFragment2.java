@@ -3,12 +3,14 @@ package com.example.nt118_englishvocabapp.ui.flashcard;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -17,24 +19,27 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.databinding.FragmentFlashcard2Binding;
 import com.example.nt118_englishvocabapp.models.Definition;
-import com.example.nt118_englishvocabapp.models.Example;
 import com.example.nt118_englishvocabapp.models.FlashcardItem;
-import com.example.nt118_englishvocabapp.models.POS;
+import com.example.nt118_englishvocabapp.models.LearnableItem;
+import com.example.nt118_englishvocabapp.models.Pronunciation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FlashcardFragment2 extends Fragment {
 
+    private static final String TAG = "FlashcardFragment2";
     private FragmentFlashcard2Binding binding;
-    private int topicId = 1; // ID chủ đề thật từ API
-    private List<FlashcardItem> flashcards = new ArrayList<>();
+    private int topicId = 1;
+    private List<LearnableItem> learnableItems = new ArrayList<>();
     private int currentIndex = 0;
     private boolean showingFront = true;
     private boolean isFlipping = false;
     private int lastIndex = -1;
 
     private FlashcardViewModel viewModel;
+    private MediaPlayer mediaPlayer;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -49,54 +54,34 @@ public class FlashcardFragment2 extends Fragment {
             topicId = getArguments().getInt("topic_index", 1);
         }
 
-        binding.txtTopicTitle.setText(getTopicTitle(topicId));
 
-        // Quan sát dữ liệu flashcards từ ViewModel
-        viewModel.getFlashcards().observe(getViewLifecycleOwner(), items -> {
-            // 'items' BÂY GIỜ CÓ THỂ LÀ NULL
+
+        viewModel.getLearnableItems().observe(getViewLifecycleOwner(), items -> {
             if (items != null) {
-                // Có dữ liệu mới, ẩn loading
-                Log.d("FlashcardFragment2", "Loaded " + items.size() + " flashcards");
-                this.flashcards.clear();
-                this.flashcards.addAll(items);
+                learnableItems.clear();
+                learnableItems.addAll(items);
+                Log.d(TAG, "Loaded " + items.size() + " items");
             } else {
-                // items là null, nghĩa là đang tải
-                // Hiển thị loading, xóa thẻ cũ
-                this.flashcards.clear();
-                Log.d("FlashcardFragment2", "Loading new flashcards...");
+                learnableItems.clear();
+                Log.d(TAG, "Loading new flashcards...");
             }
-            // Dù thế nào cũng cập nhật UI
-            this.currentIndex = 0;
-            this.showingFront = true;
-            updateUI();
-        });
 
-        // Gọi API load dữ liệu
-        viewModel.fetchFlashcards(topicId);
-
-        // Nút quay lại chủ đề
-        binding.btnBackTopic.setOnClickListener(v -> {
-            restoreNavigationBar();
-            if (getParentFragmentManager().getBackStackEntryCount() > 0) {
-                getParentFragmentManager().popBackStack();
-            }
-        });
-
-        // Lật thẻ
-        binding.cardContainer.setOnClickListener(v -> flipCard());
-
-        // Nút trước
-        binding.btnPrev.setOnClickListener(v -> {
-            if (isOnCongrats()) {
-                currentIndex = Math.max(0, flashcards.size() - 1);
-            } else {
-                currentIndex = Math.max(0, currentIndex - 1);
-            }
+            currentIndex = 0;
             showingFront = true;
             updateUI();
         });
 
-        // Nút kế tiếp
+        viewModel.fetchFlashcards(topicId);
+
+        // --- LISTENER ---
+        binding.cardContainer.setOnClickListener(v -> flipCard());
+        binding.btnPrev.setOnClickListener(v -> {
+            if (!isOnCongrats()) {
+                currentIndex = Math.max(0, currentIndex - 1);
+                showingFront = true;
+                updateUI();
+            }
+        });
         binding.btnNext.setOnClickListener(v -> {
             if (!isOnCongrats()) {
                 currentIndex++;
@@ -104,17 +89,16 @@ public class FlashcardFragment2 extends Fragment {
                 updateUI();
             } else {
                 restoreNavigationBar();
-                if (getParentFragmentManager().getBackStackEntryCount() > 0) {
-                    getParentFragmentManager().popBackStack();
-                }
-            }
-        });
-
-        binding.btnReturnAfterCongrats.setOnClickListener(v -> {
-            restoreNavigationBar();
-            if (getParentFragmentManager().getBackStackEntryCount() > 0) {
                 getParentFragmentManager().popBackStack();
             }
+        });
+        binding.btnReturnAfterCongrats.setOnClickListener(v -> {
+            restoreNavigationBar();
+            getParentFragmentManager().popBackStack();
+        });
+        binding.btnBackTopic.setOnClickListener(v -> {
+            restoreNavigationBar();
+            getParentFragmentManager().popBackStack();
         });
 
         updateUI();
@@ -123,69 +107,139 @@ public class FlashcardFragment2 extends Fragment {
     }
 
     private boolean isOnCongrats() {
-        return flashcards == null || currentIndex >= flashcards.size();
+        return learnableItems == null || currentIndex >= learnableItems.size();
     }
 
+    /**
+     * ✅ Nâng cấp: Hiển thị phát âm “US” ưu tiên, xử lý null-safety đầy đủ
+     */
     private void updateUI() {
         String progress;
-        if (flashcards == null || flashcards.size() == 0) {
+        if (learnableItems == null || learnableItems.isEmpty()) {
             progress = "0/0";
         } else if (isOnCongrats()) {
-            progress = flashcards.size() + "/" + flashcards.size();
+            progress = learnableItems.size() + "/" + learnableItems.size();
         } else {
-            progress = (currentIndex + 1) + "/" + flashcards.size();
+            progress = (currentIndex + 1) + "/" + learnableItems.size();
         }
         binding.txtProgress.setText("Progress: " + progress);
 
         if (isOnCongrats()) {
             binding.cardContainer.setVisibility(View.INVISIBLE);
             binding.congratsContainer.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        binding.cardContainer.setVisibility(View.VISIBLE);
+        binding.congratsContainer.setVisibility(View.GONE);
+
+        LearnableItem item = learnableItems.get(currentIndex);
+        FlashcardItem word = item.word;
+        Definition def = item.definition;
+
+        if (def == null) {
+            binding.textTerm.setText(word.getWordText());
+            binding.textDefinition.setText("No definition available for this word.");
+            binding.textPhonetic.setVisibility(View.GONE);
+            binding.textPOS.setVisibility(View.GONE);
+            binding.textExample.setVisibility(View.GONE);
+            binding.btnAudio.setVisibility(View.GONE);
+            binding.imgRegion.setVisibility(View.GONE);
+            binding.textVietnameseTerm.setText("N/A");
+            binding.textVietnamesePOS.setVisibility(View.GONE);
+            return;
+        }
+
+        // --- MẶT TRƯỚC ---
+        binding.textTerm.setText(word.getWordText());
+
+        // 🔹 Phát âm — chọn “US” trước, fallback sang đầu tiên
+        if (word.getPronunciations() != null && !word.getPronunciations().isEmpty()) {
+            Pronunciation selectedPron = null;
+            for (Pronunciation p : word.getPronunciations()) {
+                if ("US".equals(p.getRegion())) {
+                    selectedPron = p;
+                    break;
+                }
+            }
+            if (selectedPron == null) selectedPron = word.getPronunciations().get(0);
+
+            binding.textPhonetic.setText("'" + selectedPron.getPhoneticSpelling() + "'");
+            binding.textPhonetic.setVisibility(View.VISIBLE);
+
+            if ("US".equals(selectedPron.getRegion())) {
+                binding.imgRegion.setImageResource(R.drawable.ic_flag_us);
+                binding.imgRegion.setVisibility(View.VISIBLE);
+            } else {
+                binding.imgRegion.setVisibility(View.GONE);
+            }
+
+            final String audioUrl = selectedPron.getAudioFileUrl();
+            if (audioUrl != null && !audioUrl.isEmpty()) {
+                binding.btnAudio.setVisibility(View.VISIBLE);
+                binding.btnAudio.setOnClickListener(v -> playAudio(audioUrl));
+            } else {
+                binding.btnAudio.setVisibility(View.GONE);
+            }
         } else {
-            binding.cardContainer.setVisibility(View.VISIBLE);
-            binding.congratsContainer.setVisibility(View.GONE);
+            binding.textPhonetic.setVisibility(View.GONE);
+            binding.btnAudio.setVisibility(View.GONE);
+            binding.imgRegion.setVisibility(View.GONE);
+        }
 
-            FlashcardItem item = flashcards.get(currentIndex);
+        // 🔹 Loại từ
+        if (def.getPos() != null) {
+            binding.textPOS.setText("(" + def.getPos().getPosName() + ")");
+            binding.textPOS.setVisibility(View.VISIBLE);
+        } else {
+            binding.textPOS.setVisibility(View.GONE);
+        }
 
-            // Chuẩn bị dữ liệu
-            String title = item.getWordText();
-            String pos = " ";
-            String definition = "N/A";
-            String example = " ";
-            String vietTitle = item.getWordText();
-            String vietDefinition = "N/A";
-            String vietPOS = " ";
+        // 🔹 Định nghĩa & ví dụ
+        binding.textDefinition.setText("Definition: " + def.getDefinitionText());
+        if (def.getExamples() != null && !def.getExamples().isEmpty()) {
+            binding.textExample.setText("Example: " + def.getExamples().get(0).getExampleSentence());
+            binding.textExample.setVisibility(View.VISIBLE);
+        } else {
+            binding.textExample.setVisibility(View.GONE);
+        }
 
-            if (item.getDefinitions() != null && !item.getDefinitions().isEmpty()) {
-                Definition def = item.getDefinitions().get(0);
-                definition = def.getDefinitionText();
-                vietDefinition = def.getTranslationText();
+        // --- MẶT SAU ---
+        binding.textVietnameseTerm.setText(def.getTranslationText());
+        if (def.getPos() != null) {
+            binding.textVietnamesePOS.setText("(" + def.getPos().getPosNameVie() + ")");
+            binding.textVietnamesePOS.setVisibility(View.VISIBLE);
+        } else {
+            binding.textVietnamesePOS.setVisibility(View.GONE);
+        }
 
-                if (def.getPos() != null) {
-                    pos = def.getPos().getPosName();
-                    vietPOS = def.getPos().getPosName();
-                }
-                if (def.getExamples() != null && !def.getExamples().isEmpty()) {
-                    Example ex = def.getExamples().get(0);
-                    example = "Example: " + ex.getExampleSentence();
-                }
-            }
+        // 🔹 Reset flip state nếu sang thẻ mới
+        if (currentIndex != lastIndex) {
+            lastIndex = currentIndex;
+            showingFront = true;
+            binding.cardContainer.setRotationY(0f);
+            binding.frontView.setVisibility(View.VISIBLE);
+            binding.backView.setVisibility(View.GONE);
+        }
+    }
 
-            // Cập nhật mặt trước
-            binding.textTerm.setText(title + " (" + pos + ")");
-            binding.textDefinition.setText(definition);
-            binding.textExample.setText(example);
-
-            // Cập nhật mặt sau
-            binding.textVietnameseTerm.setText(vietTitle + " (" + vietPOS + ")");
-            binding.textVietnameseDefinition.setText("Định nghĩa: " + vietDefinition);
-
-            if (currentIndex != lastIndex) {
-                lastIndex = currentIndex;
-                showingFront = true;
-                binding.cardContainer.setRotationY(0f);
-                binding.frontView.setVisibility(View.VISIBLE);
-                binding.backView.setVisibility(View.GONE);
-            }
+    private void playAudio(String url) {
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+        }
+        mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(url);
+            mediaPlayer.prepareAsync();
+            mediaPlayer.setOnPreparedListener(MediaPlayer::start);
+            mediaPlayer.setOnErrorListener((mp, what, extra) -> {
+                Log.e(TAG, "MediaPlayer error: " + what);
+                Toast.makeText(getContext(), "Cannot play audio", Toast.LENGTH_SHORT).show();
+                return true;
+            });
+        } catch (IOException e) {
+            Log.e(TAG, "MediaPlayer setDataSource error", e);
+            Toast.makeText(getContext(), "Invalid audio source", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -206,19 +260,19 @@ public class FlashcardFragment2 extends Fragment {
         flip.setDuration(400);
         flip.setInterpolator(new DecelerateInterpolator());
 
+        flip.addUpdateListener(animation -> {
+            float animatedValue = (float) animation.getAnimatedValue();
+            if (animatedValue >= 90 && visible.getVisibility() == View.VISIBLE) {
+                visible.setVisibility(View.GONE);
+                hidden.setVisibility(View.VISIBLE);
+            }
+        });
+
         flip.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 showingFront = !showingFront;
                 isFlipping = false;
-            }
-        });
-
-        flip.addUpdateListener(animation -> {
-            float value = (float) animation.getAnimatedValue();
-            if (value >= 90 && visible.getVisibility() == View.VISIBLE) {
-                visible.setVisibility(View.GONE);
-                hidden.setVisibility(View.VISIBLE);
             }
         });
 
@@ -240,20 +294,14 @@ public class FlashcardFragment2 extends Fragment {
         if (bottomAppBar != null) bottomAppBar.setVisibility(View.VISIBLE);
         if (fab != null) fab.setVisibility(View.VISIBLE);
     }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         restoreNavigationBar();
-        binding = null;
-    }
-
-    private String getTopicTitle(int idx) {
-        switch (idx) {
-            case 1: return "Fruits";
-            case 2: return "Animals";
-            case 3: return "Personalities";
-            default: return "Topic";
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
         }
+        binding = null;
     }
 }
