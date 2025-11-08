@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.nt118_englishvocabapp.R;
@@ -19,6 +20,9 @@ import com.example.nt118_englishvocabapp.databinding.FragmentVocabBinding;
 import com.example.nt118_englishvocabapp.ui.vocab2.VocabFragment2;
 import com.example.nt118_englishvocabapp.util.KeyboardUtils;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class VocabFragment extends Fragment {
 
@@ -31,6 +35,9 @@ public class VocabFragment extends Fragment {
     // move topics and adapter to fields so filter listener can update them
     private java.util.List<TopicCard> allTopics = new java.util.ArrayList<>();
     private TopicCardAdapter topicAdapter;
+
+    // ViewModel to fetch topics from backend
+    private VocabViewModel viewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -84,17 +91,19 @@ public class VocabFragment extends Fragment {
         }
 
         // RecyclerView setup: use TopicCardAdapter
-        allTopics.add(new TopicCard("Fruits", "Easy", 10, R.drawable.fruits));
-        allTopics.add(new TopicCard("Information & Technology", "Medium", 12, R.drawable.it));
-        allTopics.add(new TopicCard("Careers", "Hard", 8, R.drawable.careers));
-        allTopics.add(new TopicCard("Apperances", "Easy", 9, R.drawable.apperances));
-        allTopics.add(new TopicCard("Personalities", "Medium", 11, R.drawable.personalities));
-        allTopics.add(new TopicCard("Travel", "Easy", 15, R.drawable.travel));
+        // start with empty list; will be populated from backend via ViewModel
+        allTopics = new ArrayList<>();
 
         LinearLayoutManager lm = new LinearLayoutManager(requireContext());
         binding.recyclerTopics.setLayoutManager(lm);
-        topicAdapter = new TopicCardAdapter(allTopics, (item, pos) -> onCardClicked(pos+1));
+        topicAdapter = new TopicCardAdapter(allTopics, (item, pos) -> onCardClicked(item.getTopicId()));
         binding.recyclerTopics.setAdapter(topicAdapter);
+
+        // Initialize ViewModel and observe topics/errors
+        viewModel = new ViewModelProvider(requireActivity()).get(VocabViewModel.class);
+        observeViewModel();
+        // Trigger initial load
+        viewModel.fetchTopics();
 
         // Listen for filter results from FilterFragment
         getParentFragmentManager().setFragmentResultListener("vocabFilter", this, (requestKey, bundle) -> {
@@ -186,6 +195,35 @@ public class VocabFragment extends Fragment {
         return root;
     }
 
+    private void observeViewModel() {
+        viewModel.getTopics().observe(getViewLifecycleOwner(), topics -> {
+            if (topics != null && !topics.isEmpty()) {
+                // Map backend Topic -> UI TopicCard (preserve difficulty/status)
+                allTopics.clear();
+                for (com.example.nt118_englishvocabapp.models.Topic t : topics) {
+                    String title = t.getTopicName() != null ? t.getTopicName() : "Untitled";
+                    String difficulty = t.getDifficulty() != null ? t.getDifficulty() : "";
+                    int wordsCount = 0; // backend Topic doesn't include words count; keep 0
+                    int imageRes = R.drawable.apperances; // placeholder image
+                    TopicCard card = new TopicCard(title, difficulty, wordsCount, imageRes);
+                    allTopics.add(card);
+                }
+                topicAdapter.updateList(new ArrayList<>(allTopics));
+            } else {
+                // empty list
+                allTopics.clear();
+                topicAdapter.updateList(new ArrayList<>());
+            }
+        });
+
+        viewModel.getError().observe(getViewLifecycleOwner(), err -> {
+            if (err != null && !err.isEmpty()) {
+                Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Vocab load error: " + err);
+            }
+        });
+    }
+
     private void applyFilters(boolean savedOnly, String difficulty) {
         java.util.List<TopicCard> filtered = new java.util.ArrayList<>();
         for (TopicCard t : allTopics) {
@@ -222,7 +260,7 @@ public class VocabFragment extends Fragment {
         keyboardListener = null;
     }
 
-    private void onCardClicked(int index) {
+    private void onCardClicked(int topicId) {
         try {
             // Use KeyboardUtils to hide keyboard, remove listener and restore bottom UI
             keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
@@ -235,7 +273,7 @@ public class VocabFragment extends Fragment {
             // Navigate to detail fragment
             VocabFragment2 frag = new VocabFragment2();
             Bundle args = new Bundle();
-            args.putInt("topic_index", index);
+            args.putInt("topic_index", topicId);
             frag.setArguments(args);
 
             AppCompatActivity activity = (AppCompatActivity) requireActivity();
@@ -247,7 +285,7 @@ public class VocabFragment extends Fragment {
                     .addToBackStack(backStackName)
                     .commitAllowingStateLoss();
         } catch (Exception e) {
-            Log.e(TAG, "Navigation error while opening topic " + index, e);
+            Log.e(TAG, "Navigation error while opening topic " + topicId, e);
             Toast.makeText(requireContext(), "Navigation error: " + e.getClass().getSimpleName() + " - " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }

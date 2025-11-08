@@ -49,8 +49,8 @@
         <!-- Favorite icon aligned to the right -->
         <ImageView
             android:id="@+id/img_favorite"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="8dp"
             android:layout_marginTop="4dp"

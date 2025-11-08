@@ -1,26 +1,28 @@
-// java
 package com.example.nt118_englishvocabapp.ui.vocab3;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.nt118_englishvocabapp.R;
+import com.example.nt118_englishvocabapp.ui.vocab3.VocabWordViewModel;
 import com.example.nt118_englishvocabapp.ui.vocab2.VocabFragment2;
 import com.example.nt118_englishvocabapp.ui.vocab4.VocabFragment4;
 import com.example.nt118_englishvocabapp.ui.vocab5.VocabFragment5;
 import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+/**
+ * VocabFragment3 - Definition tab with navigation to Forms (VocabFragment4) and Synonyms (VocabFragment5).
+ * Uses a shared VocabWordViewModel so all three detail fragments can observe the same word details.
+ */
 public class VocabFragment3 extends Fragment {
 
     public static final String ARG_WORD = "arg_word";
@@ -34,10 +36,9 @@ public class VocabFragment3 extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_vocab3, container, false);
 
-        // Find tab views
+        // Tab controls
         TextView tabDefinition = root.findViewById(R.id.tab_definition);
         TextView tabForms = root.findViewById(R.id.tab_forms);
         TextView tabSynonyms = root.findViewById(R.id.tab_synonyms);
@@ -47,12 +48,12 @@ public class VocabFragment3 extends Fragment {
         View contentForms = root.findViewById(R.id.content_forms);
         View contentSynonyms = root.findViewById(R.id.content_synonyms);
 
-        // Lower content views to populate
+        // Lower content views
         TextView wordText = root.findViewById(R.id.wordText);
         TextView wordType = root.findViewById(R.id.wordType);
         TextView definitionEn = root.findViewById(R.id.definitionEn);
 
-        // Load args if provided
+        // Read args safely
         Bundle args = getArguments();
         String word = args != null ? args.getString(ARG_WORD) : null;
         String type = args != null ? args.getString(ARG_WORD_TYPE) : null;
@@ -62,14 +63,22 @@ public class VocabFragment3 extends Fragment {
         if (type != null) wordType.setText(type);
         if (def != null) definitionEn.setText(def);
 
-        int hostId = (container != null) ? container.getId() : android.R.id.content;
-        // Helper listener to set selection or navigate
+        // Shared ViewModel (scoped to the activity) so other detail fragments can observe updates
+        VocabWordViewModel vm = new ViewModelProvider(requireActivity()).get(VocabWordViewModel.class);
+        vm.setWordDetails(word, type, def);
+        vm.getWord().observe(getViewLifecycleOwner(), w -> { if (w != null && !w.isEmpty()) wordText.setText(w); });
+        vm.getWordType().observe(getViewLifecycleOwner(), t -> { if (t != null && !t.isEmpty()) wordType.setText(t); });
+        vm.getDefinition().observe(getViewLifecycleOwner(), d -> { if (d != null && !d.isEmpty()) definitionEn.setText(d); });
+
+        // Host container id where fragments are replaced
+        final int hostId = (container != null) ? container.getId() : android.R.id.content;
+
+        // Tab click listener: definition stays in this fragment; other tabs navigate
         View.OnClickListener tabClick = v -> {
             if (v == tabDefinition) {
-                // show definition content inside this fragment
-                setSelectedTab(v, tabDefinition, tabForms, tabSynonyms, contentDefinition, contentForms, contentSynonyms);
+                setSelectedTab(v, tabDefinition, tabForms, tabSynonyms,
+                        contentDefinition, contentForms, contentSynonyms);
             } else if (v == tabForms) {
-                // navigate to Forms fragment, pass args
                 VocabFragment4 f = new VocabFragment4();
                 Bundle b = new Bundle();
                 b.putString(ARG_WORD, word);
@@ -82,7 +91,6 @@ public class VocabFragment3 extends Fragment {
                         .addToBackStack(null)
                         .commit();
             } else if (v == tabSynonyms) {
-                // navigate to Synonyms fragment, pass args
                 VocabFragment5 f = new VocabFragment5();
                 Bundle b = new Bundle();
                 b.putString(ARG_WORD, word);
@@ -97,41 +105,49 @@ public class VocabFragment3 extends Fragment {
             }
         };
 
-
-
         tabDefinition.setOnClickListener(tabClick);
         tabForms.setOnClickListener(tabClick);
         tabSynonyms.setOnClickListener(tabClick);
 
-        // Initialize default selection to definition inside this fragment
-        setSelectedTab(tabDefinition, tabDefinition, tabForms, tabSynonyms, contentDefinition, contentForms, contentSynonyms);
+        // Initialize selection
+        setSelectedTab(tabDefinition, tabDefinition, tabForms, tabSynonyms,
+                contentDefinition, contentForms, contentSynonyms);
 
-        // Bind standardized return button behavior (make sure to return to vocabfragment2)
-        ReturnButtonHelper.bind(root, this);
-        View btnReturn = root.findViewById(R.id.btn_return);
-        if (btnReturn != null) {
-            btnReturn.setOnClickListener(v -> {
-                String backStackName = "VocabFragment2_BackStack";
-                getParentFragmentManager().popBackStack(backStackName, 0);
+        // Return button: use ReturnButtonHelper with a fallback that navigates to VocabFragment2
+        Runnable fallback = () -> {
+            if (getActivity() == null) return;
+            getActivity().runOnUiThread(() -> {
+                try {
+                    androidx.fragment.app.FragmentManager fm = requireActivity().getSupportFragmentManager();
+                    // clear entire back stack to avoid unexpected intermediate fragments
+                    fm.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    VocabFragment2 f2 = new VocabFragment2();
+                    fm.beginTransaction().replace(hostId, f2).commitAllowingStateLoss();
+                } catch (Exception ignored) {
+                    // fallback: dispatch activity back
+                    if (getActivity() != null) requireActivity().getOnBackPressedDispatcher().onBackPressed();
+                }
             });
-        }
+        };
+
+        // Bind the return button using the helper; preClick is null here
+        ReturnButtonHelper.bind(root, this, null, fallback);
+
         Toast.makeText(getContext(), "Vocab Fragment 3 Opened!", Toast.LENGTH_SHORT).show();
         return root;
     }
 
+    // Toggle tab UI + content visibility
     private void setSelectedTab(View selected, TextView def, TextView forms, TextView syn,
                                 View contentDef, View contentForms, View contentSyn) {
         def.setSelected(def == selected);
         forms.setSelected(forms == selected);
         syn.setSelected(syn == selected);
 
-        // Keep all tabs enabled so they remain clickable and can navigate between fragments.
-        // Previously we disabled non-selected tabs which prevented their click listeners from firing.
         def.setEnabled(true);
         forms.setEnabled(true);
         syn.setEnabled(true);
 
-        // Toggle content visibility
         contentDef.setVisibility(def == selected ? View.VISIBLE : View.GONE);
         contentForms.setVisibility(forms == selected ? View.VISIBLE : View.GONE);
         contentSyn.setVisibility(syn == selected ? View.VISIBLE : View.GONE);

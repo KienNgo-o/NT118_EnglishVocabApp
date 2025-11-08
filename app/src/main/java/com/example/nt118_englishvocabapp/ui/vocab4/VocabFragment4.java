@@ -1,11 +1,9 @@
 package com.example.nt118_englishvocabapp.ui.vocab4;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,12 +12,15 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.nt118_englishvocabapp.R;
-import com.example.nt118_englishvocabapp.ui.vocab2.VocabFragment2;
 import com.example.nt118_englishvocabapp.ui.vocab3.VocabFragment3;
+import com.example.nt118_englishvocabapp.ui.vocab3.VocabWordViewModel;
 import com.example.nt118_englishvocabapp.ui.vocab5.VocabFragment5;
 import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+/**
+ * VocabFragment4 (Forms) - currently shows forms content and allows navigation
+ * between definition/forms/synonyms.
+ */
 public class VocabFragment4 extends Fragment {
 
     public VocabFragment4() {
@@ -53,6 +54,13 @@ public class VocabFragment4 extends Fragment {
             String type = args.getString(VocabFragment3.ARG_WORD_TYPE);
             if (word != null) wordText.setText(word);
             if (type != null) wordType.setText(type);
+
+            // Seed shared ViewModel so other detail fragments can observe/update
+            VocabWordViewModel vm = new androidx.lifecycle.ViewModelProvider(requireActivity()).get(VocabWordViewModel.class);
+            vm.setWordDetails(word, type, null);
+            // Observe VM for future backend updates
+            vm.getWord().observe(getViewLifecycleOwner(), w -> { if (w != null && !w.isEmpty()) wordText.setText(w); });
+            vm.getWordType().observe(getViewLifecycleOwner(), t -> { if (t != null && !t.isEmpty()) wordType.setText(t); });
         }
 
         int hostId = (container != null) ? container.getId() : android.R.id.content;
@@ -84,13 +92,7 @@ public class VocabFragment4 extends Fragment {
 
         // Bind standardized return button behavior (make sure to return to vocabfragment2)
         ReturnButtonHelper.bind(root, this);
-        View btnReturn = root.findViewById(R.id.btn_return);
-        if (btnReturn != null) {
-            btnReturn.setOnClickListener(v -> {
-                String backStackName = "VocabFragment2_BackStack";
-                getParentFragmentManager().popBackStack(backStackName, 0);
-            });
-        }
+
         Toast.makeText(getContext(), "Vocab Fragment 4 Opened!", Toast.LENGTH_SHORT).show();
         return root;
     }

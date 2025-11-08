@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Shared / Common colors (used across many fragments) -->
+    <!-- ==========================
+         Common / Shared colors
+         (used across many fragments)
+         ========================== -->
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
     <color name="gray">#757575</color>
@@ -9,7 +12,10 @@
     <color name="light_divider">#E8E8F0</color>
     <color name="dark">#304046</color>
 
-    <!-- Brand / Accent colors (shared) -->
+    <!-- ==========================
+         Brand / Accent colors
+         (app brand & accents)
+         ========================== -->
     <color name="light_purple">#D2D5FF</color>
     <color name="dark_purple">#410FA3</color>
     <color name="purple_500">#9C27B0</color>
@@ -17,56 +23,61 @@
     <color name="blue">#3D5CFF</color>
     <color name="blue_button">#0961F5</color>
     <color name="orange">#FF9051</color>
-    <!-- Teal (secondary) colors referenced by themes -->
     <color name="teal_200">#03DAC5</color>
     <color name="teal_700">#018786</color>
-    <!-- Label color for image name; night variant in values-night -->
-    <color name="quiz_button_bg">#FFFFFFFF</color>
-    <!-- Vocab fragments colors -->
-    <!-- Always-white circular background for quiz stage buttons -->
-    <color name="card_background_vocabulary">#FFFFFFFF</color>
-    <color name="green_700">#2E7D32</color>
 
-    <!-- Keep flashcard appearance same in night for specific parts -->
+    <!-- ==========================
+         Flashcard fragment
+         (flashcard card, text, nav and arrows)
+         ========================== -->
     <color name="flashcard_bg">#D2D5FF</color>
-
-    <!-- Flashcard fragments colors -->
+    <color name="flashcard_text">#212121</color>
+    <color name="flashcard_nav_bg">#D2D5FF</color>
+    <color name="flashcard_arrow_tint">#410FA3</color>
+    <color name="arrow_tint">#410FA3</color>
     <color name="card_text_color">#410FA3</color>
 
-    <!-- Arrow tint used for navigation arrows in flashcards (light theme default) -->
-    <color name="arrow_tint">#410FA3</color>
-    <!-- Flashcard-specific arrow tint (keeps flashcard arrows identical across themes) -->
-    <color name="flashcard_arrow_tint">#410FA3</color>
+    <!-- ==========================
+         Vocab / List fragments
+         (vocab list items & quiz button backgrounds)
+         ========================== -->
+    <color name="card_background_vocabulary">#FFFFFFFF</color>
+    <color name="vocab_card_background">#FFFFFFFF</color>
+    <color name="quiz_button_bg">#FFFFFFFF</color>
+    <color name="green_700">#2E7D32</color>
 
-    <!-- Translate fragment colors (none isolated) -->
+    <!-- ==========================
+         UI surfaces / Typography
+         (general surface & text defaults)
+         ========================== -->
+    <color name="card_background">#FFFFFFFF</color>
+    <color name="text_primary">#212121</color>
     <color name="text_secondary">#7A7A7A</color>
     <color name="divider">#F1F1F1</color>
     <color name="row_icon_tint">#4C4C4C</color>
+    <color name="search_icon_color">#212121</color>
     <color name="on_purple">#FFFFFFFF</color>
 
-    <!-- UI surface defaults (base declarations required for qualified overrides) -->
-    <color name="card_background">#FFFFFFFF</color>
-    <color name="text_primary">#212121</color>
-
-    <!-- Missing colors referenced by layouts -->
-    <color name="white_gray">#F7F8FA</color>
-    <color name="light_white_gray">#F1F1F2</color>
-    <color name="flashcard_text">#212121</color>
-
-    <!-- Screen background color used by fragment roots (light theme) -->
-    <color name="screen_background">#D2D5FF</color>
-    <!-- Search icon color (keeps search icon identical across themes) -->
-    <color name="search_icon_color">#212121</color>
-    <!-- Navigation button background specifically for flashcard nav so it stays same in night mode -->
-    <color name="flashcard_nav_bg">#D2D5FF</color>
-    <!-- Vocab list item background (separate from general card_background) -->
-    <color name="vocab_card_background">#FFFFFFFF</color>
-
-    <!-- Auth related fragments colors -->
-    <!-- Multiple choice / Quiz feedback colors -->
+    <!-- ==========================
+         Quiz / Auth / Feedback
+         (correct/incorrect states and save icon tints)
+         ========================== -->
     <color name="correct_green">#2E7D32</color>
     <color name="incorrect_red">#C62828</color>
-    <!-- Save icon tint states -->
     <color name="saved_green">#2E7D32</color>
     <color name="unsaved_gray">#9E9E9E</color>
+
+    <!-- ==========================
+         Helper / layout-specific colors
+         (utility colors referenced directly from layouts)
+         ========================== -->
+    <color name="white_gray">#F7F8FA</color>
+    <color name="light_white_gray">#F1F1F2</color>
+
+    <!-- ==========================
+         Screen / Fragment backgrounds
+         (root backgrounds used by fragments)
+         ========================== -->
+    <color name="screen_background">#D2D5FF</color>
+
 </resources>

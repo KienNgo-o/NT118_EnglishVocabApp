@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.nt118_englishvocabapp.R;
@@ -25,25 +26,20 @@ public class VocabFragment2 extends Fragment {
     private VocabTopicAdapter adapter;
     private List<Topic> fullTopics = new ArrayList<>();
 
+    // ViewModel for backend-backed word list
+    private Vocab2ViewModel viewModel;
+    private Integer topicIdArg = null; // optional topic id passed from VocabFragment
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentVocab2Binding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Sample words - replace with real data source later
-        fullTopics = new ArrayList<>(Arrays.asList(
-                new Topic("cat", "(n.)", "A small domesticated carnivorous mammal."),
-                new Topic("run", "(v.)", "To move at a speed faster than a walk."),
-                new Topic("beautiful", "(adj.)", "Pleasing the senses or mind aesthetically."),
-                new Topic("happiness", "(n.)", "The state of being happy."),
-                new Topic("eat", "(v.)", "To consume food."),
-                new Topic("technology", "(n.)", "Application of scientific knowledge for practical purposes."),
-                new Topic("travel", "(v.)", "To make a journey, typically of some length."),
-                new Topic("school", "(n.)", "An institution for educating children or adults."),
-                new Topic("weather", "(n.)", "The state of the atmosphere at a place and time."),
-                new Topic("sport", "(n.)", "An activity involving physical exertion and skill in which an individual or team competes.")
-        ));
+        // If a topic id was passed, record it; otherwise we will use local samples
+        if (getArguments() != null && getArguments().containsKey("topic_index")) {
+            topicIdArg = getArguments().getInt("topic_index");
+        }
 
         // RecyclerView setup
         binding.recyclerTopics.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -64,6 +60,31 @@ public class VocabFragment2 extends Fragment {
                     .commit();
         });
         binding.recyclerTopics.setAdapter(adapter);
+
+        // Initialize ViewModel
+        viewModel = new ViewModelProvider(requireActivity()).get(Vocab2ViewModel.class);
+        observeViewModel();
+
+        // If topicIdArg is provided, fetch from backend; else populate with sample data
+        if (topicIdArg != null && topicIdArg > 0) {
+            viewModel.fetchWords(topicIdArg);
+        } else {
+            // Sample words - replace with real data source later
+            fullTopics = new ArrayList<>(Arrays.asList(
+                    new Topic("cat", "(n.)", "A small domesticated carnivorous mammal."),
+                    new Topic("run", "(v.)", "To move at a speed faster than a walk."),
+                    new Topic("beautiful", "(adj.)", "Pleasing the senses or mind aesthetically."),
+                    new Topic("happiness", "(n.)", "The state of being happy."),
+                    new Topic("eat", "(v.)", "To consume food."),
+                    new Topic("technology", "(n.)", "Application of scientific knowledge for practical purposes."),
+                    new Topic("travel", "(v.)", "To make a journey, typically of some length."),
+                    new Topic("school", "(n.)", "An institution for educating children or adults."),
+                    new Topic("weather", "(n.)", "The state of the atmosphere at a place and time."),
+                    new Topic("sport", "(n.)", "An activity involving physical exertion and skill in which an individual or team competes.")
+            ));
+
+            adapter.updateList(new ArrayList<>(fullTopics));
+        }
 
         // Search icon click - filter the list
         binding.searchTopic.setOnClickListener(v -> {
@@ -120,6 +141,37 @@ public class VocabFragment2 extends Fragment {
         }
         Toast.makeText(getContext(), "Vocab Fragment 2 Opened!", Toast.LENGTH_SHORT).show();
         return root;
+    }
+
+    private void observeViewModel() {
+        viewModel.getTopics().observe(getViewLifecycleOwner(), topics -> {
+            if (topics == null) {
+                // loading state - show progress
+                if (binding != null) binding.progressLoading.setVisibility(View.VISIBLE);
+                return;
+            }
+
+            // hide progress
+            if (binding != null) binding.progressLoading.setVisibility(View.GONE);
+
+            if (!topics.isEmpty()) {
+                fullTopics.clear();
+                fullTopics.addAll(topics);
+                adapter.updateList(new ArrayList<>(fullTopics));
+            } else {
+                // empty result from backend
+                fullTopics.clear();
+                adapter.updateList(new ArrayList<>());
+                Toast.makeText(requireContext(), "No words found for this topic", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        viewModel.getError().observe(getViewLifecycleOwner(), err -> {
+            if (err != null && !err.isEmpty()) {
+                if (binding != null) binding.progressLoading.setVisibility(View.GONE);
+                Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void applyFilters(boolean savedOnly, String difficulty) {
