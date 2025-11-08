@@ -3,6 +3,7 @@ package com.example.nt118_englishvocabapp.ui.vocab2;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -34,7 +35,7 @@ public class VocabTopicAdapter extends RecyclerView.Adapter<VocabTopicAdapter.Vi
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_topic, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_vocab, parent, false);
         return new ViewHolder(view);
     }
 
@@ -44,6 +45,9 @@ public class VocabTopicAdapter extends RecyclerView.Adapter<VocabTopicAdapter.Vi
         holder.word.setText(t.getWord());
         holder.wordType.setText(t.getWordType());
         holder.definition.setText(t.getDefinition());
+
+        // set favorite icon state
+        holder.imgFavorite.setImageResource(t.isFavorite() ? R.drawable.favorite_yes : R.drawable.favorite_no);
 
         // Determine background based on position and list size
         int size = topics.size();
@@ -64,6 +68,15 @@ public class VocabTopicAdapter extends RecyclerView.Adapter<VocabTopicAdapter.Vi
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(t, position);
         });
+
+        // toggle favorite when clicking the icon
+        holder.imgFavorite.setOnClickListener(v -> {
+            boolean newState = !t.isFavorite();
+            t.setFavorite(newState);
+            holder.imgFavorite.setImageResource(newState ? R.drawable.favorite_yes : R.drawable.favorite_no);
+            // optionally notify item changed if you want animations or persistence elsewhere
+            // notifyItemChanged(position);
+        });
     }
 
     @Override
@@ -75,12 +88,14 @@ public class VocabTopicAdapter extends RecyclerView.Adapter<VocabTopicAdapter.Vi
         TextView word;
         TextView wordType;
         TextView definition;
+        ImageView imgFavorite;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             word = itemView.findViewById(R.id.txt_word);
             wordType = itemView.findViewById(R.id.txt_word_type);
             definition = itemView.findViewById(R.id.txt_definition);
+            imgFavorite = itemView.findViewById(R.id.img_favorite);
         }
     }
 }

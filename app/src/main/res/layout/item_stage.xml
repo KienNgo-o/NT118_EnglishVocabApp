@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/stage_card"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="12dp">  <!-- reduced margin -->
+
+    <!-- slightly smaller frame to reduce overall size -->
+    <FrameLayout
+        android:id="@+id/image_frame"
+        android:layout_width="80dp"
+        android:layout_height="80dp">
+
+        <View
+            android:id="@+id/base_circle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/circle_bg" />
+
+        <ImageView
+            android:id="@+id/stage_image"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center"
+            android:scaleType="centerInside"
+            android:contentDescription="@null" />
+
+        <ImageView
+            android:id="@+id/lock_icon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_gravity="end|bottom"
+            android:visibility="gone"
+            android:src="@android:drawable/ic_lock_lock"
+            android:contentDescription="@null" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/stage_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+</LinearLayout>

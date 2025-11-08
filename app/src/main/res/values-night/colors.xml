@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Night mode overrides: only define colors that should differ in dark theme -->
+    <!-- Keep accents identical unless explicitly changed -->
+    <color name="light_purple">#313438</color>
+    <color name="dark_purple">#410FA3</color>
+    <color name="purple_500">#9C27B0</color>
+    <color name="purple_700">#5E35B1</color>
+    <color name="blue">#3D5CFF</color>
+    <color name="blue_button">#0961F5</color>
+    <color name="orange">#FF9051</color>
+
+    <!-- Shared/common overrides -->
+    <color name="light_gray">#E0E0E0</color>
+    <color name="light_divider">#E8E8F0</color>
+    <color name="dark">#304046</color>
+
+    <!-- UI surface & text overrides for night theme -->
+    <color name="card_background">#313438</color>
+    <color name="card_background_vocabulary">#313438</color>
+    <color name="card_text_color">#D2D5FF</color>
+    <color name="text_primary">#F0F2F3</color>
+    <color name="text_secondary">#C7C9CC</color>
+    <color name="divider">#36373A</color>
+    <color name="row_icon_tint">#C7C9CC</color>
+
+    <!-- Flashcard appearance kept consistent where required (keep card color same as light; only screen bg changes) -->
+    <color name="flashcard_bg">#D2D5FF</color>
+    <color name="on_purple">#FFFFFFFF</color>
+
+    <!-- Overrides for 'light' helper colors used by layouts so UI stays dark in night mode -->
+    <!-- Make `white_gray` match the quiz/ screen background in night mode so fragment screen bg is dark -->
+    <color name="white_gray">#414347</color>
+    <!-- For the flashcard card back, keep the exact light-mode back color so the card looks identical in night -->
+    <color name="light_white_gray">#F1F1F2</color>
+    <!-- Ensure flashcard definition/example text matches light mode -->
+    <color name="flashcard_text">#212121</color>
+
+    <!-- Icon/arrow tint in night mode -->
+    <color name="arrow_tint">#D2D5FF</color>
+     <!-- Flashcard-specific arrow tint (mirror light mode) -->
+    <color name="flashcard_arrow_tint">#410FA3</color>
+    <!-- Search icon color: keep same as light mode so this icon won't change in night mode -->
+    <color name="search_icon_color">#212121</color>
+
+    <!-- Screen background for targeted fragments in night mode (lighter black requested) -->
+    <!-- Changed from #37393E to a slightly lighter black: #414347 -->
+    <color name="screen_background">#484B4F</color>
+
+    <!-- Quiz related -->
+    <color name="correct_green">#2E7D32</color>
+    <color name="incorrect_red">#C62828</color>
+    <!-- Save icon tint states for night mode -->
+    <color name="saved_green">#2E7D32</color>
+    <!-- Slightly lighter unsaved gray so the icon remains visible on dark surfaces -->
+    <color name="unsaved_gray">#B0B0B0</color>
+    <!-- Ensure nav background for flashcard remains the same as light mode in night -->
+    <color name="flashcard_nav_bg">#D2D5FF</color>
+    <!-- Vocab list item background in night: darker than light mode, scoped to vocab items only -->
+    <color name="vocab_card_background">#1F1E1C</color>
+</resources>

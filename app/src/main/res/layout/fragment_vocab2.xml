@@ -50,7 +50,7 @@
                     android:layout_centerInParent="true"
                     android:text="Vocabulary"
                     android:textSize="24sp"
-                    android:textColor="@color/dark_purple"
+                    android:textColor="@color/card_text_color"
                     android:textStyle="bold" />
             </RelativeLayout>
 
@@ -114,7 +114,10 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="5dp"
-                    android:src="@drawable/search_topic" />
+                    android:src="@drawable/search_topic"
+                    app:tint="@color/search_icon_color"
+                    app:tintMode="src_in"
+                    android:contentDescription="@string/cd_search_topic" />
             </RelativeLayout>
         </LinearLayout>
 

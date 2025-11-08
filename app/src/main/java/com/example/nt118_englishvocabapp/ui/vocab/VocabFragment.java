@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.TextView;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,10 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.databinding.FragmentVocabBinding;
-import com.example.nt118_englishvocabapp.ui.home.HomeFragment;
 import com.example.nt118_englishvocabapp.ui.vocab2.VocabFragment2;
 import com.example.nt118_englishvocabapp.util.KeyboardUtils;
-import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
 import android.util.Log;
 
 public class VocabFragment extends Fragment {
@@ -28,12 +26,23 @@ public class VocabFragment extends Fragment {
     private FragmentVocabBinding binding;
     private View keyboardRootView;
     private ViewTreeObserver.OnGlobalLayoutListener keyboardListener;
+    private int previousSoftInputMode = -1; // store previous window soft input mode
+
+    // move topics and adapter to fields so filter listener can update them
+    private java.util.List<TopicCard> allTopics = new java.util.ArrayList<>();
+    private TopicCardAdapter topicAdapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentVocabBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        // Save and set the window soft input mode to ADJUST_PAN so only this fragment pans
+        if (getActivity() != null && getActivity().getWindow() != null) {
+            previousSoftInputMode = getActivity().getWindow().getAttributes().softInputMode;
+            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+        }
 
         Toast.makeText(getContext(), "Vocab Fragment Opened!", Toast.LENGTH_SHORT).show();
 
@@ -75,7 +84,6 @@ public class VocabFragment extends Fragment {
         }
 
         // RecyclerView setup: use TopicCardAdapter
-        java.util.List<TopicCard> allTopics = new java.util.ArrayList<>();
         allTopics.add(new TopicCard("Fruits", "Easy", 10, R.drawable.fruits));
         allTopics.add(new TopicCard("Information & Technology", "Medium", 12, R.drawable.it));
         allTopics.add(new TopicCard("Careers", "Hard", 8, R.drawable.careers));
@@ -85,8 +93,16 @@ public class VocabFragment extends Fragment {
 
         LinearLayoutManager lm = new LinearLayoutManager(requireContext());
         binding.recyclerTopics.setLayoutManager(lm);
-        TopicCardAdapter topicAdapter = new TopicCardAdapter(allTopics, (item, pos) -> onCardClicked(pos+1));
+        topicAdapter = new TopicCardAdapter(allTopics, (item, pos) -> onCardClicked(pos+1));
         binding.recyclerTopics.setAdapter(topicAdapter);
+
+        // Listen for filter results from FilterFragment
+        getParentFragmentManager().setFragmentResultListener("vocabFilter", this, (requestKey, bundle) -> {
+            if (bundle == null) return;
+            boolean savedOnly = bundle.getBoolean("savedOnly", false);
+            String difficulty = bundle.getString("difficulty", null);
+            applyFilters(savedOnly, difficulty);
+        });
 
         // Update: make search logic consistent with VocabFragment2
         binding.searchTopic.setOnClickListener(v -> {
@@ -127,18 +143,20 @@ public class VocabFragment extends Fragment {
                     keyboardRootView,
                     keyboardListener
             );
-        });
 
-        // Standardize behavior: hide keyboard first, then pop backstack or navigate home as a fallback
-        View.OnClickListener preClick = v -> {
-            if (!isAdded()) return;
-            keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
-                    requireActivity(),
-                    v,
-                    keyboardRootView,
-                    keyboardListener
-            );
-        };
+            // Show bottom sheet filter
+            try {
+                FilterDialog filterSheet = new FilterDialog();
+                if (getActivity() != null) {
+                    filterSheet.show(getActivity().getSupportFragmentManager(), "VocabFilterSheet");
+                } else {
+                    // fall back to parent fragment manager when activity is not available
+                    filterSheet.show(getParentFragmentManager(), "VocabFilterSheet");
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error showing filter sheet", e);
+            }
+        });
 
         // Make sure to return to home fragment properly
         binding.btnReturn.setOnClickListener(v -> {
@@ -168,9 +186,33 @@ public class VocabFragment extends Fragment {
         return root;
     }
 
+    private void applyFilters(boolean savedOnly, String difficulty) {
+        java.util.List<TopicCard> filtered = new java.util.ArrayList<>();
+        for (TopicCard t : allTopics) {
+            boolean matchesSaved = !savedOnly || t.isSaved();
+            boolean matchesDifficulty = (difficulty == null) || difficulty.isEmpty() || (t.difficulty != null && t.difficulty.equalsIgnoreCase(difficulty));
+            if (matchesSaved && matchesDifficulty) {
+                filtered.add(t);
+            }
+        }
+
+        // Update adapter with filtered results
+        topicAdapter.updateList(filtered);
+
+        String label = "Filters applied";
+        if (savedOnly) label += ": savedOnly";
+        if (difficulty != null) label += ", difficulty=" + difficulty;
+        Toast.makeText(requireContext(), label, Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        // Restore previous soft input mode so other screens are unaffected
+        if (getActivity() != null && getActivity().getWindow() != null && previousSoftInputMode != -1) {
+            getActivity().getWindow().setSoftInputMode(previousSoftInputMode);
+            previousSoftInputMode = -1;
+        }
         // Remove listener from the same view it was added to
         if (keyboardRootView != null && keyboardListener != null) {
             keyboardRootView.getViewTreeObserver().removeOnGlobalLayoutListener(keyboardListener);

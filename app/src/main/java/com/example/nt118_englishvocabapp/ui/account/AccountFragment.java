@@ -28,6 +28,9 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.activity.result.ActivityResultCallback;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import android.content.SharedPreferences;
+import android.content.Context;
 
 import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
 import com.example.nt118_englishvocabapp.util.KeyboardUtils;
@@ -102,6 +105,9 @@ public class AccountFragment extends Fragment {
         final RadioButton rbEveryday = view.findViewById(com.example.nt118_englishvocabapp.R.id.rb_everyday);
         final RadioButton rbEvery2Days = view.findViewById(com.example.nt118_englishvocabapp.R.id.rb_every_2_days);
 
+        // Dark mode switch
+        final SwitchCompat switchDarkMode = view.findViewById(com.example.nt118_englishvocabapp.R.id.switch_dark_mode);
+
         // avatar views
         imgAvatar = view.findViewById(com.example.nt118_englishvocabapp.R.id.img_avatar);
         ImageButton btnAvatarAction = view.findViewById(com.example.nt118_englishvocabapp.R.id.btn_avatar_action);
@@ -119,6 +125,39 @@ public class AccountFragment extends Fragment {
             if (rgFrequency != null) rgFrequency.setEnabled(enabled);
             if (rbEveryday != null) rbEveryday.setEnabled(enabled);
             if (rbEvery2Days != null) rbEvery2Days.setEnabled(enabled);
+        }
+
+        // Initialize dark mode switch state from SharedPreferences
+        try {
+            SharedPreferences prefs = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+            boolean darkEnabled = prefs.getBoolean("pref_dark_mode", false);
+            if (switchDarkMode != null) {
+                // set checked state before attaching listener to avoid immediate callback
+                switchDarkMode.setChecked(darkEnabled);
+
+                switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    try {
+                        // persist choice
+                        prefs.edit().putBoolean("pref_dark_mode", isChecked).apply();
+
+                        // apply mode
+                        if (isChecked) {
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                        } else {
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                        }
+
+                        // recreate activity to apply theme across UI
+                        if (getActivity() != null) {
+                            getActivity().recreate();
+                        }
+                    } catch (Exception e) {
+                        Log.e("AccountFragment", "Error toggling dark mode", e);
+                    }
+                });
+            }
+        } catch (Exception e) {
+            Log.e("AccountFragment", "Failed to read or write dark mode preference", e);
         }
 
         // copy initial text
