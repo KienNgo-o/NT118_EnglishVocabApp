@@ -156,4 +156,5 @@
     <string name="hint_search_topic">Search topic…</string>
     <string name="cd_prev">Previous</string>
     <string name="cd_next">Next</string>
+    <string name="topic_image">Topic Image</string>
 </resources>

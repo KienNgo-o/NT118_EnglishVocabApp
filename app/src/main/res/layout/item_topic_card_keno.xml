@@ -27,26 +27,25 @@
             tools:text="Topic Name" />
 
         <ImageView
-        android:id="@+id/img_lock_icon"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/ic_lock"
-        android:background="#80000000"
-        android:scaleType="center"
-        android:visibility="gone"
-        app:tint="@color/white" />
+            android:id="@+id/img_topic"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_below="@id/txt_topic_name"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="6dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/topic_image"
+            tools:src="@drawable/animals" />
 
         <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="262dp"
-            android:layout_height="61dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="70dp"
-            android:layout_marginEnd="75dp"
-            android:layout_marginBottom="27dp"
-            app:srcCompat="@drawable/padlock" />
+            android:id="@+id/img_lock_icon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_lock"
+            android:background="#80000000"
+            android:scaleType="center"
+            android:visibility="gone"
+            app:tint="@color/white" />
 
     </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>

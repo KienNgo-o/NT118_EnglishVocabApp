@@ -49,7 +49,9 @@ public class FlashcardViewModel extends AndroidViewModel {
      * Gọi API 1: Lấy tất cả chủ đề
      */
     public void fetchTopics() {
+
         apiService.getAllTopics().enqueue(new Callback<List<Topic>>() {
+
             @Override
             public void onResponse(@NonNull Call<List<Topic>> call, @NonNull Response<List<Topic>> response) {
                 if (response.isSuccessful()) {
@@ -71,6 +73,7 @@ public class FlashcardViewModel extends AndroidViewModel {
      * Gọi API 2: Lấy flashcards cho một chủ đề
      */
     public void fetchFlashcards(int topicId) {
+        flashcardList.postValue(null);
         apiService.getFlashcardsForTopic(topicId).enqueue(new Callback<List<FlashcardItem>>() {
             @Override
             public void onResponse(@NonNull Call<List<FlashcardItem>> call, @NonNull Response<List<FlashcardItem>> response) {

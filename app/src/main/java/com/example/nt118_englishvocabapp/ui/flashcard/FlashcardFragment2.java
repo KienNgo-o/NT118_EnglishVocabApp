@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +12,14 @@ import android.view.animation.DecelerateInterpolator;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.databinding.FragmentFlashcard2Binding;
+import com.example.nt118_englishvocabapp.models.Definition;
+import com.example.nt118_englishvocabapp.models.Example;
+import com.example.nt118_englishvocabapp.models.FlashcardItem;
+import com.example.nt118_englishvocabapp.models.POS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,38 +27,65 @@ import java.util.List;
 public class FlashcardFragment2 extends Fragment {
 
     private FragmentFlashcard2Binding binding;
-    private int topicIndex = 1;
+    private int topicId = 1; // ID chủ đề thật từ API
     private List<FlashcardItem> flashcards = new ArrayList<>();
     private int currentIndex = 0;
     private boolean showingFront = true;
     private boolean isFlipping = false;
     private int lastIndex = -1;
+
+    private FlashcardViewModel viewModel;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentFlashcard2Binding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        viewModel = new ViewModelProvider(requireActivity()).get(FlashcardViewModel.class);
         binding.backView.setRotationY(180f);
+
         if (getArguments() != null) {
-            topicIndex = getArguments().getInt("topic_index", 1);
+            topicId = getArguments().getInt("topic_index", 1);
         }
 
-        // load cards for the topic (only Fruits has cards for now)
-        flashcards = getFlashcardsForTopic(topicIndex);
+        binding.txtTopicTitle.setText(getTopicTitle(topicId));
 
-        binding.txtTopicTitle.setText(getTopicTitle(topicIndex));
+        // Quan sát dữ liệu flashcards từ ViewModel
+        viewModel.getFlashcards().observe(getViewLifecycleOwner(), items -> {
+            // 'items' BÂY GIỜ CÓ THỂ LÀ NULL
+            if (items != null) {
+                // Có dữ liệu mới, ẩn loading
+                Log.d("FlashcardFragment2", "Loaded " + items.size() + " flashcards");
+                this.flashcards.clear();
+                this.flashcards.addAll(items);
+            } else {
+                // items là null, nghĩa là đang tải
+                // Hiển thị loading, xóa thẻ cũ
+                this.flashcards.clear();
+                Log.d("FlashcardFragment2", "Loading new flashcards...");
+            }
+            // Dù thế nào cũng cập nhật UI
+            this.currentIndex = 0;
+            this.showingFront = true;
+            updateUI();
+        });
 
+        // Gọi API load dữ liệu
+        viewModel.fetchFlashcards(topicId);
+
+        // Nút quay lại chủ đề
         binding.btnBackTopic.setOnClickListener(v -> {
             restoreNavigationBar();
             if (getParentFragmentManager().getBackStackEntryCount() > 0) {
                 getParentFragmentManager().popBackStack();
-            } else {
-                getParentFragmentManager().popBackStack();
             }
         });
 
+        // Lật thẻ
         binding.cardContainer.setOnClickListener(v -> flipCard());
 
+        // Nút trước
         binding.btnPrev.setOnClickListener(v -> {
             if (isOnCongrats()) {
                 currentIndex = Math.max(0, flashcards.size() - 1);
@@ -63,6 +96,7 @@ public class FlashcardFragment2 extends Fragment {
             updateUI();
         });
 
+        // Nút kế tiếp
         binding.btnNext.setOnClickListener(v -> {
             if (!isOnCongrats()) {
                 currentIndex++;
@@ -83,8 +117,6 @@ public class FlashcardFragment2 extends Fragment {
             }
         });
 
-        currentIndex = 0;
-        showingFront = true;
         updateUI();
         hideNavigationBar();
         return root;
@@ -106,27 +138,51 @@ public class FlashcardFragment2 extends Fragment {
         binding.txtProgress.setText("Progress: " + progress);
 
         if (isOnCongrats()) {
-            binding.cardContainer.setVisibility(View.INVISIBLE); // Sử dụng cardContainer thay vì cardWrapper
+            binding.cardContainer.setVisibility(View.INVISIBLE);
             binding.congratsContainer.setVisibility(View.VISIBLE);
         } else {
-            binding.cardContainer.setVisibility(View.VISIBLE); // Sử dụng cardContainer thay vì cardWrapper
+            binding.cardContainer.setVisibility(View.VISIBLE);
             binding.congratsContainer.setVisibility(View.GONE);
 
             FlashcardItem item = flashcards.get(currentIndex);
-            // Cập nhật mặt trước (Tiếng Anh)
-            binding.textTerm.setText(item.title + (item.pos != null ? " (" + item.pos + ")" : ""));
-            binding.textDefinition.setText(item.definition);
-            binding.textExample.setText(item.example);
 
-            // Cập nhật mặt sau (Tiếng Việt)
-            binding.textVietnameseTerm.setText(item.vietnameseTitle + (item.pos != null ? " (danh từ)" : "")); // Giả sử là danh từ
-            binding.textVietnameseDefinition.setText("Định nghĩa: " + item.vietnameseDefinition);
+            // Chuẩn bị dữ liệu
+            String title = item.getWordText();
+            String pos = " ";
+            String definition = "N/A";
+            String example = " ";
+            String vietTitle = item.getWordText();
+            String vietDefinition = "N/A";
+            String vietPOS = " ";
 
+            if (item.getDefinitions() != null && !item.getDefinitions().isEmpty()) {
+                Definition def = item.getDefinitions().get(0);
+                definition = def.getDefinitionText();
+                vietDefinition = def.getTranslationText();
+
+                if (def.getPos() != null) {
+                    pos = def.getPos().getPosName();
+                    vietPOS = def.getPos().getPosName();
+                }
+                if (def.getExamples() != null && !def.getExamples().isEmpty()) {
+                    Example ex = def.getExamples().get(0);
+                    example = "Example: " + ex.getExampleSentence();
+                }
+            }
+
+            // Cập nhật mặt trước
+            binding.textTerm.setText(title + " (" + pos + ")");
+            binding.textDefinition.setText(definition);
+            binding.textExample.setText(example);
+
+            // Cập nhật mặt sau
+            binding.textVietnameseTerm.setText(vietTitle + " (" + vietPOS + ")");
+            binding.textVietnameseDefinition.setText("Định nghĩa: " + vietDefinition);
 
             if (currentIndex != lastIndex) {
                 lastIndex = currentIndex;
                 showingFront = true;
-                binding.cardContainer.setRotationY(0f); // Đảm bảo thẻ quay về mặt trước
+                binding.cardContainer.setRotationY(0f);
                 binding.frontView.setVisibility(View.VISIBLE);
                 binding.backView.setVisibility(View.GONE);
             }
@@ -134,7 +190,8 @@ public class FlashcardFragment2 extends Fragment {
     }
 
     private void flipCard() {
-        if (isOnCongrats() || isFlipping) return;isFlipping = true;
+        if (isOnCongrats() || isFlipping) return;
+        isFlipping = true;
 
         final View visible = showingFront ? binding.frontView : binding.backView;
         final View hidden = showingFront ? binding.backView : binding.frontView;
@@ -142,7 +199,6 @@ public class FlashcardFragment2 extends Fragment {
         float scale = getResources().getDisplayMetrics().density;
         binding.cardContainer.setCameraDistance(8000 * scale);
 
-        // Xác định góc bắt đầu và kết thúc
         float startAngle = showingFront ? 0 : 180;
         float endAngle = showingFront ? 180 : 0;
 
@@ -152,22 +208,15 @@ public class FlashcardFragment2 extends Fragment {
 
         flip.addListener(new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationStart(Animator animation) {
-                // Hiển thị view ẩn ở giữa animation
-            }
-
-            @Override
             public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
                 showingFront = !showingFront;
                 isFlipping = false;
             }
         });
 
         flip.addUpdateListener(animation -> {
-            float animatedValue = (float) animation.getAnimatedValue();
-            // Lật view tại điểm giữa của animation (90 độ)
-            if (animatedValue >= 90 && visible.getVisibility() == View.VISIBLE) {
+            float value = (float) animation.getAnimatedValue();
+            if (value >= 90 && visible.getVisibility() == View.VISIBLE) {
                 visible.setVisibility(View.GONE);
                 hidden.setVisibility(View.VISIBLE);
             }
@@ -175,7 +224,6 @@ public class FlashcardFragment2 extends Fragment {
 
         flip.start();
     }
-
 
     private void hideNavigationBar() {
         if (getActivity() == null) return;
@@ -200,58 +248,11 @@ public class FlashcardFragment2 extends Fragment {
         binding = null;
     }
 
-    // --- Data model and provider ---
-    private static class FlashcardItem {
-        String title;
-        String pos;
-        String definition;
-        String example;
-        String vietnameseTitle; // Thêm trường này
-        String vietnameseDefinition; // Thêm trường này
-
-        FlashcardItem(String title, String pos, String definition, String example, String vietnameseTitle, String vietnameseDefinition) {
-            this.title = title;
-            this.pos = pos;
-            this.definition = definition;
-            this.example = example;
-            this.vietnameseTitle = vietnameseTitle; // Khởi tạo
-            this.vietnameseDefinition = vietnameseDefinition; // Khởi tạo
-        }
-    }
-
-    private List<FlashcardItem> getFlashcardsForTopic(int topicIdx) {
-        List<FlashcardItem> list = new ArrayList<>();
-        if (topicIdx == 1) { // Chỉ mục Fruits
-            list.add(new FlashcardItem(
-                    "Watermelon",
-                    "n",
-                    "A large, round or oval-shaped fruit with dark green skin, sweet pink flesh, and a lot of black seeds.",
-                    "Example: Watermelon is my favorite fruit in the summer.",
-                    "Dưa hấu", // Tiêu đề tiếng Việt
-                    "Một loại quả to, hình tròn hoặc oval, có vỏ màu xanh đậm, ruột hồng ngọt và có nhiều hạt đen." // Định nghĩa tiếng Việt
-            ));
-            list.add(new FlashcardItem(
-                    "Tomato",
-                    "n",
-                    "A round, red fruit with a lot of seeds, eaten cooked or uncooked as a vegetable, for example in salads or sauces.",
-                    "Example: Cut the tomato in half and scoop out the seeds.",
-                    "Cà chua", // Tiêu đề tiếng Việt
-                    "Một loại quả tròn, màu đỏ, có nhiều hạt, được ăn chín hoặc sống như một loại rau, ví dụ trong salad hoặc nước sốt." // Định nghĩa tiếng Việt
-            ));
-        }
-        // các chủ đề khác trả về danh sách rỗng -> hiển thị congrats ngay lập tức
-        return list;
-    }
-
-
     private String getTopicTitle(int idx) {
         switch (idx) {
             case 1: return "Fruits";
             case 2: return "Animals";
             case 3: return "Personalities";
-            case 4: return "Careers";
-            case 5: return "Appearances";
-            case 6: return "Travel";
             default: return "Topic";
         }
     }
