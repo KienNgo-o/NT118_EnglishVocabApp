@@ -13,7 +13,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2.5"
+        android:layout_weight="2"
         android:orientation="vertical">
 
         <!-- Toolbar -->
@@ -101,7 +101,7 @@
         android:id="@+id/topics_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="7.5"
+        android:layout_weight="8"
         android:clipToPadding="false"
         android:padding="12dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"

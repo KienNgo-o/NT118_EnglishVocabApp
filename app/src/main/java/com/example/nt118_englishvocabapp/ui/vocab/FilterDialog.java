@@ -1,13 +1,12 @@
 package com.example.nt118_englishvocabapp.ui.vocab;
 
 import android.app.Dialog;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -15,14 +14,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 
 import com.example.nt118_englishvocabapp.R;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
-public class FilterDialog extends BottomSheetDialogFragment {
+public class FilterDialog extends DialogFragment {
 
     public FilterDialog() {
         // empty constructor
@@ -63,6 +62,7 @@ public class FilterDialog extends BottomSheetDialogFragment {
                     if (checkedId == R.id.chip_easy) difficulty = "Easy";
                     else if (checkedId == R.id.chip_medium) difficulty = "Medium";
                     else if (checkedId == R.id.chip_hard) difficulty = "Hard";
+                    else if (checkedId == R.id.chip_all) difficulty = null; // All -> no filter
                 }
 
                 // send results back to the owning fragment via FragmentResult
@@ -70,9 +70,7 @@ public class FilterDialog extends BottomSheetDialogFragment {
                 result.putBoolean("savedOnly", savedOnly);
                 result.putString("difficulty", difficulty);
                 // use parent fragment manager so listener on VocabFragment will receive it
-                if (getParentFragmentManager() != null) {
-                    getParentFragmentManager().setFragmentResult("vocabFilter", result);
-                }
+                getParentFragmentManager().setFragmentResult("vocabFilter", result);
 
                 Toast.makeText(getContext(), "Filter applied", Toast.LENGTH_SHORT).show();
                 dismiss();
@@ -81,7 +79,8 @@ public class FilterDialog extends BottomSheetDialogFragment {
 
         // Setup chip visuals so selection shows as colored
         if (chipGroup != null) {
-            chipGroup.setOnCheckedChangeListener((group, checkedId) -> refreshChipColors(group));
+            // use newer checked state listener (returns list of checked ids)
+            chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> refreshChipColors(group));
             // initial refresh to match any pre-checked chip
             refreshChipColors(chipGroup);
         }
@@ -94,19 +93,19 @@ public class FilterDialog extends BottomSheetDialogFragment {
         int checkedId = group.getCheckedChipId();
 
         int colorChecked = ContextCompat.getColor(requireContext(), R.color.purple_700);
-        int colorUncheckedBg = Color.parseColor("#F2F2F7");
+        int colorUncheckedBg = 0xFFF2F2F7; // parsed color
         int colorCheckedText = ContextCompat.getColor(requireContext(), R.color.white);
-        int colorUncheckedText = Color.parseColor("#8a8a8a");
+        int colorUncheckedText = 0xFF8A8A8A;
 
         for (int i = 0; i < group.getChildCount(); i++) {
             View c = group.getChildAt(i);
             if (c instanceof Chip) {
                 Chip chip = (Chip) c;
                 if (chip.getId() == checkedId) {
-                    chip.setChipBackgroundColor(ColorStateList.valueOf(colorChecked));
+                    chip.setChipBackgroundColor(android.content.res.ColorStateList.valueOf(colorChecked));
                     chip.setTextColor(colorCheckedText);
                 } else {
-                    chip.setChipBackgroundColor(ColorStateList.valueOf(colorUncheckedBg));
+                    chip.setChipBackgroundColor(android.content.res.ColorStateList.valueOf(colorUncheckedBg));
                     chip.setTextColor(colorUncheckedText);
                 }
             }
@@ -117,15 +116,11 @@ public class FilterDialog extends BottomSheetDialogFragment {
     public void onStart() {
         super.onStart();
         Dialog d = getDialog();
-        if (d != null) {
-            // Make the bottom sheet container itself transparent so only the internal card shows its white background
-            View bottomSheet = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
-            if (bottomSheet != null) {
-                bottomSheet.setBackground(new ColorDrawable(Color.TRANSPARENT));
-            }
-            if (d.getWindow() != null) {
-                d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            }
+        if (d != null && d.getWindow() != null) {
+            // Make the dialog window background transparent so only the card shows
+            d.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            // Ensure the window wraps the content of the card
+            d.getWindow().setLayout(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
         }
     }
 }

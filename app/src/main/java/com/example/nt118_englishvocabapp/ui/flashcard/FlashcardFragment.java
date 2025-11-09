@@ -14,13 +14,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.adapters.TopicAdapter;
 import com.example.nt118_englishvocabapp.databinding.FragmentFlashcardBinding;
 import com.example.nt118_englishvocabapp.models.Topic;
+import com.example.nt118_englishvocabapp.ui.vocab.FilterDialog;
 import com.example.nt118_englishvocabapp.util.KeyboardUtils;
 
 import java.util.ArrayList;
@@ -41,6 +46,8 @@ public class FlashcardFragment extends Fragment implements TopicAdapter.OnTopicC
     private final List<Topic> allTopics = new ArrayList<>(); // Danh sách đầy đủ để lọc
     private View keyboardRootView;
     private ViewTreeObserver.OnGlobalLayoutListener keyboardListener;
+    private SharedPreferences prefs;
+    private static final String TOPIC_SAVED_PREFS = "topic_saved_prefs";
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -50,6 +57,7 @@ public class FlashcardFragment extends Fragment implements TopicAdapter.OnTopicC
 
         // 1. Khởi tạo ViewModel
         viewModel = new ViewModelProvider(requireActivity()).get(FlashcardViewModel.class);
+        prefs = requireContext().getSharedPreferences(TOPIC_SAVED_PREFS, Context.MODE_PRIVATE);
 
         // 2. Cài đặt RecyclerView
         setupRecyclerView();
@@ -57,6 +65,16 @@ public class FlashcardFragment extends Fragment implements TopicAdapter.OnTopicC
         // 3. Cài đặt các Listener (Keyboard, Search, Click...)
         setupKeyboardListener(root);
         setupClickListeners();
+
+        // Listen for filter dialog results
+        getParentFragmentManager().setFragmentResultListener("vocabFilter", this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                boolean savedOnly = result.getBoolean("savedOnly", false);
+                String difficulty = result.getString("difficulty", null);
+                applyFilter(savedOnly, difficulty);
+            }
+        });
 
         return root;
     }
@@ -82,6 +100,11 @@ public class FlashcardFragment extends Fragment implements TopicAdapter.OnTopicC
         // Báo cho RecyclerView trong XML (phải đặt ID là topics_recycler_view)
         binding.topicsRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         binding.topicsRecyclerView.setAdapter(topicAdapter);
+        // Reduce flicker by disabling change animations (updates handled with payloads)
+        if (binding.topicsRecyclerView.getItemAnimator() instanceof DefaultItemAnimator) {
+            ((DefaultItemAnimator) binding.topicsRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        }
+        binding.topicsRecyclerView.setHasFixedSize(true);
     }
 
     /**
@@ -129,7 +152,9 @@ public class FlashcardFragment extends Fragment implements TopicAdapter.OnTopicC
 
         // Nút Lọc (Filter)
         binding.filter.setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Filter clicked", Toast.LENGTH_SHORT).show();
+            // Open the existing Vocab FilterDialog (reuses fragment_vocab_filter layout & logic)
+            FilterDialog dlg = new FilterDialog();
+            dlg.show(getParentFragmentManager(), "vocab_filter_dialog");
             KeyboardUtils.hideKeyboardAndRestoreUI(requireActivity(), v, keyboardRootView, keyboardListener);
         });
 
@@ -162,12 +187,18 @@ public class FlashcardFragment extends Fragment implements TopicAdapter.OnTopicC
      */
     private void filterTopics(String query) {
         String q = query.toLowerCase().trim();
+        List<Topic> source = viewModel.getTopics().getValue();
+        if (source == null) {
+            // fallback to local cache
+            source = new ArrayList<>(allTopics);
+        }
+
         List<Topic> filteredList = new ArrayList<>();
 
         if (q.isEmpty()) {
-            filteredList.addAll(allTopics); // Hiển thị lại tất cả
+            filteredList.addAll(source); // Hiển thị lại tất cả (use latest source)
         } else {
-            for (Topic topic : allTopics) {
+            for (Topic topic : source) {
                 if (topic.getTopicName().toLowerCase().contains(q)) {
                     filteredList.add(topic);
                 }
@@ -179,6 +210,29 @@ public class FlashcardFragment extends Fragment implements TopicAdapter.OnTopicC
         if (filteredList.isEmpty() && !q.isEmpty()) {
             Toast.makeText(requireContext(), "No topic found: " + query, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    // Apply filter received from FilterDialog
+    private void applyFilter(boolean savedOnly, String difficulty) {
+        List<Topic> source = viewModel.getTopics().getValue();
+        if (source == null) source = new ArrayList<>(allTopics);
+
+        List<Topic> filtered = new ArrayList<>();
+        for (Topic t : source) {
+            // check savedOnly: read persisted flag from SharedPreferences
+            if (savedOnly) {
+                boolean saved = prefs.getBoolean("topic_saved_" + t.getTopicId(), false);
+                if (!saved) continue; // skip non-saved
+            }
+            // check difficulty filter (null means All)
+            if (difficulty != null && !difficulty.isEmpty()) {
+                String diff = t.getDifficulty() != null ? t.getDifficulty().trim() : "";
+                if (diff.isEmpty() || !diff.equalsIgnoreCase(difficulty)) continue;
+            }
+            filtered.add(t);
+        }
+
+        topicAdapter.submitList(filtered);
     }
 
     /**

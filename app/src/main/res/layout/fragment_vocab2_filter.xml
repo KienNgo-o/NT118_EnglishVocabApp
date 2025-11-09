@@ -1,106 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_container_filter2"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="10dp"
+    app:cardUseCompatPadding="true"
+    app:strokeWidth="0dp"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:padding="0dp">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_container_filter2"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="328dp"
         android:layout_height="wrap_content"
+        android:background="@android:color/white"
         android:gravity="center"
-        app:cardBackgroundColor="@android:color/transparent"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="10dp"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:orientation="vertical"
+        android:padding="20dp">
 
-        <LinearLayout
-            android:layout_width="379dp"
-            android:layout_height="wrap_content"
-            android:background="@android:color/white"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="20dp">
+        <!-- Header: close icon + title centered -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp">
 
-            <!-- Header: close icon + title centered -->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="48dp">
+            <ImageButton
+                android:id="@+id/close_filter2"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/close"
+                android:contentDescription="@string/cd_close_filter" />
 
-                <ImageButton
-                    android:id="@+id/close_filter2"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:background="@drawable/close"
-                    android:contentDescription="@string/cd_close_filter" />
-
-                <TextView
-                    android:id="@+id/title_filter2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="@string/title_search_filter"
-                    android:textColor="#222222"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-            </RelativeLayout>
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="8dp" />
-
-            <!-- Saved row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/label_saved_2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/label_favorite"
-                    android:textColor="#222222"
-                    android:textSize="14sp" />
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/switch_saved_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:thumbTint="@color/white"
-                    android:trackTint="@color/teal_200" />
-            </LinearLayout>
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="16dp" />
-
-            <!-- Type label -->
             <TextView
-                android:id="@+id/label_type"
-                android:layout_width="match_parent"
+                android:id="@+id/title_filter2"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
-                android:text="@string/label_type"
+                android:layout_centerInParent="true"
+                android:text="@string/title_search_filter"
                 android:textColor="#222222"
-                android:textSize="14sp" />
+                android:textSize="22sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
 
-            <!-- Type chips -->
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp" />
+
+        <!-- Saved row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/label_saved_2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/label_favorite"
+                android:textColor="#222222"
+                android:textSize="18sp" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch_saved_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:thumbTint="@color/white"
+                android:trackTint="@color/teal_200" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="16dp" />
+
+        <!-- Type label -->
+        <TextView
+            android:id="@+id/label_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            android:text="@string/label_type"
+            android:textColor="#222222"
+            android:textSize="18sp" />
+
+        <!-- Type chips (wrapped in HorizontalScrollView for horizontal scrolling) -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:paddingBottom="4dp">
+
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chip_group_type"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:chipSpacing="12dp"
                 app:singleLine="true"
                 app:singleSelection="true">
+
+                <!-- Added: All option for types (no type filter) -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_all_type"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="All"
+                    android:textColor="#8a8a8a"
+                    android:checked="true"
+                    app:checkedIconVisible="false"
+                    app:chipBackgroundColor="#F2F2F7"
+                    app:chipCornerRadius="8dp" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_noun"
@@ -147,39 +161,39 @@
                     app:chipBackgroundColor="#F2F2F7"
                     app:chipCornerRadius="8dp" />
             </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
 
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="20dp" />
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
 
-            <!-- Bottom actions -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+        <!-- Bottom actions -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_clear_filter2"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="44dp"
-                    android:layout_marginEnd="12dp"
-                    android:layout_weight="1"
-                    android:strokeWidth="2"
-                    android:text="@string/btn_clear"
-                    android:textColor="@color/purple_700"
-                    app:strokeColor="@color/purple_700" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_clear_filter2"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:strokeWidth="2"
+                android:text="@string/btn_clear"
+                android:textColor="@color/purple_700"
+                app:strokeColor="@color/purple_700" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_apply_filter2"
-                    android:layout_width="0dp"
-                    android:layout_height="44dp"
-                    android:layout_weight="2"
-                    android:backgroundTint="@color/purple_700"
-                    android:text="@string/btn_apply_filter"
-                    android:textColor="#FFFFFF" />
-            </LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_apply_filter2"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="2"
+                android:backgroundTint="@color/purple_700"
+                android:text="@string/btn_apply_filter"
+                android:textColor="#FFFFFF" />
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

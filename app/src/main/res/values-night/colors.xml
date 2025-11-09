@@ -66,6 +66,7 @@
          ========================== -->
     <color name="white_gray">#414347</color>
     <color name="light_white_gray">#F1F1F2</color>
+    <color name="topic_title_color">#FFFFFFFF</color>
 
     <!-- ==========================
          Screen / Fragment backgrounds (night overrides)
