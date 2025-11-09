@@ -526,6 +526,7 @@
                             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" />
 
                             <LinearLayout
+                                android:id="@+id/row_logout"
                                 android:layout_width="match_parent"
                                 android:layout_height="56dp"
                                 android:orientation="horizontal"
@@ -559,6 +560,7 @@
                             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" />
 
                             <LinearLayout
+                                android:id="@+id/row_delete_account"
                                 android:layout_width="match_parent"
                                 android:layout_height="56dp"
                                 android:orientation="horizontal"

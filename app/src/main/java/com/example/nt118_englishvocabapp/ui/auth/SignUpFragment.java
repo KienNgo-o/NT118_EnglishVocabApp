@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -49,18 +50,22 @@ public class SignUpFragment extends Fragment {
         etPassword = view.findViewById(R.id.input_password);
         btnSignUp = view.findViewById(R.id.button_sign_up);
 
-        // Nút đăng ký
-        btnSignUp.setOnClickListener(v -> {
-            // Validate và thực hiện đăng ký
-            handleSignUp();
+        // Nút đăng ký -> NAVIGATE back to SignIn only
+        btnSignUp.setOnClickListener(v -> handleSignUp());
 
+        // Nút chuyển sang màn hình Sign in -> NAVIGATE back to SignIn
+        view.findViewById(R.id.button_go_to_sign_in).setOnClickListener(v -> {
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container_view_auth, new SignInFragment())
+                    .addToBackStack(null)
+                    .commit();
+            Toast.makeText(getContext(), "Ok!", Toast.LENGTH_SHORT).show();
         });
 
-        // Nút quay lại (nếu có)
-        // Ví dụ: view.findViewById(R.id.button_back_to_sign_in).setOnClickListener(v -> {
-        //     getParentFragmentManager().popBackStack();
-        // });
-
+        ImageButton fb = view.findViewById(R.id.social_facebook_sign_up);
+        ImageButton g = view.findViewById(R.id.social_google_sign_up);
+        fb.setOnClickListener(v -> Toast.makeText(getContext(), "Facebook sign-up not implemented", Toast.LENGTH_SHORT).show());
+        g.setOnClickListener(v -> Toast.makeText(getContext(), "Google sign-up not implemented", Toast.LENGTH_SHORT).show());
         return view;
     }
 
@@ -68,7 +73,6 @@ public class SignUpFragment extends Fragment {
         String username = etUsername.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
-
         // 1. Kiểm tra (Validate) input
         if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
             Toast.makeText(getContext(), "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
@@ -100,38 +104,12 @@ public class SignUpFragment extends Fragment {
                 if (response.isSuccessful()) {
                     // Thành công (Code 204)
                     Log.i("SignUp", "Đăng ký thành công!");
-
-                    // Hiển thị dialog chúc mừng (từ file list của bạn)
-                    // Đây là UX tốt hơn là chỉ quay lại
-                    new CongratulationDialogFragment().show(getParentFragmentManager(), "CongratulationDialog");
-
-                    // Bạn có thể lắng nghe dialog này dismiss
-                    // và gọi LoginActivity.returnToSignInScreen()
-                    // Continue -> quay lại Sign In (no backend yet)
-//                    view.findViewById(R.id.button_sign_up).setOnClickListener(v -> {
-//                        getParentFragmentManager().beginTransaction()
-//                                .replace(R.id.fragment_container_view_auth, new SignInFragment())
-//                                .addToBackStack(null)
-//                                .commit();
-//                        Toast.makeText(getContext(), "Account Registration Successful!", Toast.LENGTH_SHORT).show();
-//                    });
-//
-//                    // Nút chuyển sang màn hình Sign in
-//                    view.findViewById(R.id.button_go_to_sign_in).setOnClickListener(v -> {
-//                        getParentFragmentManager().beginTransaction()
-//                                .replace(R.id.fragment_container_view_auth, new SignInFragment())
-//                                .addToBackStack(null)
-//                                .commit();
-//                        Toast.makeText(getContext(), "Ok!", Toast.LENGTH_SHORT).show();
-//                    });
-//
-//
-//                    ImageButton fb = view.findViewById(R.id.social_facebook_sign_up);
-//                    ImageButton g = view.findViewById(R.id.social_google_sign_up);
-//                    fb.setOnClickListener(v -> Toast.makeText(getContext(), "Facebook sign-up not implemented", Toast.LENGTH_SHORT).show());
-//                    g.setOnClickListener(v -> Toast.makeText(getContext(), "Google sign-up not implemented", Toast.LENGTH_SHORT).show());
-//
-//                    return view;
+                    // Navigate back to SignIn
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container_view_auth, new SignInFragment())
+                            .addToBackStack(null)
+                            .commit();
+                    Toast.makeText(getContext(), "Đã đăng ký thành công! Quay lại Sign In", Toast.LENGTH_LONG).show();
                 } else {
                     // Thất bại
                     if (response.code() == 409) {

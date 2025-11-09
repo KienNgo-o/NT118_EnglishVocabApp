@@ -108,6 +108,8 @@ public class AccountFragment extends Fragment {
         // Dark mode switch
         final SwitchCompat switchDarkMode = view.findViewById(com.example.nt118_englishvocabapp.R.id.switch_dark_mode);
 
+        LinearLayout rowLogout = view.findViewById(com.example.nt118_englishvocabapp.R.id.row_logout);
+        LinearLayout rowDeleteAccount = view.findViewById(com.example.nt118_englishvocabapp.R.id.row_delete_account);
         // avatar views
         imgAvatar = view.findViewById(com.example.nt118_englishvocabapp.R.id.img_avatar);
         ImageButton btnAvatarAction = view.findViewById(com.example.nt118_englishvocabapp.R.id.btn_avatar_action);
@@ -333,6 +335,20 @@ public class AccountFragment extends Fragment {
                     Log.d("AccountFragment", "Notification frequency: " + freq);
                     // TODO: persist frequency and reschedule notifications accordingly
                 }
+            });
+        }
+
+        if (rowLogout != null) {
+            rowLogout.setOnClickListener(v -> {
+                if (!isAdded()) return;
+                new LogoutDialogFragment().show(getParentFragmentManager(), "logout_dialog");
+            });
+        }
+
+        if (rowDeleteAccount != null) {
+            rowDeleteAccount.setOnClickListener(v -> {
+                if (!isAdded()) return;
+                new DeleteAccDialogFragment().show(getParentFragmentManager(), "deleteacc_dialog");
             });
         }
     }
