@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,7 +16,7 @@ import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.ui.vocab3.VocabFragment3;
 import com.example.nt118_englishvocabapp.ui.vocab3.VocabWordViewModel;
 import com.example.nt118_englishvocabapp.ui.vocab4.VocabFragment4;
-import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
+import com.example.nt118_englishvocabapp.ui.vocab2.VocabFragment2;
 
 /**
  * VocabFragment5 (Synonyms) - displays synonyms and allows navigation between
@@ -88,8 +89,37 @@ public class VocabFragment5 extends Fragment {
             // already on Synonyms - no-op
         });
 
-        // Bind standardized return button behavior (make sure to return to vocabfragment2)
-        ReturnButtonHelper.bind(root, this);
+        // Return button: always navigate immediately to VocabFragment2, ignoring back stack
+        ImageButton btnReturn = root.findViewById(R.id.btn_return);
+        if (btnReturn != null) {
+            btnReturn.setOnClickListener(v -> {
+                if (getActivity() == null) return;
+                v.setEnabled(false);
+                getActivity().runOnUiThread(() -> {
+                    androidx.fragment.app.FragmentManager fm = requireActivity().getSupportFragmentManager();
+                    try {
+                        if (fm.isStateSaved()) {
+                            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                                try {
+                                    fm.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                                    fm.executePendingTransactions();
+                                    fm.beginTransaction().setReorderingAllowed(true).replace(hostId, new VocabFragment2()).commitAllowingStateLoss();
+                                } catch (Exception ignored) {
+                                    if (getActivity() != null) requireActivity().getOnBackPressedDispatcher().onBackPressed();
+                                }
+                            }, 120);
+                            return;
+                        }
+
+                        try { fm.popBackStackImmediate(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE); } catch (Exception ignored) {}
+                        try { fm.executePendingTransactions(); } catch (Exception ignored) {}
+                        fm.beginTransaction().setReorderingAllowed(true).replace(hostId, new VocabFragment2()).commitAllowingStateLoss();
+                    } catch (Exception ignored) {
+                        if (getActivity() != null) requireActivity().getOnBackPressedDispatcher().onBackPressed();
+                    }
+                 });
+             });
+         }
 
         Toast.makeText(getContext(), "Vocab Fragment 5 Opened!", Toast.LENGTH_SHORT).show();
         return root;

@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,11 +14,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.nt118_englishvocabapp.R;
-import com.example.nt118_englishvocabapp.ui.vocab3.VocabWordViewModel;
 import com.example.nt118_englishvocabapp.ui.vocab2.VocabFragment2;
 import com.example.nt118_englishvocabapp.ui.vocab4.VocabFragment4;
 import com.example.nt118_englishvocabapp.ui.vocab5.VocabFragment5;
-import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
 
 /**
  * VocabFragment3 - Definition tab with navigation to Forms (VocabFragment4) and Synonyms (VocabFragment5).
@@ -64,7 +63,7 @@ public class VocabFragment3 extends Fragment {
         if (def != null) definitionEn.setText(def);
 
         // Shared ViewModel (scoped to the activity) so other detail fragments can observe updates
-        VocabWordViewModel vm = new ViewModelProvider(requireActivity()).get(VocabWordViewModel.class);
+        com.example.nt118_englishvocabapp.ui.vocab3.VocabWordViewModel vm = new ViewModelProvider(requireActivity()).get(com.example.nt118_englishvocabapp.ui.vocab3.VocabWordViewModel.class);
         vm.setWordDetails(word, type, def);
         vm.getWord().observe(getViewLifecycleOwner(), w -> { if (w != null && !w.isEmpty()) wordText.setText(w); });
         vm.getWordType().observe(getViewLifecycleOwner(), t -> { if (t != null && !t.isEmpty()) wordType.setText(t); });
@@ -113,25 +112,43 @@ public class VocabFragment3 extends Fragment {
         setSelectedTab(tabDefinition, tabDefinition, tabForms, tabSynonyms,
                 contentDefinition, contentForms, contentSynonyms);
 
-        // Return button: use ReturnButtonHelper with a fallback that navigates to VocabFragment2
-        Runnable fallback = () -> {
-            if (getActivity() == null) return;
-            getActivity().runOnUiThread(() -> {
-                try {
+        // Return button: implement deterministic navigation directly so it ALWAYS goes back to VocabFragment2
+        ImageButton btnReturn = root.findViewById(R.id.btn_return);
+        if (btnReturn != null) {
+            btnReturn.setOnClickListener(v -> {
+                if (getActivity() == null) return;
+                // guard against double clicks/races
+                v.setEnabled(false);
+                // Immediately navigate to VocabFragment2, ignoring any back stack
+                getActivity().runOnUiThread(() -> {
                     androidx.fragment.app.FragmentManager fm = requireActivity().getSupportFragmentManager();
-                    // clear entire back stack to avoid unexpected intermediate fragments
-                    fm.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                    VocabFragment2 f2 = new VocabFragment2();
-                    fm.beginTransaction().replace(hostId, f2).commitAllowingStateLoss();
-                } catch (Exception ignored) {
-                    // fallback: dispatch activity back
-                    if (getActivity() != null) requireActivity().getOnBackPressedDispatcher().onBackPressed();
-                }
-            });
-        };
+                    try {
+                        // If state already saved, delay the replace slightly to avoid IllegalStateException
+                        if (fm.isStateSaved()) {
+                            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                                try {
+                                    fm.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                                    fm.executePendingTransactions();
+                                    fm.beginTransaction().setReorderingAllowed(true).replace(hostId, new VocabFragment2()).commitAllowingStateLoss();
+                                } catch (Exception ignored) {
+                                    if (getActivity() != null) requireActivity().getOnBackPressedDispatcher().onBackPressed();
+                                }
+                            }, 120);
+                            return;
+                        }
 
-        // Bind the return button using the helper; preClick is null here
-        ReturnButtonHelper.bind(root, this, null, fallback);
+                        // Not saved: synchronously clear back stack and execute pending
+                        try { fm.popBackStackImmediate(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE); } catch (Exception ignored) {}
+                        try { fm.executePendingTransactions(); } catch (Exception ignored) {}
+
+                        // Perform a safe replace with reordering allowed
+                        fm.beginTransaction().setReorderingAllowed(true).replace(hostId, new VocabFragment2()).commitAllowingStateLoss();
+                    } catch (Exception ignored) {
+                        if (getActivity() != null) requireActivity().getOnBackPressedDispatcher().onBackPressed();
+                    }
+                });
+            });
+        }
 
         Toast.makeText(getContext(), "Vocab Fragment 3 Opened!", Toast.LENGTH_SHORT).show();
         return root;
