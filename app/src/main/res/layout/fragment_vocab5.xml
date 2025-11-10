@@ -307,7 +307,7 @@
                         android:gravity="center"
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
-                        android:text="Từ trái nghĩa (Acronyms)"
+                        android:text="Từ trái nghĩa (Antonyms)"
                         android:textColor="@android:color/white"
                         android:textSize="14sp"
                         android:textStyle="bold" />

@@ -1,7 +1,9 @@
+// ui/vocab/VocabFragment.java
 package com.example.nt118_englishvocabapp.ui.vocab;
 
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,54 +15,61 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.nt118_englishvocabapp.R;
+import com.example.nt118_englishvocabapp.adapters.VocabTopicAdapter;
 import com.example.nt118_englishvocabapp.databinding.FragmentVocabBinding;
+import com.example.nt118_englishvocabapp.models.Topic;
 import com.example.nt118_englishvocabapp.ui.vocab2.VocabFragment2;
 import com.example.nt118_englishvocabapp.util.KeyboardUtils;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class VocabFragment extends Fragment {
+public class VocabFragment extends Fragment implements VocabTopicAdapter.OnTopicClickListener {
 
     private static final String TAG = "VocabFragment";
     private FragmentVocabBinding binding;
     private View keyboardRootView;
     private ViewTreeObserver.OnGlobalLayoutListener keyboardListener;
-    private int previousSoftInputMode = -1; // store previous window soft input mode
+    private int previousSoftInputMode = -1;
 
-    // move topics and adapter to fields so filter listener can update them
-    private java.util.List<TopicCard> allTopics = new java.util.ArrayList<>();
-    private TopicCardAdapter topicAdapter;
-
-    // ViewModel to fetch topics from backend
+    private List<Topic> allTopics = new ArrayList<>();
+    private VocabTopicAdapter topicAdapter;
     private VocabViewModel viewModel;
 
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-
         binding = FragmentVocabBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Save and set the window soft input mode to ADJUST_PAN so only this fragment pans
+        // Lưu và set chế độ bàn phím chỉ cho fragment này
         if (getActivity() != null && getActivity().getWindow() != null) {
             previousSoftInputMode = getActivity().getWindow().getAttributes().softInputMode;
             getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         }
 
-        Toast.makeText(getContext(), "Vocab Fragment Opened!", Toast.LENGTH_SHORT).show();
+        // Gốc để phát hiện bàn phím
+        keyboardRootView = getActivity() != null
+                ? requireActivity().findViewById(android.R.id.content)
+                : root;
 
-        // Use Activity content view as stable root for keyboard detection
-        if (getActivity() != null) {
-            keyboardRootView = requireActivity().findViewById(android.R.id.content);
-        } else {
-            keyboardRootView = root; // fallback
-        }
+        setupKeyboardListener();
+        setupRecyclerView();
 
-        // Keyboard visibility listener: hide bottom menu and FAB when keyboard is shown
+        viewModel = new ViewModelProvider(requireActivity()).get(VocabViewModel.class);
+        observeViewModel();
+        viewModel.fetchTopics();
+
+        setupClickListeners();
+
+        return root;
+    }
+
+    private void setupKeyboardListener() {
         keyboardListener = new ViewTreeObserver.OnGlobalLayoutListener() {
             private boolean lastStateVisible = false;
 
@@ -69,150 +78,45 @@ public class VocabFragment extends Fragment {
                 if (keyboardRootView == null || getActivity() == null) return;
 
                 Rect r = new Rect();
-                // safe: keyboardRootView is activity content view
                 keyboardRootView.getWindowVisibleDisplayFrame(r);
                 int screenHeight = keyboardRootView.getRootView().getHeight();
                 int keypadHeight = screenHeight - r.bottom;
                 boolean isKeyboardVisible = keypadHeight > screenHeight * 0.15;
 
-                if (isKeyboardVisible == lastStateVisible) return; // no change
+                if (isKeyboardVisible == lastStateVisible) return;
                 lastStateVisible = isKeyboardVisible;
 
                 View bottomAppBar = requireActivity().findViewById(R.id.bottomAppBar);
                 View fab = requireActivity().findViewById(R.id.fab);
-
                 if (bottomAppBar != null) bottomAppBar.setVisibility(isKeyboardVisible ? View.GONE : View.VISIBLE);
                 if (fab != null) fab.setVisibility(isKeyboardVisible ? View.GONE : View.VISIBLE);
             }
         };
-
         if (keyboardRootView != null) {
             keyboardRootView.getViewTreeObserver().addOnGlobalLayoutListener(keyboardListener);
         }
+    }
 
-        // RecyclerView setup: use TopicCardAdapter
-        // start with empty list; will be populated from backend via ViewModel
-        allTopics = new ArrayList<>();
-
+    private void setupRecyclerView() {
+        topicAdapter = new VocabTopicAdapter(this, requireContext());
         LinearLayoutManager lm = new LinearLayoutManager(requireContext());
         binding.recyclerTopics.setLayoutManager(lm);
-        topicAdapter = new TopicCardAdapter(allTopics, (item, pos) -> onCardClicked(item.getTopicId()));
         binding.recyclerTopics.setAdapter(topicAdapter);
-
-        // Initialize ViewModel and observe topics/errors
-        viewModel = new ViewModelProvider(requireActivity()).get(VocabViewModel.class);
-        observeViewModel();
-        // Trigger initial load
-        viewModel.fetchTopics();
-
-        // Listen for filter results from FilterFragment
-        getParentFragmentManager().setFragmentResultListener("vocabFilter", this, (requestKey, bundle) -> {
-            if (bundle == null) return;
-            boolean savedOnly = bundle.getBoolean("savedOnly", false);
-            String difficulty = bundle.getString("difficulty", null);
-            applyFilters(savedOnly, difficulty);
-        });
-
-        // Update: make search logic consistent with VocabFragment2
-        binding.searchTopic.setOnClickListener(v -> {
-            String query = binding.searchEditText.getText().toString().trim().toLowerCase();
-
-            // If empty, behave like VocabFragment2: show all (there's no list adapter here) and inform the user
-            if (query.isEmpty()) {
-                Toast.makeText(requireContext(), "Showing all topics", Toast.LENGTH_SHORT).show();
-                topicAdapter.updateList(new java.util.ArrayList<>(allTopics));
-                return;
-            }
-
-            java.util.List<TopicCard> filtered = new java.util.ArrayList<>();
-            for (TopicCard t : allTopics) {
-                if (t.title != null && t.title.toLowerCase().contains(query)) {
-                    filtered.add(t);
-                }
-            }
-
-            if (filtered.isEmpty()) {
-                Toast.makeText(requireContext(), "No topic found for: " + query, Toast.LENGTH_SHORT).show();
-            }
-            topicAdapter.updateList(filtered);
-        });
-
-
-        binding.searchEditText.setOnClickListener(v -> {
-            // Use KeyboardUtils to focus and show keyboard
-            KeyboardUtils.showKeyboard(requireActivity(), binding.searchEditText);
-        });
-
-        binding.filter.setOnClickListener(v ->
-        {
-            Toast.makeText(requireContext(), "Filter clicked", Toast.LENGTH_SHORT).show();
-            keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
-                    requireActivity(),
-                    v,
-                    keyboardRootView,
-                    keyboardListener
-            );
-
-            // Show bottom sheet filter
-            try {
-                FilterDialog filterSheet = new FilterDialog();
-                if (getActivity() != null) {
-                    filterSheet.show(getActivity().getSupportFragmentManager(), "VocabFilterSheet");
-                } else {
-                    // fall back to parent fragment manager when activity is not available
-                    filterSheet.show(getParentFragmentManager(), "VocabFilterSheet");
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Error showing filter sheet", e);
-            }
-        });
-
-        // Make sure to return to home fragment properly
-        binding.btnReturn.setOnClickListener(v -> {
-            keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
-                    requireActivity(), v, keyboardRootView, keyboardListener);
-
-            // prefer using MainActivity helper to keep BottomNavigationView state in sync
-            if (requireActivity() instanceof com.example.nt118_englishvocabapp.MainActivity) {
-                ((com.example.nt118_englishvocabapp.MainActivity) requireActivity()).navigateToHome();
-                return;
-            }
-
-            // fallback (should rarely run)
-            if (getParentFragmentManager().getBackStackEntryCount() > 0) {
-                getParentFragmentManager().popBackStack();
-            } else {
-                AppCompatActivity activity = (AppCompatActivity) requireActivity();
-                activity.getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.frame_layout, new com.example.nt118_englishvocabapp.ui.home.HomeFragment())
-                        .commitAllowingStateLoss();
-            }
-        });
-
-        // individual card clicks handled by adapter callback
-
-        return root;
+        if (binding.recyclerTopics.getItemAnimator() instanceof DefaultItemAnimator) {
+            ((DefaultItemAnimator) binding.recyclerTopics.getItemAnimator()).setSupportsChangeAnimations(false);
+        }
+        binding.recyclerTopics.setHasFixedSize(true);
     }
 
     private void observeViewModel() {
         viewModel.getTopics().observe(getViewLifecycleOwner(), topics -> {
             if (topics != null && !topics.isEmpty()) {
-                // Map backend Topic -> UI TopicCard (preserve difficulty/status)
                 allTopics.clear();
-                for (com.example.nt118_englishvocabapp.models.Topic t : topics) {
-                    String title = t.getTopicName() != null ? t.getTopicName() : "Untitled";
-                    String difficulty = t.getDifficulty() != null ? t.getDifficulty() : "";
-                    int wordsCount = 0; // backend Topic doesn't include words count; keep 0
-                    int imageRes = R.drawable.apperances; // placeholder image
-                    TopicCard card = new TopicCard(title, difficulty, wordsCount, imageRes);
-                    allTopics.add(card);
-                }
-                topicAdapter.updateList(new ArrayList<>(allTopics));
+                allTopics.addAll(topics);
+                topicAdapter.submitList(new ArrayList<>(allTopics));
             } else {
-                // empty list
                 allTopics.clear();
-                topicAdapter.updateList(new ArrayList<>());
+                topicAdapter.submitList(new ArrayList<>());
             }
         });
 
@@ -224,45 +128,88 @@ public class VocabFragment extends Fragment {
         });
     }
 
-    private void applyFilters(boolean savedOnly, String difficulty) {
-        java.util.List<TopicCard> filtered = new java.util.ArrayList<>();
-        for (TopicCard t : allTopics) {
-            boolean matchesSaved = !savedOnly || t.isSaved();
-            boolean matchesDifficulty = (difficulty == null) || difficulty.isEmpty() || (t.difficulty != null && t.difficulty.equalsIgnoreCase(difficulty));
-            if (matchesSaved && matchesDifficulty) {
-                filtered.add(t);
+    private void setupClickListeners() {
+        binding.searchTopic.setOnClickListener(v -> {
+            String query = binding.searchEditText.getText().toString().trim().toLowerCase();
+            filterTopics(query);
+        });
+
+        binding.searchEditText.setOnClickListener(v ->
+                KeyboardUtils.showKeyboard(requireActivity(), binding.searchEditText)
+        );
+
+        binding.filter.setOnClickListener(v -> {
+            Toast.makeText(requireContext(), "Filter clicked", Toast.LENGTH_SHORT).show();
+            keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
+                    requireActivity(), v, keyboardRootView, keyboardListener);
+            try {
+                FilterDialog filterSheet = new FilterDialog();
+                if (getActivity() != null) {
+                    filterSheet.show(getActivity().getSupportFragmentManager(), "VocabFilterSheet");
+                } else {
+                    filterSheet.show(getParentFragmentManager(), "VocabFilterSheet");
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error showing filter sheet", e);
+            }
+        });
+
+        binding.btnReturn.setOnClickListener(v -> {
+            keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
+                    requireActivity(), v, keyboardRootView, keyboardListener);
+            if (requireActivity() instanceof com.example.nt118_englishvocabapp.MainActivity) {
+                ((com.example.nt118_englishvocabapp.MainActivity) requireActivity()).navigateToHome();
+            } else if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                getParentFragmentManager().popBackStack();
+            }
+        });
+
+        // Lắng nghe bộ lọc từ FilterDialog
+        getParentFragmentManager().setFragmentResultListener("vocabFilter", this, (key, bundle) -> {
+            if (bundle == null) return;
+            boolean savedOnly = bundle.getBoolean("savedOnly", false);
+            String difficulty = bundle.getString("difficulty", null);
+            applyFilters(savedOnly, difficulty);
+        });
+    }
+
+    private void filterTopics(String query) {
+        List<Topic> filtered = new ArrayList<>();
+        if (query.isEmpty()) {
+            filtered.addAll(allTopics);
+            Toast.makeText(requireContext(), "Showing all topics", Toast.LENGTH_SHORT).show();
+        } else {
+            for (Topic t : allTopics) {
+                if (t.getTopicName() != null && t.getTopicName().toLowerCase().contains(query)) {
+                    filtered.add(t);
+                }
+            }
+            if (filtered.isEmpty()) {
+                Toast.makeText(requireContext(), "No topic found for: " + query, Toast.LENGTH_SHORT).show();
             }
         }
+        topicAdapter.submitList(filtered);
+    }
 
-        // Update adapter with filtered results
-        topicAdapter.updateList(filtered);
-
-        String label = "Filters applied";
-        if (savedOnly) label += ": savedOnly";
-        if (difficulty != null) label += ", difficulty=" + difficulty;
-        Toast.makeText(requireContext(), label, Toast.LENGTH_SHORT).show();
+    private void applyFilters(boolean savedOnly, String difficulty) {
+        List<Topic> filtered = new ArrayList<>();
+        for (Topic t : allTopics) {
+            boolean matchesSaved = !savedOnly && t.isSaved();
+            boolean matchesDiff = (difficulty == null || difficulty.isEmpty()
+                    || (t.getDifficulty() != null && t.getDifficulty().equalsIgnoreCase(difficulty)));
+            if (matchesSaved && matchesDiff) filtered.add(t);
+        }
+        topicAdapter.submitList(filtered);
+        Toast.makeText(requireContext(), "Filters applied", Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // Restore previous soft input mode so other screens are unaffected
-        if (getActivity() != null && getActivity().getWindow() != null && previousSoftInputMode != -1) {
-            getActivity().getWindow().setSoftInputMode(previousSoftInputMode);
-            previousSoftInputMode = -1;
+    public void onTopicClick(Topic topic) {
+        if ("locked".equalsIgnoreCase(topic.getStatus())) {
+            Toast.makeText(getContext(), topic.getTopicName() + " is locked!", Toast.LENGTH_SHORT).show();
+            return;
         }
-        // Remove listener from the same view it was added to
-        if (keyboardRootView != null && keyboardListener != null) {
-            keyboardRootView.getViewTreeObserver().removeOnGlobalLayoutListener(keyboardListener);
-        }
-        binding = null;
-        keyboardRootView = null;
-        keyboardListener = null;
-    }
-
-    private void onCardClicked(int topicId) {
         try {
-            // Use KeyboardUtils to hide keyboard, remove listener and restore bottom UI
             keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(
                     requireActivity(),
                     requireActivity().getWindow().getDecorView(),
@@ -270,24 +217,41 @@ public class VocabFragment extends Fragment {
                     keyboardListener
             );
 
-            // Navigate to detail fragment
             VocabFragment2 frag = new VocabFragment2();
             Bundle args = new Bundle();
-            args.putInt("topic_index", topicId);
+            args.putInt("topic_index", topic.getTopicId());
             frag.setArguments(args);
 
             AppCompatActivity activity = (AppCompatActivity) requireActivity();
-            String backStackName = "VocabFragment2_BackStack"; // make a named back stack entry
             activity.getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.frame_layout, frag)
-                    // Instead of addToBackStack(null), using a named back stack entry
-                    .addToBackStack(backStackName)
+                    .addToBackStack("VocabFragment2_BackStack")
                     .commitAllowingStateLoss();
         } catch (Exception e) {
-            Log.e(TAG, "Navigation error while opening topic " + topicId, e);
-            Toast.makeText(requireContext(), "Navigation error: " + e.getClass().getSimpleName() + " - " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Log.e(TAG, "Navigation error: " + e.getMessage(), e);
+            Toast.makeText(requireContext(), "Navigation error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
+    @Override
+    public void onTopicSaveClick(Topic topic, boolean isSaved) {
+        Toast.makeText(getContext(),
+                (isSaved ? "Saved " : "Unsaved ") + topic.getTopicName(),
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (getActivity() != null && previousSoftInputMode != -1) {
+            getActivity().getWindow().setSoftInputMode(previousSoftInputMode);
+        }
+        if (keyboardRootView != null && keyboardListener != null) {
+            keyboardRootView.getViewTreeObserver().removeOnGlobalLayoutListener(keyboardListener);
+        }
+        binding = null;
+        keyboardRootView = null;
+        keyboardListener = null;
+    }
 }

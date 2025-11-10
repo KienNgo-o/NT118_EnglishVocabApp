@@ -3,7 +3,7 @@ import com.example.nt118_englishvocabapp.models.Topic;
 import com.example.nt118_englishvocabapp.models.RefreshRequest;
 import com.example.nt118_englishvocabapp.models.RefreshResponse;
 import com.example.nt118_englishvocabapp.models.SignOutRequest;
-import com.example.nt118_englishvocabapp.models.User;
+
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -11,6 +11,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import com.example.nt118_englishvocabapp.models.FlashcardItem;
 import retrofit2.http.Path;
+import com.example.nt118_englishvocabapp.models.VocabWord; // 👈 THÊM IMPORT NÀY
 public interface ApiService {
 
     @POST("/api/auth/signin")
@@ -36,4 +37,6 @@ public interface ApiService {
     Call<List<FlashcardItem>> getFlashcardsForTopic(
             @Path("id") int topicId
     );
+    @GET("api/topics/{id}/words")
+    Call<List<VocabWord>> getWordsForTopic(@Path("id") int topicId);
 }

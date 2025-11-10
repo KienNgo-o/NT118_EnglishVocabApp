@@ -16,14 +16,14 @@ public class TopicCard {
         this.imageResId = imageResId;
     }
 
-    // New constructor that includes topicId
-    public TopicCard(int topicId, String title, String difficulty, int wordsCount, int imageResId) {
-        this.topicId = topicId;
-        this.title = title;
-        this.difficulty = difficulty;
-        this.wordsCount = wordsCount;
-        this.imageResId = imageResId;
-    }
+//    // New constructor that includes topicId
+//    public TopicCard(int topicId, String title, String difficulty, int wordsCount, int imageResId) {
+//        this.topicId = topicId;
+//        this.title = title;
+//        this.difficulty = difficulty;
+//        this.wordsCount = wordsCount;
+//        this.imageResId = imageResId;
+//    }
 
     public boolean isSaved() {
         return saved;

@@ -1,4 +1,4 @@
-// java
+// ui/vocab2/VocabFragment2.java
 package com.example.nt118_englishvocabapp.ui.vocab2;
 
 import android.os.Bundle;
@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.databinding.FragmentVocab2Binding;
+import com.example.nt118_englishvocabapp.models.VocabWord; // 👈 THÊM IMPORT NÀY
 import com.example.nt118_englishvocabapp.ui.vocab3.VocabFragment3;
 import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
 
@@ -24,11 +25,13 @@ import java.util.List;
 public class VocabFragment2 extends Fragment {
     private FragmentVocab2Binding binding;
     private VocabTopicAdapter adapter;
-    private List<Topic> fullTopics = new ArrayList<>();
 
-    // ViewModel for backend-backed word list
+    // ❗️THAY ĐỔI: Dùng Model mới
+    private List<Topic> fullTopics = new ArrayList<>(); // UI Model (Topic.java)
+    private List<VocabWord> backendWords = new ArrayList<>(); // Data Model (VocabWord.java)
+
     private Vocab2ViewModel viewModel;
-    private Integer topicIdArg = null; // optional topic id passed from VocabFragment
+    private Integer topicIdArg = null;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -36,7 +39,7 @@ public class VocabFragment2 extends Fragment {
         binding = FragmentVocab2Binding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // If a topic id was passed, record it; otherwise we will use local samples
+        // Nếu có topic id được truyền vào
         if (getArguments() != null && getArguments().containsKey("topic_index")) {
             topicIdArg = getArguments().getInt("topic_index");
         }
@@ -44,7 +47,7 @@ public class VocabFragment2 extends Fragment {
         // RecyclerView setup
         binding.recyclerTopics.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new VocabTopicAdapter(new ArrayList<>(fullTopics), (topic, position) -> {
-            // Open fragment_vocab3 when any card is clicked and pass the selected word data
+            // Mở fragment_vocab3 khi click vào 1 từ
             VocabFragment3 fragment = new VocabFragment3();
             Bundle b = new Bundle();
             b.putString(VocabFragment3.ARG_WORD, topic.getWord());
@@ -61,15 +64,14 @@ public class VocabFragment2 extends Fragment {
         });
         binding.recyclerTopics.setAdapter(adapter);
 
-        // Initialize ViewModel
+        // ViewModel
         viewModel = new ViewModelProvider(requireActivity()).get(Vocab2ViewModel.class);
         observeViewModel();
 
-        // If topicIdArg is provided, fetch from backend; else populate with sample data
+        // Nếu có topicIdArg thì fetch backend, ngược lại dùng sample
         if (topicIdArg != null && topicIdArg > 0) {
             viewModel.fetchWords(topicIdArg);
         } else {
-            // Sample words - replace with real data source later
             fullTopics = new ArrayList<>(Arrays.asList(
                     new Topic("cat", "(n.)", "A small domesticated carnivorous mammal."),
                     new Topic("run", "(v.)", "To move at a speed faster than a walk."),
@@ -80,13 +82,12 @@ public class VocabFragment2 extends Fragment {
                     new Topic("travel", "(v.)", "To make a journey, typically of some length."),
                     new Topic("school", "(n.)", "An institution for educating children or adults."),
                     new Topic("weather", "(n.)", "The state of the atmosphere at a place and time."),
-                    new Topic("sport", "(n.)", "An activity involving physical exertion and skill in which an individual or team competes.")
+                    new Topic("sport", "(n.)", "An activity involving physical exertion and skill.")
             ));
-
             adapter.updateList(new ArrayList<>(fullTopics));
         }
 
-        // Search icon click - filter the list
+        // Search icon click
         binding.searchTopic.setOnClickListener(v -> {
             String query = binding.searchEditText.getText().toString().trim().toLowerCase();
             if (query.isEmpty()) {
@@ -110,7 +111,7 @@ public class VocabFragment2 extends Fragment {
             adapter.updateList(filtered);
         });
 
-        // Listen for filter results from the vocab2 filter dialog (same key as VocabFragment)
+        // Nhận kết quả filter
         getParentFragmentManager().setFragmentResultListener("vocabFilter", this, (requestKey, bundle) -> {
             if (bundle == null) return;
             boolean savedOnly = bundle.getBoolean("savedOnly", false);
@@ -118,9 +119,8 @@ public class VocabFragment2 extends Fragment {
             applyFilters(savedOnly, difficulty);
         });
 
-        // Filter icon - show vocab2 filter bottom sheet
+        // Nút filter
         binding.filter.setOnClickListener(v -> {
-            // Show the vocab2 FilterDialog (bottom sheet)
             FilterDialog filterSheet = new FilterDialog();
             try {
                 if (getActivity() != null) {
@@ -133,35 +133,45 @@ public class VocabFragment2 extends Fragment {
             }
         });
 
-        // Standardized return behavior: fall back to finishing the activity if no backstack
+        // Nút quay lại
         ReturnButtonHelper.bind(binding.getRoot(), this, null, () -> requireActivity().finish());
         View btnReturn = root.findViewById(R.id.btn_return);
         if (btnReturn != null) {
             btnReturn.setOnClickListener(v -> getParentFragmentManager().popBackStack());
         }
+
         Toast.makeText(getContext(), "Vocab Fragment 2 Opened!", Toast.LENGTH_SHORT).show();
         return root;
     }
 
+    // ❗️THAY ĐỔI: ViewModel getter mới
     private void observeViewModel() {
-        viewModel.getTopics().observe(getViewLifecycleOwner(), topics -> {
-            if (topics == null) {
-                // loading state - show progress
-                if (binding != null) binding.progressLoading.setVisibility(View.VISIBLE);
+        viewModel.getWordList().observe(getViewLifecycleOwner(), words -> { // 👈 Sửa ở đây
+            if (binding == null) return;
+
+            if (words == null) {
+                binding.progressLoading.setVisibility(View.VISIBLE);
                 return;
             }
 
-            // hide progress
-            if (binding != null) binding.progressLoading.setVisibility(View.GONE);
+            binding.progressLoading.setVisibility(View.GONE);
+            backendWords.clear();
+            backendWords.addAll(words);
 
-            if (!topics.isEmpty()) {
-                fullTopics.clear();
-                fullTopics.addAll(topics);
-                adapter.updateList(new ArrayList<>(fullTopics));
-            } else {
-                // empty result from backend
-                fullTopics.clear();
-                adapter.updateList(new ArrayList<>());
+            // Map từ VocabWord -> Topic (UI Model)
+            fullTopics.clear();
+            for (VocabWord w : backendWords) {
+                Topic uiTopic = new Topic(
+                        w.getWordText(),
+                        "(n.)", // 👈 API 2 chỉ trả về danh từ
+                        w.getPrimaryDefinition()
+                );
+                fullTopics.add(uiTopic);
+            }
+
+            adapter.updateList(new ArrayList<>(fullTopics));
+
+            if (fullTopics.isEmpty()) {
                 Toast.makeText(requireContext(), "No words found for this topic", Toast.LENGTH_SHORT).show();
             }
         });
@@ -181,14 +191,12 @@ public class VocabFragment2 extends Fragment {
         String wantedForm = difficulty == null ? null : difficulty.trim().toLowerCase();
 
         for (Topic t : fullTopics) {
-            boolean matchesSaved = !savedOnly || t.isFavorite(); // treat favorite as "saved"
-
+            boolean matchesSaved = !savedOnly || t.isFavorite();
             boolean matchesForm = true;
             if (wantedForm != null && !wantedForm.isEmpty()) {
                 String normalized = normalizeWordForm(t.getWordType());
                 matchesForm = normalized != null && normalized.equals(wantedForm.toLowerCase());
             }
-
             if (matchesSaved && matchesForm) filtered.add(t);
         }
 
@@ -199,21 +207,19 @@ public class VocabFragment2 extends Fragment {
         Toast.makeText(requireContext(), label, Toast.LENGTH_SHORT).show();
     }
 
-    // Normalize examples like "(n.)", "n.", "noun", "(adj.)" into: "noun","verb","adjective","adverb".
     private String normalizeWordForm(String raw) {
         if (raw == null) return null;
-        String s = raw.toLowerCase().replaceAll("[^a-z]", ""); // remove non-letters
+        String s = raw.toLowerCase().replaceAll("[^a-z]", "");
         if (s.isEmpty()) return null;
-        if (s.startsWith("n")) return "noun"; // covers n, noun
-        if (s.startsWith("v")) return "verb"; // covers v, verb
-        if (s.startsWith("adj")) return "adjective"; // covers adj, adjective
-        if (s.startsWith("adv")) return "adverb"; // covers adv, adverb
-        // fallback: try full words
+        if (s.startsWith("n")) return "noun";
+        if (s.startsWith("v")) return "verb";
+        if (s.startsWith("adj")) return "adjective";
+        if (s.startsWith("adv")) return "adverb";
         if (s.contains("noun")) return "noun";
         if (s.contains("verb")) return "verb";
         if (s.contains("adjective")) return "adjective";
         if (s.contains("adverb")) return "adverb";
-        return s; // return whatever remains
+        return s;
     }
 
     @Override
