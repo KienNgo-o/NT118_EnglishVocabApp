@@ -22,6 +22,7 @@ import com.example.nt118_englishvocabapp.models.Definition;
 import com.example.nt118_englishvocabapp.models.FlashcardItem;
 import com.example.nt118_englishvocabapp.models.LearnableItem;
 import com.example.nt118_englishvocabapp.models.Pronunciation;
+import com.example.nt118_englishvocabapp.models.Topic;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,8 +53,32 @@ public class FlashcardFragment2 extends Fragment {
 
         if (getArguments() != null) {
             topicId = getArguments().getInt("topic_index", 1);
+            // If caller passed topic name, use it immediately to set the title to avoid waiting for network
+            String argName = getArguments().getString("topic_name", null);
+            if (argName != null && !argName.isEmpty()) {
+                binding.txtTopicTitle.setText(getString(R.string.title_flashcard) + " - " + argName);
+            }
         }
 
+        // Set a sensible default title and then try to resolve the real topic name
+        try {
+            binding.txtTopicTitle.setText(getString(R.string.title_flashcard));
+        } catch (Exception ignored) {}
+
+        // Observe topics to set the full title when the topic name becomes available
+        viewModel.getTopics().observe(getViewLifecycleOwner(), topics -> {
+            if (topics == null || topics.isEmpty()) return;
+            for (Topic t : topics) {
+                if (t != null && t.getTopicId() == topicId) {
+                    String name = t.getTopicName() == null ? "" : t.getTopicName();
+                    binding.txtTopicTitle.setText(getString(R.string.title_flashcard) + " - " + name);
+                    return;
+                }
+            }
+        });
+
+        // Ensure topics are fetched (if not already loaded elsewhere)
+        viewModel.fetchTopics();
 
 
         viewModel.getLearnableItems().observe(getViewLifecycleOwner(), items -> {
@@ -305,4 +330,3 @@ public class FlashcardFragment2 extends Fragment {
         binding = null;
     }
 }
-

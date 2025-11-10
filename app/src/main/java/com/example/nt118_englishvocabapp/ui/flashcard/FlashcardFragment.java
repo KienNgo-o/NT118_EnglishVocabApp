@@ -164,11 +164,14 @@ public class FlashcardFragment extends Fragment implements TopicAdapter.OnTopicC
         );
 
         // Click vào icon tìm kiếm (kính lúp)
-        binding.searchFlashcard.setOnClickListener(v -> {
-            String query = binding.searchEditText.getText().toString();
-            filterTopics(query);
-            KeyboardUtils.hideKeyboardAndRestoreUI(requireActivity(), v, keyboardRootView, keyboardListener);
-        });
+        View searchIcon = binding.getRoot().findViewById(R.id.search_flashcard);
+        if (searchIcon != null) {
+            searchIcon.setOnClickListener(v -> {
+                String query = binding.searchEditText.getText().toString();
+                filterTopics(query);
+                KeyboardUtils.hideKeyboardAndRestoreUI(requireActivity(), v, keyboardRootView, keyboardListener);
+            });
+        }
 
         // Nhấn nút "Search" trên bàn phím
         binding.searchEditText.setOnEditorActionListener((v, actionId, event) -> {
@@ -248,19 +251,21 @@ public class FlashcardFragment extends Fragment implements TopicAdapter.OnTopicC
         }
 
         // Nếu không khóa, mở màn hình chi tiết
-        openDetail(topic.getTopicId());
+        openDetail(topic);
     }
 
     /**
      * Mở màn hình FlashcardFragment2 với topicId được chọn
      */
-    private void openDetail(int topicId) {
+    private void openDetail(Topic topic) {
         KeyboardUtils.hideKeyboardAndRestoreUI(
                 requireActivity(), requireActivity().getWindow().getDecorView(), keyboardRootView, keyboardListener);
 
         FlashcardFragment2 frag = new FlashcardFragment2();
         Bundle b = new Bundle();
-        b.putInt("topic_index", topicId); // Gửi topicId thật qua Bundle
+        b.putInt("topic_index", topic.getTopicId()); // Gửi topicId thật qua Bundle
+        // Also pass the topic name so the detail fragment can set the title immediately
+        if (topic.getTopicName() != null) b.putString("topic_name", topic.getTopicName());
         frag.setArguments(b);
 
         AppCompatActivity activity = (AppCompatActivity) requireActivity();

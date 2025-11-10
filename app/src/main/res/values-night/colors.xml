@@ -68,6 +68,9 @@
     <color name="light_white_gray">#F1F1F2</color>
     <color name="topic_title_color">#FFFFFFFF</color>
 
+    <!-- progress text color for the flashcard progress pill (night mode) -->
+    <color name="progress_text">#FFFFFFFF</color>
+
     <!-- ==========================
          Screen / Fragment backgrounds (night overrides)
          ========================== -->
