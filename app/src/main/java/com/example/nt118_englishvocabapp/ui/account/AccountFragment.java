@@ -1,5 +1,6 @@
 package com.example.nt118_englishvocabapp.ui.account;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +37,16 @@ import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
 import com.example.nt118_englishvocabapp.util.KeyboardUtils;
 import com.example.nt118_englishvocabapp.ui.home.HomeFragment;
 
+import com.example.nt118_englishvocabapp.LoginActivity; // Import LoginActivity
+import com.example.nt118_englishvocabapp.network.ApiService;
+import com.example.nt118_englishvocabapp.network.RetrofitClient;
+import com.example.nt118_englishvocabapp.network.SessionManager;
+import com.example.nt118_englishvocabapp.network.SignOutRequest;
+
+// Imports cho Retrofit
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 public class AccountFragment extends Fragment {
 
     // Activity result launcher for picking an image from gallery
@@ -83,10 +94,16 @@ public class AccountFragment extends Fragment {
         return inflater.inflate(com.example.nt118_englishvocabapp.R.layout.fragment_account, container, false);
     }
 
+    // --- THÊM MỚI CÁC BIẾN CHO LOGOUT ---
+    private ApiService apiService;
+    private SessionManager sessionManager;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        if (getContext() != null) {
+            apiService = RetrofitClient.getApiService(getContext());
+            sessionManager = SessionManager.getInstance(getContext());
+        }
         // Find views
         LinearLayout rowEdit = view.findViewById(com.example.nt118_englishvocabapp.R.id.row_edit_profile);
         final CardView expandedCard = view.findViewById(com.example.nt118_englishvocabapp.R.id.card_edit_profile_expanded);
@@ -339,7 +356,29 @@ public class AccountFragment extends Fragment {
                 if (!isAdded()) return;
                 new LogoutDialogFragment().show(getParentFragmentManager(), "logout_dialog");
             });
+
+
         }
+        if (isAdded()) {
+            getParentFragmentManager().setFragmentResultListener(
+                    LogoutDialogFragment.REQUEST_KEY, // Key phải khớp với Dialog
+                    this,
+                    (requestKey, bundle) -> {
+                        // Khi "Confirm" được nhấn, hàm performLogout() sẽ chạy
+                        performLogout();
+                    }
+            );
+        }
+
+        // 2. GỌI DIALOG: Thiết lập click listener để MỞ dialog
+        if (rowLogout != null) {
+            rowLogout.setOnClickListener(v -> {
+                if (!isAdded()) return;
+                // Dòng này mới là dòng MỞ dialog
+                new LogoutDialogFragment().show(getParentFragmentManager(), "logout_dialog");
+            });
+        }
+
 
         if (rowDeleteAccount != null) {
             rowDeleteAccount.setOnClickListener(v -> {
@@ -347,5 +386,62 @@ public class AccountFragment extends Fragment {
                 new DeleteAccDialogFragment().show(getParentFragmentManager(), "deleteacc_dialog");
             });
         }
+    }
+    private void performLogout() {
+        if (!isAdded() || getContext() == null) return; // Kiểm tra an toàn
+
+
+        // Đảm bảo sessionManager đã được khởi tạo
+        if (sessionManager == null) {
+            sessionManager = SessionManager.getInstance(getContext());
+        }
+
+        String refreshToken = sessionManager.getRefreshToken();
+        if (refreshToken == null) {
+            // Nếu không có token, không cần gọi API, chỉ cần chuyển màn hình
+            forceLogoutToLoginScreen();
+            return;
+        }
+
+        // Đảm bảo apiService đã được khởi tạo
+        if (apiService == null) {
+            apiService = RetrofitClient.getApiService(getContext());
+        }
+
+        // Gọi API /signout
+        apiService.signOut(new SignOutRequest(refreshToken)).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                // Dù API thành công hay thất bại, chúng ta CŨNG PHẢI xoá token
+                forceLogoutToLoginScreen();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                // Lỗi mạng, chúng ta CŨNG PHẢI xoá token
+                forceLogoutToLoginScreen();
+            }
+        });
+    }
+
+    /**
+     * Hàm này dọn dẹp session và chuyển về màn hình Login
+     */
+    private void forceLogoutToLoginScreen() {
+        if (getActivity() == null || !isAdded()) return; // Đảm bảo Fragment còn tồn tại
+
+        // 1. Xoá token đã lưu
+        if (sessionManager == null) {
+            sessionManager = SessionManager.getInstance(getContext());
+        }
+        sessionManager.clearTokens();
+
+        // 2. Chuyển về LoginActivity và xoá hết các Activity cũ
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+
+        // Kết thúc MainActivity (nơi chứa AccountFragment)
+        getActivity().finish();
     }
 }

@@ -2,7 +2,6 @@ package com.example.nt118_englishvocabapp.network;
 import com.example.nt118_englishvocabapp.models.Topic;
 import com.example.nt118_englishvocabapp.models.RefreshRequest;
 import com.example.nt118_englishvocabapp.models.RefreshResponse;
-import com.example.nt118_englishvocabapp.models.SignOutRequest;
 
 import java.util.List;
 import retrofit2.Call;
