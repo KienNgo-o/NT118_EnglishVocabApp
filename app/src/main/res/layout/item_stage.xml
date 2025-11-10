@@ -3,7 +3,7 @@
     android:id="@+id/stage_card"
     android:orientation="vertical"
     android:gravity="center"
-    android:layout_width="wrap_content"
+    android:layout_width="100dp"
     android:layout_height="wrap_content"
     android:layout_margin="12dp">  <!-- reduced margin -->
 
@@ -29,8 +29,9 @@
 
         <ImageView
             android:id="@+id/lock_icon"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_margin="3dp"
             android:layout_gravity="end|bottom"
             android:visibility="gone"
             android:src="@android:drawable/ic_lock_lock"
@@ -39,8 +40,11 @@
 
     <TextView
         android:id="@+id/stage_label"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 </LinearLayout>

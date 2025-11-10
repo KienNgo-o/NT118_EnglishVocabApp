@@ -109,6 +109,11 @@
 
     <!-- Stage label, uses placeholder %1$d for stage number -->
     <string name="part_label">Part %1$d</string>
+    <string name="basic_colors_label">Basic colors</string>
+    <string name="animals_label">Animals</string>
+    <string name="school_label">School</string>
+    <string name="test1_label">Test 1</string>
+    <string name="emotion_label">Emotion</string>
 
     <!-- New strings for choose-by-sound fragment -->
     <string name="title_choose_by_sound">Quiz - Choose by Sound</string>

@@ -60,16 +60,38 @@ public class StageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 StageViewHolder svh = (StageViewHolder) holder;
                 String imageName;
                 switch (it.getStageNumber()) {
-                    case 1: imageName = "fruits"; break;
-                    case 2: imageName = "animals"; break;
-                    case 3: imageName = "careers"; break;
+                    case 1: imageName = "basic_colors"; break; // replace fruits with basic_colors
+                    case 2: imageName = "animals"; break; // keep animals
+                    case 3: imageName = "school"; break; // replace careers with school for part 3
+                    case 4: imageName = "test"; break; // use test drawable for part 4
+                    case 5: imageName = "emotion"; break; // use emotion drawable for part 5
                     default: imageName = "stage_" + it.getStageNumber(); break;
                 }
                 int drawableId = context.getResources().getIdentifier(imageName, "drawable", context.getPackageName());
                 if (drawableId != 0) svh.stageImage.setImageResource(drawableId);
                 else svh.stageImage.setImageResource(android.R.drawable.ic_menu_gallery);
 
-                svh.stageLabel.setText(context.getString(R.string.part_label, it.getStageNumber()));
+                // Use custom labels for parts 1-4 where provided, otherwise fall back to "Part N"
+                switch (it.getStageNumber()) {
+                    case 1:
+                        svh.stageLabel.setText(context.getString(R.string.basic_colors_label));
+                        break;
+                    case 2:
+                        svh.stageLabel.setText(context.getString(R.string.animals_label));
+                        break;
+                    case 3:
+                        svh.stageLabel.setText(context.getString(R.string.school_label));
+                        break;
+                    case 4:
+                        svh.stageLabel.setText(context.getString(R.string.test1_label));
+                        break;
+                    case 5:
+                        svh.stageLabel.setText(context.getString(R.string.emotion_label));
+                        break;
+                    default:
+                        svh.stageLabel.setText(context.getString(R.string.part_label, it.getStageNumber()));
+                        break;
+                }
                 svh.lockIcon.setVisibility(it.isUnlocked() ? View.GONE : View.VISIBLE);
 
                 svh.itemView.setOnClickListener(v -> {

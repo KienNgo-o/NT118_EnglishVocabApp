@@ -175,7 +175,8 @@ public class QuizFragment extends Fragment {
 
         List<StageItem> items = new ArrayList<>();
         final int totalStages = 12; // change as needed
-        final int unlockedCount = 2; // demo: first two unlocked; replace with real progress logic
+        // Unlock configuration: set unlockedCount to 3 so Part 3 is unlocked.
+        final int unlockedCount = 3; // first three unlocked
 
         // Zig-zag pattern columns sequence: 0,1,2,1 repeating
         int[] pattern = new int[]{0, 1, 2, 1};
@@ -197,10 +198,48 @@ public class QuizFragment extends Fragment {
     }
 
     private void onStageClick(StageItem stageItem) {
-        if (stageItem.isUnlocked()) {
-            Toast.makeText(getContext(), "Open " + stageItem.getName(), Toast.LENGTH_SHORT).show();
-        } else {
+        if (stageItem == null) return;
+
+        // If locked, show toast and do nothing
+        if (!stageItem.isUnlocked()) {
             Toast.makeText(getContext(), stageItem.getName() + " is locked", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Hide keyboard and restore UI (if present) before navigation
+        try {
+            if (getActivity() != null) {
+                View rootView = (binding != null) ? binding.getRoot() : requireActivity().findViewById(android.R.id.content);
+                keyboardListener = com.example.nt118_englishvocabapp.util.KeyboardUtils.hideKeyboardAndRestoreUI(requireActivity(), rootView, keyboardRootView, keyboardListener);
+            }
+        } catch (Exception ignored) {}
+
+        // Choose destination fragment based on stage number
+        int number = stageItem.getStageNumber();
+        Fragment dest;
+        switch (number) {
+            case 1:
+                dest = new MatchingQuizFragment();
+                break;
+            case 2:
+                dest = new FillAnswerQuizFragment();
+                break;
+            case 3:
+                dest = new MultipleChoiceQuizFragment();
+                break;
+            default:
+                // For other stages default to Matching (or customize as needed)
+                dest = new MatchingQuizFragment();
+                break;
+        }
+
+        // Perform fragment transaction (add to backstack so user can navigate back)
+        if (isAdded() && getActivity() != null) {
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.frame_layout, dest)
+                    .addToBackStack(null)
+                    .commitAllowingStateLoss();
         }
     }
 
