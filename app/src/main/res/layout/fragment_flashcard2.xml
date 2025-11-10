@@ -91,10 +91,9 @@
                 android:gravity="start">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:layout_width="300dp"
+                    android:layout_height="43dp"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/textTerm"
@@ -104,6 +103,23 @@
                         android:textSize="32sp"
                         android:textStyle="bold"
                         tools:text="Red" />
+
+                    <TextView
+                        android:id="@+id/textPOS"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/dark_purple"
+                        android:textSize="20sp"
+                        android:textStyle="italic"
+                        tools:text="(noun)" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
                     <TextView
                         android:id="@+id/textPhonetic"
@@ -119,34 +135,25 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginStart="12dp"
-                        android:src="@drawable/ic_audio_speaker"
-
                         android:background="?attr/selectableItemBackgroundBorderless"
-
-                        app:tint="@color/dark_purple"
 
                         android:contentDescription="@string/play_audio"
 
-                        android:padding="4dp" />
+                        android:padding="4dp"
+
+                        android:src="@drawable/ic_audio_speaker"
+
+                        app:tint="@color/dark_purple" />
 
                     <ImageView
                         android:id="@+id/imgRegion"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginStart="8dp"
-                        tools:src="@drawable/ic_flag_us"
-                        android:contentDescription="@string/region_flag"/>
+                        android:contentDescription="@string/region_flag"
+                        tools:src="@drawable/ic_flag_us" />
 
                 </LinearLayout>
-
-                <TextView
-                    android:id="@+id/textPOS"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/dark_purple"
-                    android:textSize="20sp"
-                    android:textStyle="italic"
-                    tools:text="(noun)" />
 
                 <TextView
                     android:id="@+id/textDefinition"

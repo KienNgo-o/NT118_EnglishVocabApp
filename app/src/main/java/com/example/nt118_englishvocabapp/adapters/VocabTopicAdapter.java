@@ -204,9 +204,6 @@ public class VocabTopicAdapter extends ListAdapter<Topic, VocabTopicAdapter.Topi
             return oldItem.getTopicId() == newItem.getTopicId();
 
         }
-
-
-
         @Override
 
         public boolean areContentsTheSame(@NonNull Topic oldItem, @NonNull Topic newItem) {
@@ -220,9 +217,6 @@ public class VocabTopicAdapter extends ListAdapter<Topic, VocabTopicAdapter.Topi
                     oldItem.isSaved() == newItem.isSaved(); // Thêm kiểm tra 'saved'
 
         }
-
-
-
         @Override
 
         public Object getChangePayload(@NonNull Topic oldItem, @NonNull Topic newItem) {
@@ -232,9 +226,7 @@ public class VocabTopicAdapter extends ListAdapter<Topic, VocabTopicAdapter.Topi
             if (oldItem.isSaved() != newItem.isSaved()) return "saveState";
 
             return null;
-
         }
-
     };
 
 }
