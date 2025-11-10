@@ -2,7 +2,7 @@ package com.example.nt118_englishvocabapp.network;
 import com.example.nt118_englishvocabapp.models.Topic;
 import com.example.nt118_englishvocabapp.models.RefreshRequest;
 import com.example.nt118_englishvocabapp.models.RefreshResponse;
-
+import retrofit2.http.HTTP;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -10,8 +10,11 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import com.example.nt118_englishvocabapp.models.FlashcardItem;
 import retrofit2.http.Path;
+
+import com.example.nt118_englishvocabapp.models.User;
 import com.example.nt118_englishvocabapp.models.VocabWord;
 import com.example.nt118_englishvocabapp.models.WordDetail;
+import retrofit2.http.PATCH;
 public interface ApiService {
 
     @POST("/api/auth/signin")
@@ -41,4 +44,8 @@ public interface ApiService {
     Call<List<VocabWord>> getWordsForTopic(@Path("id") int topicId);
     @GET("api/words/{id}")
     Call<WordDetail> getWordDetails(@Path("id") int wordId);
+    @HTTP(method = "DELETE", path = "/api/users/me", hasBody = true)
+    Call<Void> deleteAccount(@Body DeleteAccountRequest request);
+    @PATCH("/api/users/me")
+    Call<User> updateUserProfile(@Body UpdateProfileRequest request);
 }

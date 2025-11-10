@@ -33,6 +33,10 @@ import androidx.appcompat.app.AppCompatDelegate;
 import android.content.SharedPreferences;
 import android.content.Context;
 
+import com.example.nt118_englishvocabapp.R;
+import com.example.nt118_englishvocabapp.models.User;
+import com.example.nt118_englishvocabapp.network.DeleteAccountRequest;
+import com.example.nt118_englishvocabapp.network.UpdateProfileRequest;
 import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
 import com.example.nt118_englishvocabapp.util.KeyboardUtils;
 import com.example.nt118_englishvocabapp.ui.home.HomeFragment;
@@ -301,26 +305,80 @@ public class AccountFragment extends Fragment {
         if (btnApply != null) {
             btnApply.setOnClickListener(v -> {
                 try {
-                    if (!isAdded()) return;
+                    if (!isAdded() || getContext() == null) return;
 
-                    // hide keyboard first
-                    KeyboardUtils.hideKeyboardAndRestoreUI(requireActivity(), v, keyboardRootView, null);
-
-                    // read values
+                    // 1. Đọc dữ liệu
+                    String currentPass = (edtOldPassword != null && edtOldPassword.getText() != null) ? edtOldPassword.getText().toString() : "";
                     String newName = (edtName != null && edtName.getText() != null) ? edtName.getText().toString().trim() : null;
-                    // email edit was removed; do not attempt to read it here
+                    String newPass = (edtPassword != null && edtPassword.getText() != null) ? edtPassword.getText().toString() : null;
 
-                    if (newName != null && !newName.isEmpty()) {
-                        TextView headerName = view.findViewById(com.example.nt118_englishvocabapp.R.id.tv_name);
-                        if (headerName != null) headerName.setText(newName);
+                    // 2. Kiểm tra bắt buộc
+                    if (currentPass.isEmpty()) {
+                        Toast.makeText(getContext(), "Vui lòng nhập mật khẩu hiện tại", Toast.LENGTH_SHORT).show();
+                        edtOldPassword.requestFocus();
+                        return;
                     }
-                    // We no longer update header email from an edit field because that UI was removed.
 
-                    // collapse expanded card and rotate chevron back
-                    if (expandedCard != null) expandedCard.setVisibility(View.GONE);
-                    if (chevron != null) chevron.animate().rotation(0f).setDuration(200).start();
+                    // 3. Kiểm tra xem có gì để update không
+                    boolean isNameChanging = newName != null && !newName.isEmpty();
+                    boolean isPassChanging = newPass != null && !newPass.isEmpty();
 
-                    Toast.makeText(getContext(), "Profile updated", Toast.LENGTH_SHORT).show();
+                    if (!isNameChanging && !isPassChanging) {
+                        Toast.makeText(getContext(), "Không có thông tin mới để cập nhật", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // (Hiển thị loading, ví dụ: progressBar.setVisibility(View.VISIBLE))
+
+                    // 4. Tạo Request và Gọi API
+                    UpdateProfileRequest request = new UpdateProfileRequest(currentPass, newName, newPass);
+
+                    if (apiService == null) {
+                        apiService = RetrofitClient.getApiService(getContext());
+                    }
+
+                    apiService.updateUserProfile(request).enqueue(new Callback<User>() {
+                        @Override
+                        public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
+                            // (Ẩn loading)
+                            if (!isAdded()) return;
+
+                            if (response.isSuccessful() && response.body() != null) {
+                                // THÀNH CÔNG
+                                User updatedUser = response.body();
+                                Toast.makeText(getContext(), "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
+
+                                // Cập nhật lại UI (ví dụ: tên ở header)
+                                TextView headerName = view.findViewById(R.id.tv_name);
+                                if (headerName != null) headerName.setText(updatedUser.getUsername());
+
+                                // Xoá trắng các ô password
+                                edtOldPassword.setText("");
+                                edtPassword.setText("");
+
+                                // Đóng card (logic cũ của bạn)
+                                KeyboardUtils.hideKeyboardAndRestoreUI(requireActivity(), v, keyboardRootView, null);
+                                if (expandedCard != null) expandedCard.setVisibility(View.GONE);
+                                if (chevron != null) chevron.animate().rotation(0f).setDuration(200).start();
+
+                            } else if (response.code() == 401) {
+                                Toast.makeText(getContext(), "Mật khẩu hiện tại không đúng", Toast.LENGTH_LONG).show();
+                            } else if (response.code() == 409) {
+                                Toast.makeText(getContext(), "Username này đã tồn tại", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(getContext(), "Cập nhật thất bại", Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
+                            // (Ẩn loading)
+                            if (!isAdded()) return;
+                            Log.e("UpdateProfile", "onFailure: " + t.getMessage());
+                            Toast.makeText(getContext(), "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
                 } catch (Exception e) {
                     Log.e("AccountFragment", "Error applying profile edits", e);
                     Toast.makeText(getContext(), "Failed to apply changes", Toast.LENGTH_SHORT).show();
@@ -402,6 +460,24 @@ public class AccountFragment extends Fragment {
                 new LogoutDialogFragment().show(getParentFragmentManager(), "logout_dialog");
             });
         }
+        if (isAdded()) {
+            // Lắng nghe kết quả từ DeleteAccDialogFragment
+            // "delete_account_confirm" phải khớp với key bạn đặt trong dialog
+            getParentFragmentManager().setFragmentResultListener(
+                    "delete_account_confirm",
+                    this,
+                    (requestKey, bundle) -> {
+                        // Lấy mật khẩu user vừa nhập từ dialog
+                        String password = bundle.getString("password");
+                        if (password != null && !password.isEmpty()) {
+                            // Gọi hàm thực hiện xoá
+                            performDeleteAccount(password);
+                        } else {
+                            Toast.makeText(getContext(), "Không nhận được mật khẩu", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+            );
+        }
 
 
         if (rowDeleteAccount != null) {
@@ -411,15 +487,12 @@ public class AccountFragment extends Fragment {
             });
         }
     }
+
     private void performLogout() {
         if (!isAdded() || getContext() == null) return; // Kiểm tra an toàn
-
-
-        // Đảm bảo sessionManager đã được khởi tạo
         if (sessionManager == null) {
             sessionManager = SessionManager.getInstance(getContext());
         }
-
         String refreshToken = sessionManager.getRefreshToken();
         if (refreshToken == null) {
             // Nếu không có token, không cần gọi API, chỉ cần chuyển màn hình
@@ -467,5 +540,53 @@ public class AccountFragment extends Fragment {
 
         // Kết thúc MainActivity (nơi chứa AccountFragment)
         getActivity().finish();
+    }
+    private void performDeleteAccount(String password) {
+        if (!isAdded() || getContext() == null) return; // Kiểm tra an toàn
+
+        // Tìm ProgressBar (giả sử bạn đã thêm nó vào layout cho chức năng logout)
+        // LƯU Ý: Đổi R.id.progress_bar_account nếu bạn dùng ID khác
+
+
+        // Đảm bảo các service đã được khởi tạo
+        if (sessionManager == null) {
+            sessionManager = SessionManager.getInstance(getContext());
+        }
+        if (apiService == null) {
+            apiService = RetrofitClient.getApiService(getContext());
+        }
+
+        // Gọi API /api/users/me với phương thức DELETE
+        apiService.deleteAccount(new DeleteAccountRequest(password)).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                if (!isAdded()) return; // Kiểm tra fragment còn tồn tại
+
+
+                if (response.isSuccessful()) {
+                    // Xoá thành công (Code 204)
+                    Toast.makeText(getContext(), "Xoá tài khoản thành công", Toast.LENGTH_LONG).show();
+
+                    // Dùng lại hàm logout để dọn dẹp và chuyển màn hình
+                    forceLogoutToLoginScreen();
+
+                } else if (response.code() == 401) {
+                    // Sai mật khẩu (Code 401)
+                    Toast.makeText(getContext(), "Mật khẩu không chính xác", Toast.LENGTH_LONG).show();
+                } else {
+                    // Lỗi khác (400, 500...)
+                    Toast.makeText(getContext(), "Đã xảy ra lỗi khi xoá tài khoản", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                if (!isAdded()) return; // Kiểm tra fragment còn tồn tại
+
+                // Lỗi mạng
+                Log.e("DeleteAccount", "onFailure: " + t.getMessage());
+                Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
