@@ -247,44 +247,13 @@
                         android:padding="16dp">
 
                         <TextView
+                            android:id="@+id/txt_synonyms"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Most suitable"
-                            android:textColor="@color/purple_700"
-                            android:textStyle="bold"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Melon"
                             android:textColor="@android:color/black"
                             android:textSize="14sp"
                             android:layout_marginTop="6dp"
-                            android:textStyle="bold" />
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginTop="12dp"
-                            android:layout_marginBottom="12dp"
-                            android:background="@color/light_gray" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Suitable"
-                            android:textColor="@color/purple_700"
-                            android:textStyle="bold"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="None."
-                            android:textColor="@color/purple_700"
-                            android:textSize="14sp"
-                            android:layout_marginTop="6dp" />
+                            tools:text="Melon, Water" />
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -338,43 +307,13 @@
                         android:padding="16dp">
 
                         <TextView
+                            android:id="@+id/txt_antonyms"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Most suitable"
-                            android:textColor="@color/purple_700"
-                            android:textStyle="bold"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="None."
                             android:textColor="@color/purple_700"
                             android:textSize="14sp"
-                            android:layout_marginTop="6dp" />
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginTop="12dp"
-                            android:layout_marginBottom="12dp"
-                            android:background="@color/light_gray" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Suitable"
-                            android:textColor="@color/purple_700"
-                            android:textStyle="bold"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="None."
-                            android:textColor="@color/purple_700"
-                            android:textSize="14sp"
-                            android:layout_marginTop="6dp" />
+                            android:layout_marginTop="6dp"
+                            tools:text="None." />
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>

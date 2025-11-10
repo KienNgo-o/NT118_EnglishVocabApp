@@ -11,7 +11,8 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import com.example.nt118_englishvocabapp.models.FlashcardItem;
 import retrofit2.http.Path;
-import com.example.nt118_englishvocabapp.models.VocabWord; // 👈 THÊM IMPORT NÀY
+import com.example.nt118_englishvocabapp.models.VocabWord;
+import com.example.nt118_englishvocabapp.models.WordDetail;
 public interface ApiService {
 
     @POST("/api/auth/signin")
@@ -39,4 +40,6 @@ public interface ApiService {
     );
     @GET("api/topics/{id}/words")
     Call<List<VocabWord>> getWordsForTopic(@Path("id") int topicId);
+    @GET("api/words/{id}")
+    Call<WordDetail> getWordDetails(@Path("id") int wordId);
 }

@@ -7,16 +7,16 @@
     android:background="@color/light_purple"
     android:orientation="vertical"
     android:weightSum="10"
-    tools:context=".ui.vocab.VocabFragment">
+    tools:context=".ui.vocab4.VocabFragment4">
 
-    <!-- Upper part (kept the same as fragment_vocab3) -->
+    <!-- ========== PHẦN TRÊN: THANH TIÊU ĐỀ + TAB ========== -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
         android:orientation="vertical">
 
-        <!-- Top half: toolbar + divider -->
+        <!-- Thanh tiêu đề -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -59,10 +59,9 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:background="@color/dark_purple" />
-
         </LinearLayout>
 
-        <!-- Bottom half: tabs row (styled rounded container with active pill) -->
+        <!-- Thanh tab -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -72,23 +71,17 @@
             android:padding="6dp"
             android:background="@drawable/tabs_bg">
 
-            <!-- Equal width tabs: use selector for selected / pressed states -->
             <TextView
                 android:id="@+id/tab_definition"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:background="@drawable/tab_selector"
-                android:clickable="true"
-                android:focusable="true"
                 android:gravity="center"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
+                android:clickable="true"
                 android:text="@string/tab_definition"
-                android:textAllCaps="false"
                 android:textColor="@color/tab_text_color"
-                android:textSize="14sp"
-                android:contentDescription="@string/cd_tab_definition" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tab_forms"
@@ -96,16 +89,11 @@
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:background="@drawable/tab_selector"
-                android:clickable="true"
-                android:focusable="true"
                 android:gravity="center"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
+                android:clickable="true"
                 android:text="@string/tab_forms"
-                android:textAllCaps="false"
                 android:textColor="@color/tab_text_color"
-                android:textSize="14sp"
-                android:contentDescription="@string/cd_tab_forms" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tab_synonyms"
@@ -113,22 +101,15 @@
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:background="@drawable/tab_selector"
-                android:clickable="true"
-                android:focusable="true"
                 android:gravity="center"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
+                android:clickable="true"
                 android:text="@string/tab_synonyms"
-                android:textAllCaps="false"
                 android:textColor="@color/tab_text_color"
-                android:textSize="14sp"
-                android:contentDescription="@string/cd_tab_synonyms" />
-
+                android:textSize="14sp" />
         </LinearLayout>
-
     </LinearLayout>
 
-    <!-- Lower container: fixed word row (like vocab3) + scrollable cards -->
+    <!-- ========== PHẦN DƯỚI: NỘI DUNG CÁC THẺ TỪ ========== -->
     <LinearLayout
         android:id="@+id/lower_container"
         android:layout_width="match_parent"
@@ -137,7 +118,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Word row (placed same as fragment_vocab3) -->
+        <!-- Từ vựng chính -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -150,10 +131,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Watermelon"
                 android:textColor="@color/purple_700"
                 android:textSize="28sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:text="Watermelon" />
 
             <TextView
                 android:id="@+id/wordType"
@@ -164,22 +145,19 @@
                 android:paddingTop="6dp"
                 android:paddingEnd="12dp"
                 android:paddingBottom="6dp"
-                android:text="Noun"
                 android:textColor="@color/white"
                 android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:text="Noun" />
 
-            <!-- orange line to the right of the pill (same as fragment_vocab3) -->
             <View
                 android:layout_width="120dp"
                 android:layout_height="6dp"
                 android:layout_marginStart="-5dp"
-                android:layout_marginTop="0dp"
                 android:background="@drawable/orange_line" />
-
         </LinearLayout>
 
-        <!-- Scrollable card area below the fixed word row -->
+        <!-- Danh sách thẻ loại từ -->
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -193,7 +171,6 @@
                 android:paddingTop="12dp"
                 android:paddingBottom="24dp">
 
-                <!-- Example card 1 -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -208,24 +185,58 @@
                         android:orientation="vertical"
                         android:padding="16dp">
 
-                        <!-- Header: centered pill with lines to both sides -->
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="6dp">
-
-                            <View
-                                android:id="@+id/line_left_1"
-                                android:layout_width="match_parent"
-                                android:layout_height="6dp"
-                                android:layout_centerVertical="true"
-                                android:layout_toStartOf="@+id/pill_1"
-                                android:layout_marginEnd="8dp"
-                                android:background="@color/dark_purple" />
-
                             <TextView
-                                android:id="@+id/pill_1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="32dp"
+                                android:layout_centerInParent="true"
+                                android:background="@drawable/rounded_rect_purple"
+                                android:gravity="center"
+                                android:paddingLeft="18dp"
+                                android:paddingRight="18dp"
+                                android:text="Danh từ (Noun)"
+                                android:textColor="@android:color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </RelativeLayout>
+
+                        <TextView
+                            android:id="@+id/txt_noun_forms"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="None."
+                            android:textColor="@color/purple_700"
+                            android:textSize="16sp"
+                            android:layout_marginTop="8dp"
+                            android:paddingBottom="8dp" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@android:color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="6dp">
+                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="32dp"
                                 android:layout_centerInParent="true"
@@ -237,20 +248,10 @@
                                 android:textColor="@android:color/white"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
-
-                            <View
-                                android:id="@+id/line_right_1"
-                                android:layout_width="match_parent"
-                                android:layout_height="6dp"
-                                android:layout_centerVertical="true"
-                                android:layout_toEndOf="@+id/pill_1"
-                                android:layout_marginStart="8dp"
-                                android:background="@color/dark_purple" />
-
                         </RelativeLayout>
 
-                        <!-- Body content -->
                         <TextView
+                            android:id="@+id/txt_verb_forms"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="None."
@@ -262,7 +263,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Example card 2 -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -282,17 +282,7 @@
                             android:layout_height="40dp"
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="6dp">
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="6dp"
-                                android:layout_centerVertical="true"
-                                android:layout_toStartOf="@+id/pill_2"
-                                android:layout_marginEnd="8dp"
-                                android:background="@color/dark_purple" />
-
                             <TextView
-                                android:id="@+id/pill_2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="32dp"
                                 android:layout_centerInParent="true"
@@ -304,18 +294,10 @@
                                 android:textColor="@android:color/white"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="6dp"
-                                android:layout_centerVertical="true"
-                                android:layout_toEndOf="@+id/pill_2"
-                                android:layout_marginStart="8dp"
-                                android:background="@color/dark_purple" />
-
                         </RelativeLayout>
 
                         <TextView
+                            android:id="@+id/txt_adjective_forms"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="None."
@@ -327,12 +309,55 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Additional cards can be added here dynamically if needed -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@android:color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+
+                            android:layout_height="40dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="6dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="32dp"
+                                android:layout_centerInParent="true"
+                                android:background="@drawable/rounded_rect_purple"
+                                android:gravity="center"
+                                android:paddingLeft="18dp"
+                                android:paddingRight="18dp"
+                                android:text="Trạng từ (Adverb)"
+                                android:textColor="@android:color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </RelativeLayout>
+
+                        <TextView
+                            android:id="@+id/txt_adverb_forms"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="None."
+                            android:textColor="@color/purple_700"
+                            android:textSize="16sp"
+                            android:layout_marginTop="8dp"
+                            android:paddingBottom="8dp" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
 
         </ScrollView>
-
     </LinearLayout>
-
 </LinearLayout>

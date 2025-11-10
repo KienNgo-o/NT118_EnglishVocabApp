@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.databinding.FragmentVocab2Binding;
-import com.example.nt118_englishvocabapp.models.VocabWord; // 👈 THÊM IMPORT NÀY
+import com.example.nt118_englishvocabapp.models.VocabWord; // 👈 THÊM IMPORT
 import com.example.nt118_englishvocabapp.ui.vocab3.VocabFragment3;
 import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
 
@@ -23,12 +23,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class VocabFragment2 extends Fragment {
+
     private FragmentVocab2Binding binding;
     private VocabTopicAdapter adapter;
-
-    // ❗️THAY ĐỔI: Dùng Model mới
-    private List<Topic> fullTopics = new ArrayList<>(); // UI Model (Topic.java)
-    private List<VocabWord> backendWords = new ArrayList<>(); // Data Model (VocabWord.java)
+    private List<Topic> fullTopics = new ArrayList<>();
 
     private Vocab2ViewModel viewModel;
     private Integer topicIdArg = null;
@@ -37,22 +35,21 @@ public class VocabFragment2 extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentVocab2Binding.inflate(inflater, container, false);
-        View root = binding.getRoot();
 
-        // Nếu có topic id được truyền vào
+        // Nhận argument (nếu có)
         if (getArguments() != null && getArguments().containsKey("topic_index")) {
             topicIdArg = getArguments().getInt("topic_index");
         }
 
         // RecyclerView setup
         binding.recyclerTopics.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        // Adapter setup
         adapter = new VocabTopicAdapter(new ArrayList<>(fullTopics), (topic, position) -> {
-            // Mở fragment_vocab3 khi click vào 1 từ
+            // Khi click vào 1 từ vựng, mở màn hình 3
             VocabFragment3 fragment = new VocabFragment3();
             Bundle b = new Bundle();
-            b.putString(VocabFragment3.ARG_WORD, topic.getWord());
-            b.putString(VocabFragment3.ARG_WORD_TYPE, topic.getWordType());
-            b.putString(VocabFragment3.ARG_DEFINITION, topic.getDefinition());
+            b.putInt(VocabFragment3.ARG_WORD_ID, topic.getWordId());
             fragment.setArguments(b);
 
             int hostId = (container != null) ? container.getId() : android.R.id.content;
@@ -68,26 +65,19 @@ public class VocabFragment2 extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(Vocab2ViewModel.class);
         observeViewModel();
 
-        // Nếu có topicIdArg thì fetch backend, ngược lại dùng sample
+        // Nếu có topicId → gọi API, nếu không → dùng dữ liệu mẫu
         if (topicIdArg != null && topicIdArg > 0) {
             viewModel.fetchWords(topicIdArg);
         } else {
             fullTopics = new ArrayList<>(Arrays.asList(
                     new Topic("cat", "(n.)", "A small domesticated carnivorous mammal."),
                     new Topic("run", "(v.)", "To move at a speed faster than a walk."),
-                    new Topic("beautiful", "(adj.)", "Pleasing the senses or mind aesthetically."),
-                    new Topic("happiness", "(n.)", "The state of being happy."),
-                    new Topic("eat", "(v.)", "To consume food."),
-                    new Topic("technology", "(n.)", "Application of scientific knowledge for practical purposes."),
-                    new Topic("travel", "(v.)", "To make a journey, typically of some length."),
-                    new Topic("school", "(n.)", "An institution for educating children or adults."),
-                    new Topic("weather", "(n.)", "The state of the atmosphere at a place and time."),
-                    new Topic("sport", "(n.)", "An activity involving physical exertion and skill.")
+                    new Topic("beautiful", "(adj.)", "Pleasing the senses or mind aesthetically.")
             ));
             adapter.updateList(new ArrayList<>(fullTopics));
         }
 
-        // Search icon click
+        // Tìm kiếm
         binding.searchTopic.setOnClickListener(v -> {
             String query = binding.searchEditText.getText().toString().trim().toLowerCase();
             if (query.isEmpty()) {
@@ -100,9 +90,7 @@ public class VocabFragment2 extends Fragment {
             for (Topic t : fullTopics) {
                 String w = t.getWord() != null ? t.getWord().toLowerCase() : "";
                 String d = t.getDefinition() != null ? t.getDefinition().toLowerCase() : "";
-                if (w.contains(query) || d.contains(query)) {
-                    filtered.add(t);
-                }
+                if (w.contains(query) || d.contains(query)) filtered.add(t);
             }
 
             if (filtered.isEmpty()) {
@@ -111,7 +99,7 @@ public class VocabFragment2 extends Fragment {
             adapter.updateList(filtered);
         });
 
-        // Nhận kết quả filter
+        // Nhận filter result
         getParentFragmentManager().setFragmentResultListener("vocabFilter", this, (requestKey, bundle) -> {
             if (bundle == null) return;
             boolean savedOnly = bundle.getBoolean("savedOnly", false);
@@ -119,7 +107,7 @@ public class VocabFragment2 extends Fragment {
             applyFilters(savedOnly, difficulty);
         });
 
-        // Nút filter
+        // Mở filter dialog
         binding.filter.setOnClickListener(v -> {
             FilterDialog filterSheet = new FilterDialog();
             try {
@@ -135,18 +123,17 @@ public class VocabFragment2 extends Fragment {
 
         // Nút quay lại
         ReturnButtonHelper.bind(binding.getRoot(), this, null, () -> requireActivity().finish());
-        View btnReturn = root.findViewById(R.id.btn_return);
-        if (btnReturn != null) {
-            btnReturn.setOnClickListener(v -> getParentFragmentManager().popBackStack());
+        if (binding.btnReturn != null) {
+            binding.btnReturn.setOnClickListener(v -> getParentFragmentManager().popBackStack());
         }
 
         Toast.makeText(getContext(), "Vocab Fragment 2 Opened!", Toast.LENGTH_SHORT).show();
-        return root;
+        return binding.getRoot();
     }
 
-    // ❗️THAY ĐỔI: ViewModel getter mới
+    // Quan sát dữ liệu từ ViewModel
     private void observeViewModel() {
-        viewModel.getWordList().observe(getViewLifecycleOwner(), words -> { // 👈 Sửa ở đây
+        viewModel.getWordList().observe(getViewLifecycleOwner(), words -> {
             if (binding == null) return;
 
             if (words == null) {
@@ -155,20 +142,17 @@ public class VocabFragment2 extends Fragment {
             }
 
             binding.progressLoading.setVisibility(View.GONE);
-            backendWords.clear();
-            backendWords.addAll(words);
 
-            // Map từ VocabWord -> Topic (UI Model)
             fullTopics.clear();
-            for (VocabWord w : backendWords) {
+            for (VocabWord w : words) {
                 Topic uiTopic = new Topic(
+                        w.getWordId(),
                         w.getWordText(),
-                        "(n.)", // 👈 API 2 chỉ trả về danh từ
+                        "(n.)", // giả định loại từ mặc định là danh từ
                         w.getPrimaryDefinition()
                 );
                 fullTopics.add(uiTopic);
             }
-
             adapter.updateList(new ArrayList<>(fullTopics));
 
             if (fullTopics.isEmpty()) {
@@ -184,10 +168,10 @@ public class VocabFragment2 extends Fragment {
         });
     }
 
+    // Bộ lọc
     private void applyFilters(boolean savedOnly, String difficulty) {
         if (fullTopics == null) return;
         List<Topic> filtered = new ArrayList<>();
-
         String wantedForm = difficulty == null ? null : difficulty.trim().toLowerCase();
 
         for (Topic t : fullTopics) {
