@@ -229,8 +229,7 @@ public class AccountFragment extends Fragment {
         // Password toggle: make the expanded edit-card editable and allow toggling visibility
         final android.widget.EditText edtPassword = view.findViewById(com.example.nt118_englishvocabapp.R.id.expanded_password);
         final android.widget.EditText edtName = view.findViewById(com.example.nt118_englishvocabapp.R.id.expanded_username);
-        final android.widget.EditText edtEmail = view.findViewById(com.example.nt118_englishvocabapp.R.id.expanded_email);
-        final ImageButton btnPasswordToggle = view.findViewById(com.example.nt118_englishvocabapp.R.id.expanded_password_toggle);
+        final android.widget.ImageButton btnPasswordToggle = view.findViewById(com.example.nt118_englishvocabapp.R.id.expanded_password_toggle);
 
         if (btnPasswordToggle != null && edtPassword != null) {
             // start with password hidden (inputType already set in layout)
@@ -268,16 +267,13 @@ public class AccountFragment extends Fragment {
 
                     // read values
                     String newName = (edtName != null && edtName.getText() != null) ? edtName.getText().toString().trim() : null;
-                    String newEmail = (edtEmail != null && edtEmail.getText() != null) ? edtEmail.getText().toString().trim() : null;
+                    // email edit was removed; do not attempt to read it here
 
                     if (newName != null && !newName.isEmpty()) {
                         TextView headerName = view.findViewById(com.example.nt118_englishvocabapp.R.id.tv_name);
                         if (headerName != null) headerName.setText(newName);
                     }
-                    if (newEmail != null && !newEmail.isEmpty()) {
-                        TextView headerEmail = view.findViewById(com.example.nt118_englishvocabapp.R.id.tv_email);
-                        if (headerEmail != null) headerEmail.setText(newEmail);
-                    }
+                    // We no longer update header email from an edit field because that UI was removed.
 
                     // collapse expanded card and rotate chevron back
                     if (expandedCard != null) expandedCard.setVisibility(View.GONE);

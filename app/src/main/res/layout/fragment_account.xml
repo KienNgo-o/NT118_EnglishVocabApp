@@ -244,31 +244,6 @@
                                         android:paddingRight="8dp"
                                         android:autofillHints="name" />
 
-                                    <!-- Email row -->
-                                    <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:text="@string/email_label"
-                                        android:textSize="12sp"
-                                        android:textColor="@color/text_secondary"
-                                        android:layout_marginTop="8dp" />
-
-                                    <EditText
-                                        android:id="@+id/expanded_email"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:inputType="textEmailAddress"
-                                        android:hint="@string/hint_email"
-                                        android:textSize="14sp"
-                                        android:textColor="@color/text_primary"
-                                        android:textColorHint="@color/text_secondary"
-                                        android:layout_marginTop="4dp"
-                                        android:layout_marginBottom="12dp"
-                                        android:background="@drawable/edit_text_bg"
-                                        android:paddingLeft="8dp"
-                                        android:paddingRight="8dp"
-                                        android:autofillHints="emailAddress" />
-
                                     <!-- Password row -->
                                     <TextView
                                         android:layout_width="match_parent"
