@@ -10,7 +10,7 @@
 
     <LinearLayout
         android:layout_width="309dp"
-        android:layout_height="270dp"
+        android:layout_height="wrap_content"
         android:background="@color/white"
         android:gravity="center"
         android:orientation="vertical"
@@ -21,10 +21,10 @@
             android:id="@+id/ivClose"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:layout_gravity="left"
+            android:layout_gravity="start"
             android:layout_marginStart="6dp"
             android:layout_marginTop="6dp"
-            android:contentDescription="Close"
+            android:contentDescription="@string/close_label"
             android:scaleType="centerInside"
             android:src="@drawable/close" />
 
@@ -33,7 +33,7 @@
             android:layout_width="72dp"
             android:layout_height="72dp"
             android:layout_marginTop="8dp"
-            android:contentDescription="Delete account icon"
+            android:contentDescription="@string/cd_deleteacc_icon"
             android:src="@drawable/deleteacc_icon" />
 
         <TextView
@@ -41,7 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Do you want to delete your account?"
+            android:text="@string/deleteacc_title"
             android:textAlignment="center"
             android:textColor="@color/black"
             android:textSize="18sp"
@@ -52,10 +52,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Warning: this action is irreversible"
+            android:text="@string/deleteacc_warning"
             android:textAlignment="center"
             android:textColor="#D32F2F"
             android:textSize="14sp" />
+
+        <!-- Password input: user must type their password before confirming -->
+        <EditText
+            android:id="@+id/et_delete_password"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="18dp"
+            android:layout_marginEnd="18dp"
+            android:background="@drawable/edit_text_bg"
+            android:hint="@string/hint_password"
+            android:inputType="textPassword"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:autofillHints="password" />
 
         <Button
             android:id="@+id/btnConfirm"
@@ -63,7 +78,7 @@
             android:layout_height="44dp"
             android:layout_marginTop="18dp"
             android:backgroundTint="@color/purple_700"
-            android:text="Confirm"
+            android:text="@string/confirm"
             android:textAllCaps="false"
             android:textColor="@android:color/white" />
 

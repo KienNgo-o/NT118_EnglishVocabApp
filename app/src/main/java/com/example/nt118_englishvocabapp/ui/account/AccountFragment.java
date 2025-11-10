@@ -248,6 +248,10 @@ public class AccountFragment extends Fragment {
         final android.widget.EditText edtName = view.findViewById(com.example.nt118_englishvocabapp.R.id.expanded_username);
         final android.widget.ImageButton btnPasswordToggle = view.findViewById(com.example.nt118_englishvocabapp.R.id.expanded_password_toggle);
 
+        // NEW: old password field and toggle
+        final android.widget.EditText edtOldPassword = view.findViewById(com.example.nt118_englishvocabapp.R.id.expanded_old_password);
+        final android.widget.ImageButton btnOldPasswordToggle = view.findViewById(com.example.nt118_englishvocabapp.R.id.expanded_old_password_toggle);
+
         if (btnPasswordToggle != null && edtPassword != null) {
             // start with password hidden (inputType already set in layout)
             btnPasswordToggle.setOnClickListener(v -> {
@@ -268,6 +272,26 @@ public class AccountFragment extends Fragment {
                     edtPassword.setSelection(edtPassword.getText() != null ? edtPassword.getText().length() : 0);
                 } catch (Exception e) {
                     Log.e("AccountFragment", "Error toggling password visibility", e);
+                }
+            });
+        }
+
+        // Wire the old-password toggle similarly
+        if (btnOldPasswordToggle != null && edtOldPassword != null) {
+            btnOldPasswordToggle.setOnClickListener(v -> {
+                try {
+                    int inputType = edtOldPassword.getInputType();
+                    boolean isVisible = (inputType & android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) == android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+                    if (isVisible) {
+                        edtOldPassword.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        btnOldPasswordToggle.setImageResource(com.example.nt118_englishvocabapp.R.drawable.eye_closed);
+                    } else {
+                        edtOldPassword.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                        btnOldPasswordToggle.setImageResource(com.example.nt118_englishvocabapp.R.drawable.eye_open);
+                    }
+                    edtOldPassword.setSelection(edtOldPassword.getText() != null ? edtOldPassword.getText().length() : 0);
+                } catch (Exception e) {
+                    Log.e("AccountFragment", "Error toggling old password visibility", e);
                 }
             });
         }

@@ -157,6 +157,13 @@
     <string name="notif_every_2_days">Every 2 days</string>
     <string name="notif_weekly">Weekly</string>
 
+    <!-- New strings used by VocabTopicAdapter -->
+    <string name="loading">Loading...</string>
+    <plurals name="word_count">
+        <item quantity="one">%d word</item>
+        <item quantity="other">%d words</item>
+    </plurals>
+
     <!-- New string for search hint used in fragment_quiz and fragment_vocab -->
     <string name="hint_search_topic">Search topic…</string>
     <string name="cd_prev">Previous</string>
@@ -201,4 +208,17 @@
     <string name="progress_6_24">6/24</string>
     <string name="progress_0_0">0/0</string>
 
+    <!-- New strings for old password label/hint -->
+    <string name="old_password_label">Old password</string>
+    <string name="old_password_hint">Enter old password</string>
+
+    <!-- New string for new password label used in account edit card -->
+    <string name="new_password_label">New password</string>
+    <string name="new_password_hint">Enter new password</string>
+
+    <!-- New strings used by delete account dialog -->
+    <string name="close_label">Close</string>
+    <string name="cd_deleteacc_icon">Delete account icon</string>
+    <string name="deleteacc_title">Do you want to delete your account?</string>
+    <string name="deleteacc_warning">Warning: this action is irreversible</string>
 </resources>

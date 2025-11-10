@@ -68,7 +68,9 @@ public class VocabTopicAdapter extends ListAdapter<Topic, VocabTopicAdapter.Topi
                     holder.updateWordCount(topic.getWordCount());
                 }
                 if ("saveState".equals(payload)) {
-                    holder.updateSaveState(topic.isSaved());
+                    // When only the save state changed we must consult SharedPreferences
+                    // because the new item coming from API may not carry the saved flag.
+                    holder.restoreSavedState(topic);
                 }
             }
         }
@@ -175,6 +177,15 @@ public class VocabTopicAdapter extends ListAdapter<Topic, VocabTopicAdapter.Topi
             itemView.setOnClickListener(v -> listener.onTopicClick(topic));
         }
 
+        // New helper: restore saved state from SharedPreferences and update UI
+        void restoreSavedState(Topic topic) {
+            if (topic == null) return;
+            String saveKey = "topic_saved_" + topic.getTopicId();
+            boolean isSaved = prefs.getBoolean(saveKey, false);
+            topic.setSaved(isSaved);
+            updateSaveState(isSaved);
+        }
+
         // Hàm cập nhật trạng thái Save
         void updateSaveState(boolean isSaved) {
             if (btnSave == null) return;
@@ -186,9 +197,9 @@ public class VocabTopicAdapter extends ListAdapter<Topic, VocabTopicAdapter.Topi
         void updateWordCount(int count) {
             // ❗️ SỬA: Dùng biến 'txtWords'
             if (count < 0) {
-                txtWords.setText("Loading...");
+                txtWords.setText(itemView.getContext().getString(R.string.loading));
             } else {
-                txtWords.setText(count + " word" + (count == 1 ? "" : "s"));
+                txtWords.setText(itemView.getContext().getResources().getQuantityString(R.plurals.word_count, count, count));
             }
         }
     }
