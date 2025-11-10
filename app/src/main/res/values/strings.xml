@@ -15,7 +15,7 @@
     <!-- Tab labels and content descriptions -->
     <string name="tab_definition">Definition</string>
     <string name="tab_forms">Word\'s forms</string>
-    <string name="tab_synonyms">Synonyms/Acronyms</string>
+    <string name="tab_synonyms">Synonyms/Antonyms</string>
     <string name="cd_tab_definition">Tab: Definition</string>
     <string name="cd_tab_forms">Tab: Word\'s forms</string>
     <string name="cd_tab_synonyms">Tab: Synonyms or Acronyms</string>
@@ -65,7 +65,7 @@
     <string name="cd_dark_mode">Dark mode toggle</string>
     <string name="cd_logout">Logout icon</string>
     <string name="cd_delete">Delete icon</string>
-    backgroundTint    <string name="cd_search_topic">Search topic icon</string>
+    <string name="cd_search_topic">Search topic icon</string>
 
     <!-- New strings added to remove hardcoded literals -->
     <string name="toggle_password_visibility">Toggle password visibility</string>
@@ -115,8 +115,13 @@
     <string name="instruction_listen_tap">Listen and tap the matching item</string>
     <string name="cd_play_sound">Play sound</string>
 
+    <!-- Greeting and header -->
+    <string name="greeting_format">Hi, %1$s</string>
+    <string name="greeting_small">Let\'s start learning</string>
+
     <!-- Today's quote displayed on Home -->
-    <string name="today_quote">"Procrastination is like a credit card: it's a lot of fun until you get the bill."</string>
+    <string name="today_quote">"Procrastination is like a credit card: it\'s a lot of fun until you get the bill."</string>
+    <string name="today_quote_title">Today\'s Quote</string>
 
     <!-- Strings for the filter bottom sheet -->
     <string name="cd_close_filter">Close filter</string>
@@ -159,5 +164,41 @@
     <string name="topic_image">Topic Image</string>
     <string name="play_audio">Play audio</string>
     <string name="region_flag">Region flag</string>
+
+    <!-- Streak -->
+    <string name="cd_streak_icon">Streak icon</string>
+    <string name="streak_number">3</string>
+
+
+    <!-- Study days -->
+    <string name="study_days">Study days</string>
+    <string name="label_mon">Mon</string>
+    <string name="label_tue">Tue</string>
+    <string name="label_wed">Wed</string>
+    <string name="label_thu">Thu</string>
+    <string name="label_fri">Fri</string>
+    <string name="label_sat">Sat</string>
+    <string name="label_sun">Sun</string>
+
+    <!-- Calendar / active days -->
+    <string name="cd_calendar">Calendar</string>
+    <string name="active_days_default">1 Active day</string>
+
+    <!-- Cards and sample content -->
+    <string name="vocab_learning">Vocab learning</string>
+    <string name="quiz_taken">Quiz taken</string>
+    <string name="flashcard_learning">Flash card learning</string>
+
+    <string name="cd_icon">icon</string>
+
+    <string name="fruits">Fruits</string>
+    <string name="education">Education</string>
+    <string name="business">Business</string>
+    <string name="relationship">Relationship</string>
+    <string name="sample_set_2">Colors</string>
+
+    <string name="progress_40_48">40/48</string>
+    <string name="progress_6_24">6/24</string>
+    <string name="progress_0_0">0/0</string>
 
 </resources>

@@ -43,9 +43,9 @@ public class HomeFragment extends Fragment {
         TextView quizProgress1 = root.findViewById(R.id.text_quiz_progress);
         TextView quizProgress2 = root.findViewById(R.id.text_quiz_progress2);
         TextView flashProgress = root.findViewById(R.id.text_flash_progress);
-        TextView flashProgress2 = root.findViewById(R.id.text_flash_progress2);
         ImageView avatar = root.findViewById(R.id.image_avatar);
         LinearLayout rowDays = root.findViewById(R.id.row_days);
+        TextView greetingBig = root.findViewById(R.id.text_greeting_big);
 
         // Ensure the study-days row is on top of other views (avoid accidental overlay)
         if (rowDays != null) {
@@ -54,6 +54,15 @@ public class HomeFragment extends Fragment {
                 rowDays.setTranslationZ(20f);
             } catch (Exception ignored) {
             }
+        }
+
+        // Populate greeting: use account name from resources as fallback
+        try {
+            String accountName = getString(R.string.account_name);
+            if (greetingBig != null) {
+                greetingBig.setText(getString(R.string.greeting_format, accountName));
+            }
+        } catch (Exception ignored) {
         }
 
         // Observe and populate

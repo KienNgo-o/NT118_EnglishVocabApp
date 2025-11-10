@@ -136,7 +136,7 @@
         android:id="@+id/recycler_topics"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="8"
+        android:layout_weight="7.3"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
         android:clipToPadding="false" />
