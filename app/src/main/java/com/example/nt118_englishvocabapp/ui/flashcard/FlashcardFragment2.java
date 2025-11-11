@@ -53,26 +53,26 @@ public class FlashcardFragment2 extends Fragment {
 
         if (getArguments() != null) {
             topicId = getArguments().getInt("topic_index", 1);
-            // If caller passed topic name, use it immediately to set the title to avoid waiting for network
+            // nếu có tên chủ đề trong đối số, hiển thị ngay lập tức
             String argName = getArguments().getString("topic_name", null);
             if (argName != null && !argName.isEmpty()) {
-                // Show the topic name
+
                 binding.txtTopicTitle.setText(argName);
             }
         }
 
-        // Set a sensible default title and then try to resolve the real topic name
+        // Đặt tiêu đề chủ đề mặc định
         try {
             binding.txtTopicTitle.setText(getString(R.string.placeholder_topic_title));
         } catch (Exception ignored) {}
 
-        // Observe topics to set the full title when the topic name becomes available
+        // Quan sát danh sách topic để lấy tên topic hiện tại
         viewModel.getTopics().observe(getViewLifecycleOwner(), topics -> {
             if (topics == null || topics.isEmpty()) return;
             for (Topic t : topics) {
                 if (t != null && t.getTopicId() == topicId) {
                     String name = t.getTopicName() == null ? "" : t.getTopicName();
-                    // Display only the topic name
+                    // Chỉ cập nhật nếu tên không rỗng
                     if (name.isEmpty()) {
                         binding.txtTopicTitle.setText(getString(R.string.placeholder_topic_title));
                     } else {
@@ -83,7 +83,7 @@ public class FlashcardFragment2 extends Fragment {
             }
         });
 
-        // Ensure topics are fetched (if not already loaded elsewhere)
+        // Đảm bảo danh sách topic đã được tải
         viewModel.fetchTopics();
 
 
@@ -141,9 +141,6 @@ public class FlashcardFragment2 extends Fragment {
         return learnableItems == null || currentIndex >= learnableItems.size();
     }
 
-    /**
-     * ✅ Nâng cấp: Hiển thị phát âm “US” ưu tiên, xử lý null-safety đầy đủ
-     */
     private void updateUI() {
         String progress;
         if (learnableItems == null || learnableItems.isEmpty()) {

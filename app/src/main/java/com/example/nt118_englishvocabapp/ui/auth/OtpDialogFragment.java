@@ -1,4 +1,3 @@
-// java
 package com.example.nt118_englishvocabapp.ui.auth;
 
 import android.content.Context;
@@ -41,14 +40,13 @@ public class OtpDialogFragment extends DialogFragment {
                 v.findViewById(R.id.otp_6)
         };
 
-        // Ensure each box accepts one digit only
+        // Đảm bảo mỗi EditText chỉ nhận 1 ký tự số
         for (EditText e : otps) {
             e.setFilters(new InputFilter[]{ new InputFilter.LengthFilter(1) });
             e.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-            // optionally restrict digits explicitly (if needed in XML you can add android:digits="0123456789")
         }
 
-        // Attach watchers and key listeners
+        // Gắn watcher và key listener
         for (int i = 0; i < otps.length; i++) {
             final int index = i;
             final EditText current = otps[index];
@@ -57,18 +55,18 @@ public class OtpDialogFragment extends DialogFragment {
                 @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
                 @Override public void onTextChanged(CharSequence s, int st, int b, int c) {
                     if (s.length() > 1) {
-                        // keep only first char if paste happens
+                        // Chỉ giữ ký tự đầu tiên nếu dán nhiều ký tự
                         current.setText(String.valueOf(s.charAt(0)));
                         current.setSelection(1);
                         return;
                     }
                     if (s.length() == 1) {
-                        // move to next
+                        // Di chuyển đến ô tiếp theo
                         if (index + 1 < otps.length) {
                             otps[index + 1].requestFocus();
                             otps[index + 1].setSelection(otps[index + 1].getText().length());
                         } else {
-                            // hide keyboard optionally when last filled
+                            // Ẩn bàn phím nếu đã nhập xong
                             InputMethodManager imm = (InputMethodManager) requireContext()
                                     .getSystemService(Context.INPUT_METHOD_SERVICE);
                             if (imm != null) imm.hideSoftInputFromWindow(current.getWindowToken(), 0);
@@ -78,14 +76,14 @@ public class OtpDialogFragment extends DialogFragment {
                 @Override public void afterTextChanged(Editable s) {}
             });
 
-            // Handle delete key to jump back
+            // Xử lý phím xóa
             current.setOnKeyListener((view, keyCode, event) -> {
                 if (event.getAction() == KeyEvent.ACTION_DOWN &&
                         keyCode == KeyEvent.KEYCODE_DEL) {
                     if (current.getText().length() == 0 && index > 0) {
                         otps[index - 1].requestFocus();
                         otps[index - 1].setSelection(otps[index - 1].getText().length());
-                        return true; // handled
+                        return true;
                     }
                 }
                 return false;
@@ -98,7 +96,7 @@ public class OtpDialogFragment extends DialogFragment {
             dismiss();
         });
 
-        // request focus on first box when dialog view created
+        // Yêu cầu focus và hiển thị bàn phím
         otps[0].post(() -> {
             otps[0].requestFocus();
             InputMethodManager imm = (InputMethodManager) requireContext()
@@ -113,7 +111,7 @@ public class OtpDialogFragment extends DialogFragment {
     public void onStart() {
         super.onStart();
         if (getDialog() != null && getDialog().getWindow() != null) {
-            // transparent window so rounded CardView corners show correctly
+            // Đặt nền trong suốt cho dialog
             getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
     }

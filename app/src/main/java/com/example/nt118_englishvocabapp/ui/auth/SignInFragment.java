@@ -20,11 +20,11 @@ import androidx.fragment.app.Fragment;
 
 import com.example.nt118_englishvocabapp.MainActivity;
 import com.example.nt118_englishvocabapp.R;
-import com.example.nt118_englishvocabapp.network.ApiService; // Thay package
-import com.example.nt118_englishvocabapp.network.RetrofitClient; // Thay package
-import com.example.nt118_englishvocabapp.network.SessionManager; // Thay package
-import com.example.nt118_englishvocabapp.network.SignInRequest; // Thay package
-import com.example.nt118_englishvocabapp.network.SignInResponse; // Thay package
+import com.example.nt118_englishvocabapp.network.ApiService;
+import com.example.nt118_englishvocabapp.network.RetrofitClient;
+import com.example.nt118_englishvocabapp.network.SessionManager;
+import com.example.nt118_englishvocabapp.network.SignInRequest;
+import com.example.nt118_englishvocabapp.network.SignInResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,8 +50,8 @@ public class SignInFragment extends Fragment {
         sessionManager = SessionManager.getInstance(getContext());
 
         // Ánh xạ views
-        etUsername = view.findViewById(R.id.input_username); // Thay R.id của bạn
-        etPassword = view.findViewById(R.id.input_password); // Thay R.id của bạn
+        etUsername = view.findViewById(R.id.input_username);
+        etPassword = view.findViewById(R.id.input_password);
         btnSignIn = view.findViewById(R.id.button_sign_in_to_main);
         //progressBar = view.findViewById(R.id.progress_bar_sign_in); // Thêm ProgressBar vào layout
         //progressBar.setVisibility(View.GONE); // Ẩn đi lúc đầu
@@ -121,7 +121,7 @@ public class SignInFragment extends Fragment {
                             signInResponse.getRefreshToken()
                     );
 
-                    // Chuyển sang MainActivity (logic cũ của bạn đã RẤT TỐT)
+                    // Chuyển sang MainActivity
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);

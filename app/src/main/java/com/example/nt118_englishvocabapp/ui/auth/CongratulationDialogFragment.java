@@ -20,7 +20,7 @@ public class CongratulationDialogFragment extends DialogFragment {
     private CongratsListener listener;
     public void setListener(CongratsListener l) { listener = l; }
 
-    // flag to request navigation after dialog is dismissed
+    // Cờ để theo dõi việc điều hướng sau khi đóng dialog
     private boolean navigateAfterDismiss = false;
 
     @Override
@@ -29,7 +29,6 @@ public class CongratulationDialogFragment extends DialogFragment {
         View v = inflater.inflate(R.layout.dialog_congratulation, container, false);
         Button btn = v.findViewById(R.id.button_return_sign_in);
         btn.setOnClickListener(view -> {
-            // mark navigation and dismiss; actual navigation happens in onDismiss
             navigateAfterDismiss = true;
             dismiss();
         });
@@ -49,6 +48,7 @@ public class CongratulationDialogFragment extends DialogFragment {
     public void onStart() {
         super.onStart();
         if (getDialog() != null && getDialog().getWindow() != null) {
+            // Đặt nền trong suốt cho dialog
             getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
     }

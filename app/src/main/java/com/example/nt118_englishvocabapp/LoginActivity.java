@@ -29,7 +29,7 @@ public class LoginActivity extends AppCompatActivity {
         // Lấy FragmentManager
         FragmentManager fm = getSupportFragmentManager();
         // Xóa sạch toàn bộ back stack để loại bỏ các màn hình ForgotPassword
-        // Tham số thứ 2 là cờ (flag), POP_BACK_STACK_INCLUSIVE sẽ xóa tất cả các trạng thái đã lưu.
+        // POP_BACK_STACK_INCLUSIVE sẽ xóa tất cả các trạng thái đã lưu.
         fm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         // Sau khi đã xóa sạch, thay thế container bằng một SignInFragment mới.
         // Vì back stack đã trống, đây sẽ là fragment duy nhất, và nó sẽ hoạt động đúng.

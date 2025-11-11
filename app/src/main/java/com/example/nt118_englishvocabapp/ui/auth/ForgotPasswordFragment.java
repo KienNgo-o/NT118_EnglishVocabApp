@@ -29,10 +29,10 @@ public class ForgotPasswordFragment extends Fragment {
                 email.setError("Enter email");
                 return;
             }
-            // simulate sending OTP -> show OTP dialog
+            // Giả lập nhâp mã OTP thành công
             OtpDialogFragment otp = new OtpDialogFragment();
             otp.setListener(() -> {
-                // open second fragment to enter new password
+                // Mở fragment đặt lại mật khẩu mới (ForgotPassword2)
                 requireActivity().getSupportFragmentManager()
                         .beginTransaction()
                         .replace(((ViewGroup)requireActivity().findViewById(android.R.id.content)).getId(),

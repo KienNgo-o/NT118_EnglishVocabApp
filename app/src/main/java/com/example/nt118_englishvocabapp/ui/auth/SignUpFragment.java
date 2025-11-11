@@ -17,12 +17,10 @@ import androidx.fragment.app.FragmentManager;
 
 // Imports cho network
 import com.example.nt118_englishvocabapp.R;
-import com.example.nt118_englishvocabapp.network.ApiService; // Thay package
-import com.example.nt118_englishvocabapp.network.RetrofitClient; // Thay package
-import com.example.nt118_englishvocabapp.network.SignUpRequest; // Thay package
+import com.example.nt118_englishvocabapp.network.ApiService;
+import com.example.nt118_englishvocabapp.network.RetrofitClient;
+import com.example.nt118_englishvocabapp.network.SignUpRequest;
 
-// Imports cho các fragment khác (từ code gốc của bạn)
-import com.example.nt118_englishvocabapp.ui.auth.CongratulationDialogFragment; // Thay package
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,16 +42,16 @@ public class SignUpFragment extends Fragment {
         // Khởi tạo ApiService
         apiService = RetrofitClient.getApiService(getContext());
 
-        // Ánh xạ views (THAY R.id bằng ID thật trong layout của bạn)
+        // Ánh xạ views
         etUsername = view.findViewById(R.id.input_username);
         etEmail = view.findViewById(R.id.input_email);
         etPassword = view.findViewById(R.id.input_password);
         btnSignUp = view.findViewById(R.id.button_sign_up);
 
-        // Nút đăng ký -> NAVIGATE back to SignIn only
+        // Nút đăng ký
         btnSignUp.setOnClickListener(v -> handleSignUp());
 
-        // Nút chuyển sang màn hình Sign in -> NAVIGATE back to SignIn
+        // Nút chuyển sang màn hình Sign in
         view.findViewById(R.id.button_go_to_sign_in).setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container_view_auth, new SignInFragment())
@@ -104,7 +102,7 @@ public class SignUpFragment extends Fragment {
                 if (response.isSuccessful()) {
                     // Thành công (Code 204)
                     Log.i("SignUp", "Đăng ký thành công!");
-                    // Navigate back to SignIn
+                    // Quay về Sign In
                     getParentFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container_view_auth, new SignInFragment())
                             .addToBackStack(null)
