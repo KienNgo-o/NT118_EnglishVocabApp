@@ -34,7 +34,7 @@
             android:textColor="@color/dark_purple"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:text="@string/topic_label" />
+            android:text="@string/placeholder_topic_title" />
     </RelativeLayout>
 
     <View

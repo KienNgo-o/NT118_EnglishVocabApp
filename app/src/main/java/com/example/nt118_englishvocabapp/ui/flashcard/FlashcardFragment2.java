@@ -56,13 +56,14 @@ public class FlashcardFragment2 extends Fragment {
             // If caller passed topic name, use it immediately to set the title to avoid waiting for network
             String argName = getArguments().getString("topic_name", null);
             if (argName != null && !argName.isEmpty()) {
-                binding.txtTopicTitle.setText(getString(R.string.title_flashcard) + " - " + argName);
+                // Show the topic name
+                binding.txtTopicTitle.setText(argName);
             }
         }
 
         // Set a sensible default title and then try to resolve the real topic name
         try {
-            binding.txtTopicTitle.setText(getString(R.string.title_flashcard));
+            binding.txtTopicTitle.setText(getString(R.string.placeholder_topic_title));
         } catch (Exception ignored) {}
 
         // Observe topics to set the full title when the topic name becomes available
@@ -71,7 +72,12 @@ public class FlashcardFragment2 extends Fragment {
             for (Topic t : topics) {
                 if (t != null && t.getTopicId() == topicId) {
                     String name = t.getTopicName() == null ? "" : t.getTopicName();
-                    binding.txtTopicTitle.setText(getString(R.string.title_flashcard) + " - " + name);
+                    // Display only the topic name
+                    if (name.isEmpty()) {
+                        binding.txtTopicTitle.setText(getString(R.string.placeholder_topic_title));
+                    } else {
+                        binding.txtTopicTitle.setText(name);
+                    }
                     return;
                 }
             }
