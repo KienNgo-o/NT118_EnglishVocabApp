@@ -1,4 +1,3 @@
-// ui/flashcard/FlashcardViewModel.java
 package com.example.nt118_englishvocabapp.ui.flashcard;
 
 import android.app.Application;
@@ -11,14 +10,14 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.nt118_englishvocabapp.models.Definition; // 👈 THÊM
+import com.example.nt118_englishvocabapp.models.Definition;
 import com.example.nt118_englishvocabapp.models.FlashcardItem;
-import com.example.nt118_englishvocabapp.models.LearnableItem; // 👈 THÊM
+import com.example.nt118_englishvocabapp.models.LearnableItem;
 import com.example.nt118_englishvocabapp.models.Topic;
 import com.example.nt118_englishvocabapp.network.ApiService;
 import com.example.nt118_englishvocabapp.network.RetrofitClient;
 
-import java.util.ArrayList; // 👈 THÊM
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -95,7 +94,7 @@ public class FlashcardViewModel extends AndroidViewModel {
         });
     }
 
-    // Helper: fetch flashcards for all topics concurrently and post once to avoid flicker.
+    // Helper: để gọi API flashcards cho mỗi chủ đề song song và thu thập số lượng
     private void fetchCountsForTopicsConcurrently(final List<Topic> topics) {
         if (topics == null || topics.isEmpty()) {
             topicList.postValue(topics);

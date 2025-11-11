@@ -42,7 +42,6 @@ public class FlashcardFragment extends Fragment implements TopicAdapter.OnTopicC
     private FlashcardViewModel viewModel;
     private TopicAdapter topicAdapter;
 
-    // Biến toàn cục (member variables)
     private final List<Topic> allTopics = new ArrayList<>(); // Danh sách đầy đủ để lọc
     private View keyboardRootView;
     private ViewTreeObserver.OnGlobalLayoutListener keyboardListener;
@@ -215,19 +214,19 @@ public class FlashcardFragment extends Fragment implements TopicAdapter.OnTopicC
         }
     }
 
-    // Apply filter received from FilterDialog
+    // Apply filter nhận từ FilterDialog
     private void applyFilter(boolean savedOnly, String difficulty) {
         List<Topic> source = viewModel.getTopics().getValue();
         if (source == null) source = new ArrayList<>(allTopics);
 
         List<Topic> filtered = new ArrayList<>();
         for (Topic t : source) {
-            // check savedOnly: read persisted flag from SharedPreferences
+            // check savedOnly
             if (savedOnly) {
                 boolean saved = prefs.getBoolean("topic_saved_" + t.getTopicId(), false);
                 if (!saved) continue; // skip non-saved
             }
-            // check difficulty filter (null means All)
+            // check difficulty filter
             if (difficulty != null && !difficulty.isEmpty()) {
                 String diff = t.getDifficulty() != null ? t.getDifficulty().trim() : "";
                 if (diff.isEmpty() || !diff.equalsIgnoreCase(difficulty)) continue;
@@ -240,7 +239,6 @@ public class FlashcardFragment extends Fragment implements TopicAdapter.OnTopicC
 
     /**
      * Đây là hàm được gọi khi một item trong RecyclerView được click
-     * (Vì chúng ta đã implement TopicAdapter.OnTopicClickListener)
      */
     @Override
     public void onTopicClick(Topic topic) {

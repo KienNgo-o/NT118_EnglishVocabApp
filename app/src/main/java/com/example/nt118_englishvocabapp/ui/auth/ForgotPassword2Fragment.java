@@ -1,4 +1,3 @@
-// ForgotPassword2Fragment.java
 package com.example.nt118_englishvocabapp.ui.auth;
 
 import android.os.Bundle;
@@ -11,7 +10,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation; // <-- Import NavController
+import androidx.navigation.Navigation;
 
 import com.example.nt118_englishvocabapp.LoginActivity;
 import com.example.nt118_englishvocabapp.R;
@@ -43,7 +42,7 @@ public class ForgotPassword2Fragment extends Fragment {
 
             CongratulationDialogFragment dlg = new CongratulationDialogFragment();
             dlg.setListener(() -> {
-                // Thay vì tự xử lý, hãy gọi một phương thức trên LoginActivity
+                // Để LoginActivity xử lý việc quay về màn hình Sign In
                 if (getActivity() instanceof LoginActivity) {
                     ((LoginActivity) getActivity()).returnToSignInScreen();
                 }

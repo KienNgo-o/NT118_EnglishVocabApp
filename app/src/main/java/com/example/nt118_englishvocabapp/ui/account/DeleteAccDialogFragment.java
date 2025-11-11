@@ -1,4 +1,3 @@
-// java
 package com.example.nt118_englishvocabapp.ui.account;
 
 import android.app.Dialog;
@@ -31,7 +30,7 @@ public class DeleteAccDialogFragment extends DialogFragment {
 
         if (ivClose != null) ivClose.setOnClickListener(v -> dismiss());
 
-        // Start with confirm disabled until user types a password
+        // Disable nút confirm cho đến khi user nhập password
         if (btnConfirm != null) btnConfirm.setEnabled(false);
 
         if (etPassword != null) {
@@ -58,7 +57,7 @@ public class DeleteAccDialogFragment extends DialogFragment {
                     pass = etPassword.getText().toString();
                 }
 
-                // Send the typed password back to the caller using Fragment Result API
+                // Gửi password được nhập vào caller sử dụng Fragment Result API
                 Bundle result = new Bundle();
                 result.putString("password", pass);
                 getParentFragmentManager().setFragmentResult("delete_account_confirm", result);
