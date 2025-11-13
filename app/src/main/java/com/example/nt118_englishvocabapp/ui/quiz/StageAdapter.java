@@ -60,11 +60,11 @@ public class StageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 StageViewHolder svh = (StageViewHolder) holder;
                 String imageName;
                 switch (it.getStageNumber()) {
-                    case 1: imageName = "basic_colors"; break; // replace fruits with basic_colors
-                    case 2: imageName = "animals"; break; // keep animals
-                    case 3: imageName = "school"; break; // replace careers with school for part 3
-                    case 4: imageName = "test"; break; // use test drawable for part 4
-                    case 5: imageName = "emotion"; break; // use emotion drawable for part 5
+                    case 1: imageName = "basic_colors"; break;
+                    case 2: imageName = "animals"; break;
+                    case 3: imageName = "school"; break;
+                    case 4: imageName = "test"; break;
+                    case 5: imageName = "emotion"; break;
                     default: imageName = "stage_" + it.getStageNumber(); break;
                 }
                 int drawableId = context.getResources().getIdentifier(imageName, "drawable", context.getPackageName());

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- keep the selected (checked) color the same across light/night by using a color
+         that does not change between values/values-night (dark_purple = #410FA3) -->
+    <item android:color="@color/blue_button" android:state_checked="true" />
+    <!-- default/unchecked color uses the existing row icon tint which does differ by theme -->
+    <item android:color="@color/row_icon_tint" />
+</selector>
+

@@ -74,7 +74,7 @@
     <!-- Added labels used in expanded edit card to avoid hardcoded strings -->
     <string name="masked_password">***********</string>
 
-    <!-- Quiz / Multiple choice strings -->
+    <!-- Quiz / Multiple choice  -->
     <string name="title_quiz">Quiz</string>
     <string name="title_quiz_stationery">Quiz - Stationery</string>
     <string name="question_1_of_3">Question 1 of 3</string>

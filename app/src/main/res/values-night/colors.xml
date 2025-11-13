@@ -2,7 +2,7 @@
 <resources>
 
     <!-- ==========================
-         Common / Shared colors (night overrides)
+         Màu chung / dùng chung (ghi đè cho night)
          ========================== -->
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
@@ -12,7 +12,7 @@
     <color name="dark">#304046</color>
 
     <!-- ==========================
-         Brand / Accent colors (night)
+         Bộ màu chính (night)
          ========================== -->
     <color name="light_purple">#313438</color>
     <color name="dark_purple">#410FA3</color>
@@ -25,7 +25,7 @@
     <color name="teal_700">#018786</color>
 
     <!-- ==========================
-         Flashcard fragment (night overrides)
+         Flashcard fragment (ghi đè cho night)
          ========================== -->
     <color name="flashcard_bg">#D2D5FF</color>
     <color name="flashcard_text">#212121</color>
@@ -35,7 +35,7 @@
     <color name="card_text_color">#D2D5FF</color>
 
     <!-- ==========================
-         Vocab / List fragments (night overrides)
+         Vocab / List fragments (ghi đè cho night)
          ========================== -->
     <color name="card_background_vocabulary">#313438</color>
     <color name="vocab_card_background">#1F1E1C</color>
@@ -43,7 +43,7 @@
     <color name="green_700">#2E7D32</color>
 
     <!-- ==========================
-         UI surfaces / Typography (night overrides)
+         UI / Kiểu chữ (ghi đè cho night)
          ========================== -->
     <color name="card_background">#313438</color>
     <color name="text_primary">#F0F2F3</color>
@@ -54,7 +54,7 @@
     <color name="on_purple">#FFFFFFFF</color>
 
     <!-- ==========================
-         Quiz / Auth / Feedback (night overrides)
+         Quiz / Auth / Feedback (ghi đè cho night)
          ========================== -->
     <color name="correct_green">#2E7D32</color>
     <color name="incorrect_red">#C62828</color>
@@ -62,17 +62,17 @@
     <color name="unsaved_gray">#B0B0B0</color>
 
     <!-- ==========================
-         Helper / layout-specific colors (night overrides)
+         Helpers/ riêng cho layout (ghi đè cho night)
          ========================== -->
     <color name="white_gray">#414347</color>
     <color name="light_white_gray">#F1F1F2</color>
     <color name="topic_title_color">#FFFFFFFF</color>
 
-    <!-- progress text color for the flashcard progress pill (night mode) -->
+    <!-- màu chữ cho tiến độ flashcard (chế độ night) -->
     <color name="progress_text">#FFFFFFFF</color>
 
     <!-- ==========================
-         Screen / Fragment backgrounds (night overrides)
+         Nền màn hình / Fragment (ghi đè cho night)
          ========================== -->
     <color name="screen_background">#484B4F</color>
 

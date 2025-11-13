@@ -93,7 +93,7 @@
             app:chipSpacing="12dp"
             app:singleLine="true">
 
-            <!-- Added: All option (no difficulty filter) -->
+            <!--All option (no difficulty filter) -->
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_all"
                 style="@style/Widget.MaterialComponents.Chip.Choice"

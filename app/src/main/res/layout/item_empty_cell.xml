@@ -5,7 +5,7 @@
     android:layout_margin="12dp"
     android:padding="6dp">
 
-    <!-- empty placeholder sized to visually match stage items -->
+    <!-- chỗ đặt trống có kích thước để trông giống các mục stage -->
     <View
         android:layout_width="80dp"
         android:layout_height="80dp"

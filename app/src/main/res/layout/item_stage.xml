@@ -5,9 +5,8 @@
     android:gravity="center"
     android:layout_width="100dp"
     android:layout_height="wrap_content"
-    android:layout_margin="12dp">  <!-- reduced margin -->
+    android:layout_margin="12dp">
 
-    <!-- slightly smaller frame to reduce overall size -->
     <FrameLayout
         android:id="@+id/image_frame"
         android:layout_width="80dp"

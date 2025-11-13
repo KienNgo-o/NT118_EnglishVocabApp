@@ -9,7 +9,7 @@
     android:layout_marginEnd="8dp"
     android:background="@drawable/bg_topic_rect">
 
-    <!-- Container for Word and Word Type + favorite icon -->
+    <!-- Container cho từ, loại từ và nút favourite -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

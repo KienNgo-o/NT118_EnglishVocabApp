@@ -116,11 +116,11 @@
                 android:gravity="center"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:text="Synonyms/Acronyms"
+                android:text="@string/tab_synonyms"
                 android:textAllCaps="false"
                 android:textColor="@color/tab_text_color"
                 android:textSize="14sp"
-                android:contentDescription="Tab: Synonyms or Acronyms" />
+                android:contentDescription="Tab: Synonyms or Antonyms" />
 
         </LinearLayout>
 
