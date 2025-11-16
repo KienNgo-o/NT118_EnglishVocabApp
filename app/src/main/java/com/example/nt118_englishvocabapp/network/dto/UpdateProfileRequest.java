@@ -1,5 +1,5 @@
 // java
-package com.example.nt118_englishvocabapp.network;
+package com.example.nt118_englishvocabapp.network.dto;
 
 // Dùng Gson để nó bỏ qua các trường null khi gửi JSON
 import com.google.gson.annotations.Expose;

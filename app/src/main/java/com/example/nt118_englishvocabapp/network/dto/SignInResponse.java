@@ -1,4 +1,4 @@
-package com.example.nt118_englishvocabapp.network;
+package com.example.nt118_englishvocabapp.network.dto;
 
 public class SignInResponse {
     private String accessToken;

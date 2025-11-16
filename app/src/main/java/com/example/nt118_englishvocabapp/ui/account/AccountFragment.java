@@ -35,8 +35,8 @@ import android.content.Context;
 
 import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.models.User;
-import com.example.nt118_englishvocabapp.network.DeleteAccountRequest;
-import com.example.nt118_englishvocabapp.network.UpdateProfileRequest;
+import com.example.nt118_englishvocabapp.network.dto.DeleteAccountRequest;
+import com.example.nt118_englishvocabapp.network.dto.UpdateProfileRequest;
 import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
 import com.example.nt118_englishvocabapp.util.KeyboardUtils;
 import com.example.nt118_englishvocabapp.ui.home.HomeFragment;
@@ -45,7 +45,7 @@ import com.example.nt118_englishvocabapp.LoginActivity; // Import LoginActivity
 import com.example.nt118_englishvocabapp.network.ApiService;
 import com.example.nt118_englishvocabapp.network.RetrofitClient;
 import com.example.nt118_englishvocabapp.network.SessionManager;
-import com.example.nt118_englishvocabapp.network.SignOutRequest;
+import com.example.nt118_englishvocabapp.network.dto.SignOutRequest;
 
 // Imports cho Retrofit
 import retrofit2.Call;

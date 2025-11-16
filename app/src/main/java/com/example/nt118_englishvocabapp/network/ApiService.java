@@ -1,7 +1,7 @@
 package com.example.nt118_englishvocabapp.network;
 import com.example.nt118_englishvocabapp.models.Topic;
-import com.example.nt118_englishvocabapp.models.RefreshRequest;
-import com.example.nt118_englishvocabapp.models.RefreshResponse;
+import com.example.nt118_englishvocabapp.network.dto.RefreshRequest;
+import com.example.nt118_englishvocabapp.network.dto.RefreshResponse;
 import retrofit2.http.HTTP;
 import java.util.List;
 import retrofit2.Call;
@@ -14,6 +14,13 @@ import retrofit2.http.Path;
 import com.example.nt118_englishvocabapp.models.User;
 import com.example.nt118_englishvocabapp.models.VocabWord;
 import com.example.nt118_englishvocabapp.models.WordDetail;
+import com.example.nt118_englishvocabapp.network.dto.DeleteAccountRequest;
+import com.example.nt118_englishvocabapp.network.dto.SignInRequest;
+import com.example.nt118_englishvocabapp.network.dto.SignInResponse;
+import com.example.nt118_englishvocabapp.network.dto.SignOutRequest;
+import com.example.nt118_englishvocabapp.network.dto.SignUpRequest;
+import com.example.nt118_englishvocabapp.network.dto.UpdateProfileRequest;
+
 import retrofit2.http.PATCH;
 public interface ApiService {
 

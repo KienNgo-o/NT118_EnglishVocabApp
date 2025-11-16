@@ -1,4 +1,4 @@
-package com.example.nt118_englishvocabapp.models;
+package com.example.nt118_englishvocabapp.network.dto;
 
 public class RefreshRequest {
     String refreshToken;

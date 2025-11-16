@@ -7,8 +7,8 @@ import androidx.annotation.Nullable;
 
 import com.example.nt118_englishvocabapp.network.SessionManager;
 import com.example.nt118_englishvocabapp.network.ApiService;
-import com.example.nt118_englishvocabapp.models.RefreshRequest;
-import com.example.nt118_englishvocabapp.models.RefreshResponse;
+import com.example.nt118_englishvocabapp.network.dto.RefreshRequest;
+import com.example.nt118_englishvocabapp.network.dto.RefreshResponse;
 import com.example.nt118_englishvocabapp.network.RetrofitClient;
 
 import java.io.IOException;
