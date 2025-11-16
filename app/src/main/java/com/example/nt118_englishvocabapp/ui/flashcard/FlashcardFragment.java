@@ -114,9 +114,23 @@ public class FlashcardFragment extends Fragment implements TopicAdapter.OnTopicC
         viewModel.getTopics().observe(getViewLifecycleOwner(), topics -> {
             if (topics != null && !topics.isEmpty()) {
                 Log.d("FlashcardFragment", "Topics đã tải: " + topics.size());
+                // Debug: log every topic's id and wordCount for diagnosis
+                try {
+                    StringBuilder sb = new StringBuilder();
+                    for (Topic t : topics) sb.append("[id=").append(t.getTopicId()).append(",cnt=").append(t.getWordCount()).append("],");
+                    Log.d("FlashcardFragment", "Topics counts: " + sb.toString());
+                } catch (Exception ignored) {}
                 allTopics.clear();
                 allTopics.addAll(topics); // Lưu danh sách đầy đủ để lọc
-                topicAdapter.submitList(new ArrayList<>(topics)); // Gửi 1 bản copy cho adapter
+                // Submit with a commit callback so we can log when the adapter applies the diff.
+                // As a safe fallback we call notifyDataSetChanged() to ensure word counts are visible
+                topicAdapter.submitList(new ArrayList<>(topics), () -> {
+                    try {
+                        Log.d("FlashcardFragment", "Adapter commit completed. adapterSize=" + topicAdapter.getItemCount());
+                        // Force full refresh once to guarantee UI shows updated word counts (harmless fallback)
+                        topicAdapter.notifyDataSetChanged();
+                    } catch (Exception ignored) {}
+                }); // Gửi 1 bản copy cho adapter
             } else {
                 Log.d("FlashcardFragment", "Không có topic nào hoặc list rỗng.");
                 allTopics.clear();

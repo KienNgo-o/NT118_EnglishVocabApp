@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Alias used by the FAB: in night mode this points to the black icon -->
+    <item name="appicon" type="drawable">@drawable/appicon_black</item>
+</resources>
+

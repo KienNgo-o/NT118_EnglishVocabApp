@@ -2,6 +2,7 @@ package com.example.nt118_englishvocabapp.adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -195,6 +196,10 @@ public class VocabTopicAdapter extends ListAdapter<Topic, VocabTopicAdapter.Topi
 
         // Hàm cập nhật Số lượng từ
         void updateWordCount(int count) {
+            // Debug: log giá trị count được truyền vào
+            try {
+                Log.d("VocabTopicAdapter", "updateWordCount called for pos=" + getBindingAdapterPosition() + " count=" + count);
+            } catch (Exception ignored) {}
             // ❗️ SỬA: Dùng biến 'txtWords'
             if (count < 0) {
                 txtWords.setText(itemView.getContext().getString(R.string.loading));

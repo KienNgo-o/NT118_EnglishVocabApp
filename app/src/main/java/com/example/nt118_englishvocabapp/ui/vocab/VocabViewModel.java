@@ -13,6 +13,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.nt118_englishvocabapp.models.Topic;
 import com.example.nt118_englishvocabapp.models.VocabWord; // 👈 THÊM IMPORT NÀY
+import com.example.nt118_englishvocabapp.models.FlashcardItem; // used for counting via flashcards endpoint
 import com.example.nt118_englishvocabapp.network.ApiService;
 import com.example.nt118_englishvocabapp.network.RetrofitClient;
 
@@ -43,7 +44,9 @@ public class VocabViewModel extends AndroidViewModel {
     public VocabViewModel(@NonNull Application application) {
         super(application);
         this.apiService = RetrofitClient.getApiService(application.getApplicationContext());
-        this.prefs = application.getApplicationContext().getSharedPreferences("vocab_prefs", Context.MODE_PRIVATE);
+        // Use a shared cache name so flashcard & vocab agree on counts; keep legacy names for fallback
+        this.prefs = application.getApplicationContext().getSharedPreferences("topic_count_cache", Context.MODE_PRIVATE);
+        // legacy names: "vocab_prefs" and "flashcard_prefs" (we'll read from them if primary is empty)
     }
 
     // --- Getters ---
@@ -74,6 +77,8 @@ public class VocabViewModel extends AndroidViewModel {
                     for (Topic t : tlist) {
                         int cached = getCachedCountForTopic(t.getTopicId());
                         if (cached >= 0) t.setWordCount(cached);
+                        // Debug: log cached value applied (helps diagnose stale cache)
+                        Log.d(TAG, "Applied cached count for topicId=" + t.getTopicId() + " -> " + cached);
                     }
 
                     // Post the topics immediately so UI can render placeholders
@@ -81,6 +86,7 @@ public class VocabViewModel extends AndroidViewModel {
 
                     // Now fetch words for each topic concurrently to compute counts
                     // and post updated lists as counts arrive (avoids UI flicker)
+                    Log.d(TAG, "Starting fetchCountsForTopicsConcurrently for " + tlist.size() + " topics");
                     fetchCountsForTopicsConcurrently(tlist);
 
                 } else {
@@ -113,12 +119,25 @@ public class VocabViewModel extends AndroidViewModel {
         for (int i = 0; i < n; i++) {
             final int idx = i;
             final Topic topic = topicList.get(idx);
-            apiService.getWordsForTopic(topic.getTopicId()).enqueue(new Callback<List<VocabWord>>() {
+            // Use flashcards endpoint and count total definitions (each definition -> 1 LearnableItem)
+            apiService.getFlashcardsForTopic(topic.getTopicId()).enqueue(new Callback<List<FlashcardItem>>() {
                 @Override
-                public void onResponse(@NonNull Call<List<VocabWord>> call, @NonNull Response<List<VocabWord>> response) {
+                public void onResponse(@NonNull Call<List<FlashcardItem>> call, @NonNull Response<List<FlashcardItem>> response) {
                     int count = 0;
                     if (response.isSuccessful() && response.body() != null) {
-                        count = response.body().size();
+                        List<FlashcardItem> items = response.body();
+                        int total = 0;
+                        for (FlashcardItem fi : items) {
+                            if (fi.getDefinitions() != null && !fi.getDefinitions().isEmpty()) {
+                                total += fi.getDefinitions().size();
+                            } else {
+                                total += 1;
+                            }
+                        }
+                        count = total;
+                        try {
+                            Log.d(TAG, "(flashcards-defs) TopicId=" + topic.getTopicId() + ", flashcardItems=" + items.size() + ", totalDefinitions=" + total);
+                        } catch (Exception ignored) {}
                     }
                     counts[idx] = count;
 
@@ -135,7 +154,7 @@ public class VocabViewModel extends AndroidViewModel {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<List<VocabWord>> call, @NonNull Throwable t) {
+                public void onFailure(@NonNull Call<List<FlashcardItem>> call, @NonNull Throwable t) {
                     counts[idx] = 0;
                     List<Topic> updated = new ArrayList<>(n);
                     for (int j = 0; j < n; j++) {
@@ -152,10 +171,22 @@ public class VocabViewModel extends AndroidViewModel {
 
     // Helper: cache helpers (same behavior as FlashcardViewModel but for vocab)
     private int getCachedCountForTopic(int topicId) {
-        return prefs.getInt("topic_count_" + topicId, -1);
+        // Try primary cache first
+        int primary = prefs.getInt("topic_count_" + topicId, -1);
+        if (primary >= 0) return primary;
+
+        // Fallback to legacy storages to preserve previously saved counts
+        SharedPreferences legacyVocab = getApplication().getApplicationContext().getSharedPreferences("vocab_prefs", Context.MODE_PRIVATE);
+        int v = legacyVocab.getInt("topic_count_" + topicId, -1);
+        if (v >= 0) return v;
+
+        SharedPreferences legacyFlash = getApplication().getApplicationContext().getSharedPreferences("flashcard_prefs", Context.MODE_PRIVATE);
+        int f = legacyFlash.getInt("topic_count_" + topicId, -1);
+        return f >= 0 ? f : -1;
     }
 
     private void saveCountForTopic(int topicId, int count) {
+        // Always save to the primary shared cache
         prefs.edit().putInt("topic_count_" + topicId, count).apply();
     }
 

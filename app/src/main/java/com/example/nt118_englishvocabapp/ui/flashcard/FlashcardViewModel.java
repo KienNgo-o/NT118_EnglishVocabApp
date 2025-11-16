@@ -18,7 +18,9 @@ import com.example.nt118_englishvocabapp.network.ApiService;
 import com.example.nt118_englishvocabapp.network.RetrofitClient;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
@@ -44,10 +46,10 @@ public class FlashcardViewModel extends AndroidViewModel {
     public FlashcardViewModel(@NonNull Application application) {
         super(application);
         this.apiService = RetrofitClient.getApiService(application.getApplicationContext());
-        this.prefs = application.getApplicationContext().getSharedPreferences("flashcard_prefs", Context.MODE_PRIVATE);
+        // Use the shared primary cache name to match VocabViewModel
+        this.prefs = application.getApplicationContext().getSharedPreferences("topic_count_cache", Context.MODE_PRIVATE);
     }
 
-    // --- Getters cho Fragments ---
     public LiveData<List<Topic>> getTopics() { return topicList; }
     public LiveData<List<LearnableItem>> getLearnableItems() { return learnableList; }
     public LiveData<String> getError() { return error; }
@@ -105,7 +107,7 @@ public class FlashcardViewModel extends AndroidViewModel {
         final AtomicInteger remaining = new AtomicInteger(n);
         final int[] counts = new int[n];
 
-        for (int i = 0; i < n; i++) counts[i] = 0;
+        for (int i = 0; i < n; i++) counts[i] = -1; // unknown until fetched
 
         for (int i = 0; i < n; i++) {
             final int idx = i;
@@ -115,30 +117,49 @@ public class FlashcardViewModel extends AndroidViewModel {
                 public void onResponse(@NonNull Call<List<FlashcardItem>> call, @NonNull Response<List<FlashcardItem>> response) {
                     int count = 0;
                     if (response.isSuccessful() && response.body() != null) {
-                        count = response.body().size();
+                        List<FlashcardItem> items = response.body();
+                        // Count total definitions (each Definition -> 1 LearnableItem)
+                        int total = 0;
+                        for (FlashcardItem fi : items) {
+                            if (fi.getDefinitions() != null && !fi.getDefinitions().isEmpty()) {
+                                total += fi.getDefinitions().size();
+                            } else {
+                                total += 1;
+                            }
+                        }
+                        count = total;
                     }
+
                     counts[idx] = count;
 
-                    // Post an updated list with just this topic's count updated so UI shows it ASAP
+                    // Build updated list reflecting current known counts
                     List<Topic> updatedList = new ArrayList<>(n);
                     for (int j = 0; j < n; j++) {
-                        if (j == idx) updatedList.add(topics.get(j).copyWithWordCount(counts[j]));
-                        else updatedList.add(topics.get(j));
+                        int wc = counts[j] >= 0 ? counts[j] : topics.get(j).getWordCount();
+                        updatedList.add(topics.get(j).copyWithWordCount(wc));
                     }
+
                     // Persist this single count
                     saveCountForTopic(topic.getTopicId(), count);
+                    Log.d(TAG, "Computed count for topicId=" + topic.getTopicId() + " -> " + count);
+                    // Debug: log snapshot of counts
+                    try {
+                        StringBuilder sb = new StringBuilder();
+                        for (Topic tt : updatedList) sb.append(tt.getTopicId()).append("=").append(tt.getWordCount()).append(",");
+                        Log.d(TAG, "Posting updated topic list counts: " + sb.toString());
+                    } catch (Exception ignored) {}
                     topicList.postValue(updatedList);
+
                     remaining.decrementAndGet();
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<List<FlashcardItem>> call, @NonNull Throwable t) {
                     counts[idx] = 0;
-                    // Update UI with zero for this topic
                     List<Topic> updatedList = new ArrayList<>(n);
                     for (int j = 0; j < n; j++) {
-                        if (j == idx) updatedList.add(topics.get(j).copyWithWordCount(0));
-                        else updatedList.add(topics.get(j));
+                        int wc = counts[j] >= 0 ? counts[j] : topics.get(j).getWordCount();
+                        updatedList.add(topics.get(j).copyWithWordCount(wc));
                     }
                     saveCountForTopic(topic.getTopicId(), 0);
                     topicList.postValue(updatedList);
@@ -189,12 +210,24 @@ public class FlashcardViewModel extends AndroidViewModel {
         });
     }
 
-    // --- Simple cache helpers ---
-    private int getCachedCountForTopic(int topicId) {
-        return prefs.getInt("topic_count_" + topicId, -1);
+    // Local cache helpers
+    private void saveCountForTopic(int topicId, int count) {
+        // Save to primary shared cache so Vocab and Flashcard share the same store
+        prefs.edit().putInt("topic_count_" + topicId, count).apply();
     }
 
-    private void saveCountForTopic(int topicId, int count) {
-        prefs.edit().putInt("topic_count_" + topicId, count).apply();
+    private int getCachedCountForTopic(int topicId) {
+        // Try primary cache first
+        int primary = prefs.getInt("topic_count_" + topicId, -1);
+        if (primary >= 0) return primary;
+
+        // Fallback to legacy storages to preserve previously saved counts
+        SharedPreferences legacyVocab = getApplication().getApplicationContext().getSharedPreferences("vocab_prefs", Context.MODE_PRIVATE);
+        int v = legacyVocab.getInt("topic_count_" + topicId, -1);
+        if (v >= 0) return v;
+
+        SharedPreferences legacyFlash = getApplication().getApplicationContext().getSharedPreferences("flashcard_prefs", Context.MODE_PRIVATE);
+        int f = legacyFlash.getInt("topic_count_" + topicId, -1);
+        return f >= 0 ? f : -1;
     }
 }

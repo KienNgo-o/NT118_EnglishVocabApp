@@ -2,6 +2,7 @@ package com.example.nt118_englishvocabapp.adapters;
 //Đây là file "cầu nối" giữa RecyclerView và dữ liệu (List<Topic>).
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -195,6 +196,9 @@ public class TopicAdapter extends ListAdapter<Topic, TopicAdapter.TopicViewHolde
 
         // Update only the word count view to avoid full rebind flicker
         void updateWordCount(int count) {
+            try {
+                Log.d("TopicAdapter", "updateWordCount called pos=" + getBindingAdapterPosition() + " count=" + count);
+            } catch (Exception ignored) {}
             if (count < 0) {
                 txtWordCount.setText(" ");
                 txtWordCount.setVisibility(View.VISIBLE);

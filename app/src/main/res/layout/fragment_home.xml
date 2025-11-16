@@ -114,6 +114,7 @@
         android:layout_width="0dp"
         android:layout_height="100dp"
         android:translationZ="12dp"
+        android:layout_marginTop="-45dp"
         app:cardCornerRadius="12dp"
         app:cardElevation="12dp"
         app:cardBackgroundColor="@color/card_background"
@@ -727,4 +728,3 @@
     </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

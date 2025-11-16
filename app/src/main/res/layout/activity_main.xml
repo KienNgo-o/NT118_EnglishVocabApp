@@ -35,15 +35,17 @@
 
     </com.google.android.material.bottomappbar.BottomAppBar>
 
+    <!-- FloatingActionButton: use theme-aware drawable alias 'appicon' -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/search_button"
         android:backgroundTint="@color/white"
-        android:src="@drawable/search"
+        app:srcCompat="@drawable/appicon"
+        app:tint="@null"
         app:layout_anchor="@id/bottomAppBar"
-        app:maxImageSize="40dp"
-        app:tint ="@color/light_purple"/>
+        app:maxImageSize="58dp" />
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

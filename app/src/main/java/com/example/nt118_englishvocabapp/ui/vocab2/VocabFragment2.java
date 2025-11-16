@@ -18,6 +18,11 @@ import com.example.nt118_englishvocabapp.models.VocabWord; // 👈 THÊM IMPORT
 import com.example.nt118_englishvocabapp.ui.vocab3.VocabFragment3;
 import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
 
+import com.example.nt118_englishvocabapp.ui.flashcard.FlashcardViewModel;
+import com.example.nt118_englishvocabapp.models.LearnableItem;
+import com.example.nt118_englishvocabapp.models.FlashcardItem;
+import com.example.nt118_englishvocabapp.models.Definition;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +34,7 @@ public class VocabFragment2 extends Fragment {
     private List<Topic> fullTopics = new ArrayList<>();
 
     private Vocab2ViewModel viewModel;
+    private FlashcardViewModel flashcardViewModel;
     private Integer topicIdArg = null;
 
     @Override
@@ -63,18 +69,75 @@ public class VocabFragment2 extends Fragment {
 
         // ViewModel
         viewModel = new ViewModelProvider(requireActivity()).get(Vocab2ViewModel.class);
+        flashcardViewModel = new ViewModelProvider(requireActivity()).get(FlashcardViewModel.class);
         observeViewModel();
 
-        // Nếu có topicId → gọi API, nếu không → dùng dữ liệu mẫu
+        // If we have a real topicId, prefer flashcards endpoint which contains POS/definitions
+        // and may include multiple entries for the same word with different POS.
         if (topicIdArg != null && topicIdArg > 0) {
-            viewModel.fetchWords(topicIdArg);
+            // Observe learnable items (each LearnableItem = FlashcardItem + one Definition)
+            flashcardViewModel.getLearnableItems().observe(getViewLifecycleOwner(), items -> {
+                if (binding == null) return;
+
+                if (items == null) {
+                    binding.progressLoading.setVisibility(View.VISIBLE);
+                    return;
+                }
+
+                binding.progressLoading.setVisibility(View.GONE);
+                fullTopics.clear();
+
+                for (LearnableItem li : items) {
+                    if (li == null) continue;
+                    FlashcardItem fi = li.word;
+                    Definition def = li.definition;
+
+                    String wordText = fi != null ? fi.getWordText() : "";
+                    String defText = def != null ? def.getDefinitionText() : "";
+                    String posLabel = "";
+                    if (def != null && def.getPos() != null && def.getPos().getPosName() != null) {
+                        posLabel = "(" + def.getPos().getPosName() + ")";
+                    }
+
+                    Topic uiTopic = new Topic(
+                            fi != null ? fi.getWordId() : -1,
+                            wordText,
+                            posLabel,
+                            defText
+                    );
+                    fullTopics.add(uiTopic);
+                }
+
+                // Debug: log mapped items to confirm duplicates per POS exist
+                try {
+                    StringBuilder dbg = new StringBuilder();
+                    for (int i = 0; i < fullTopics.size(); i++) {
+                        Topic t = fullTopics.get(i);
+                        dbg.append(i).append(':').append(t.getWord()).append(t.getWordType()).append(',');
+                    }
+                    android.util.Log.d("VocabFragment2", "Mapped fullTopics (size=" + fullTopics.size() + "): " + dbg.toString());
+                } catch (Exception ignored) {}
+
+                adapter.updateList(new ArrayList<>(fullTopics));
+                android.util.Log.d("VocabFragment2", "Adapter updated, adapterSize=" + adapter.getItemCount());
+                 if (fullTopics.isEmpty()) {
+                     Toast.makeText(requireContext(), "No words found for this topic", Toast.LENGTH_SHORT).show();
+                 }
+            });
+
+            // Trigger fetch from flashcard endpoint
+            flashcardViewModel.fetchFlashcards(topicIdArg);
+
         } else {
-            fullTopics = new ArrayList<>(Arrays.asList(
-                    new Topic("cat", "(n.)", "A small domesticated carnivorous mammal."),
-                    new Topic("run", "(v.)", "To move at a speed faster than a walk."),
-                    new Topic("beautiful", "(adj.)", "Pleasing the senses or mind aesthetically.")
-            ));
-            adapter.updateList(new ArrayList<>(fullTopics));
+            // If no topicId provided, fallback to Vocab2ViewModel (demo/sample data)
+            if (topicIdArg == null || topicIdArg <= 0) {
+                fullTopics = new ArrayList<>(Arrays.asList(
+                        new Topic("cat", "(n.)", "A small domesticated carnivorous mammal."),
+                        new Topic("run", "(v.)", "To move at a speed faster than a walk."),
+                        new Topic("beautiful", "(adj.)", "Pleasing the senses or mind aesthetically.")
+                ));
+                adapter.updateList(new ArrayList<>(fullTopics));
+            }
         }
 
         // Tìm kiếm

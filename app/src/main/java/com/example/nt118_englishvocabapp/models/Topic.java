@@ -46,6 +46,8 @@ public class Topic {
         copy.difficulty = this.difficulty;
         copy.status = this.status;
         copy.wordCount = newWordCount;
+        // Preserve transient saved flag when copying
+        copy.saved = this.saved;
         return copy;
     }
 }

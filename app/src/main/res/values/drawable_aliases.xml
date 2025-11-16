@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Alias used by the FAB: in light mode this points to the white icon -->
+    <item name="appicon" type="drawable">@drawable/appicon_white</item>
+</resources>
+
