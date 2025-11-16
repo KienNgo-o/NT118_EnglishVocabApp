@@ -19,7 +19,7 @@ import androidx.fragment.app.FragmentManager;
 import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.network.ApiService;
 import com.example.nt118_englishvocabapp.network.RetrofitClient;
-import com.example.nt118_englishvocabapp.network.SignUpRequest;
+import com.example.nt118_englishvocabapp.network.dto.SignUpRequest;
 
 
 import retrofit2.Call;

@@ -23,8 +23,8 @@ import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.network.ApiService;
 import com.example.nt118_englishvocabapp.network.RetrofitClient;
 import com.example.nt118_englishvocabapp.network.SessionManager;
-import com.example.nt118_englishvocabapp.network.SignInRequest;
-import com.example.nt118_englishvocabapp.network.SignInResponse;
+import com.example.nt118_englishvocabapp.network.dto.SignInRequest;
+import com.example.nt118_englishvocabapp.network.dto.SignInResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
