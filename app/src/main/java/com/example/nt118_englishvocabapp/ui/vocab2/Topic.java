@@ -7,6 +7,8 @@ public class Topic {
     private String wordType;
     private String definition;
     private boolean isFavorite = false;
+    // Thêm field để lưu pos name (ví dụ: "adj" hoặc "adjective") khi dữ liệu đến từ flashcard endpoint
+    private String posName;
 
     // ❗️ SỬA: Constructor cũ
     public Topic(String word, String wordType, String definition) {
@@ -31,12 +33,24 @@ public class Topic {
         this.word = word;
         this.wordType = wordType;
         this.definition = definition;
+        this.posName = null;
+    }
+
+    // Constructor mở rộng để kèm posName
+    public Topic(int wordId, String word, String wordType, String definition, String posName) {
+        this.wordId = wordId;
+        this.word = word;
+        this.wordType = wordType;
+        this.definition = definition;
+        this.posName = posName;
     }
 
     // ❗️ THÊM: Getter mới
     public int getWordId() {
         return wordId;
     }
+
+    public String getPosName() { return posName; }
 
     // --- Getters/Setters cũ ---
     public String getWord() { return word; }

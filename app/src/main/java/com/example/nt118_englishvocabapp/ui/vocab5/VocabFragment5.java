@@ -32,6 +32,7 @@ public class VocabFragment5 extends Fragment {
     private static final String TAG = "VocabFragment5";
     private FragmentVocab5Binding binding; // 👈 Dùng ViewBinding
     private VocabWordViewModel viewModel; // 👈 Dùng ViewModel đã chia sẻ
+    private int topicIndex = -1;
 
     public VocabFragment5() {
         // Required empty public constructor
@@ -44,6 +45,12 @@ public class VocabFragment5 extends Fragment {
         // Dùng ViewBinding
         binding = FragmentVocab5Binding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        // Lấy topic_index nếu có
+        Bundle args = getArguments();
+        if (args != null && args.containsKey("topic_index")) {
+            topicIndex = args.getInt("topic_index", -1);
+        }
 
         // 1. Lấy ViewModel được chia sẻ (từ Activity)
         viewModel = new ViewModelProvider(requireActivity()).get(VocabWordViewModel.class);
@@ -125,15 +132,31 @@ public class VocabFragment5 extends Fragment {
             // Không cần truyền Bundle
 
             if (v.getId() == R.id.tab_definition) {
+                int currentId = viewModel.getCurrentWordId();
+                VocabFragment3 f3 = new VocabFragment3();
+                if (currentId > 0) {
+                    Bundle b = new Bundle();
+                    b.putInt(VocabFragment3.ARG_WORD_ID, currentId);
+                    if (topicIndex > 0) b.putInt("topic_index", topicIndex);
+                    f3.setArguments(b);
+                }
                 requireActivity().getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(hostId, new VocabFragment3())
+                        .replace(hostId, f3)
                         .addToBackStack(null)
                         .commit();
             } else if (v.getId() == R.id.tab_forms) {
+                int currentId = viewModel.getCurrentWordId();
+                VocabFragment4 f4 = new VocabFragment4();
+                if (currentId > 0) {
+                    Bundle b = new Bundle();
+                    b.putInt(VocabFragment3.ARG_WORD_ID, currentId);
+                    if (topicIndex > 0) b.putInt("topic_index", topicIndex);
+                    f4.setArguments(b);
+                }
                 requireActivity().getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(hostId, new VocabFragment4())
+                        .replace(hostId, f4)
                         .addToBackStack(null)
                         .commit();
             } else if (v.getId() == R.id.tab_synonyms) {
@@ -155,28 +178,20 @@ public class VocabFragment5 extends Fragment {
             btnReturn.setOnClickListener(v -> {
                 if (getActivity() == null) return;
                 v.setEnabled(false);
-                getActivity().runOnUiThread(() -> {
-                    androidx.fragment.app.FragmentManager fm = requireActivity().getSupportFragmentManager();
-                    try {
-                        if (fm.isStateSaved()) {
-                            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                                try {
-                                    fm.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                                    fm.executePendingTransactions();
-                                    fm.beginTransaction().setReorderingAllowed(true).replace(hostId, new VocabFragment2()).commitAllowingStateLoss();
-                                } catch (Exception ignored) {
-                                    if (getActivity() != null) requireActivity().getOnBackPressedDispatcher().onBackPressed();
-                                }
-                            }, 120);
-                            return;
-                        }
-                        try { fm.popBackStackImmediate(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE); } catch (Exception ignored) {}
-                        try { fm.executePendingTransactions(); } catch (Exception ignored) {}
-                        fm.beginTransaction().setReorderingAllowed(true).replace(hostId, new VocabFragment2()).commitAllowingStateLoss();
-                    } catch (Exception ignored) {
-                        if (getActivity() != null) requireActivity().getOnBackPressedDispatcher().onBackPressed();
+                // Always navigate directly to a fresh VocabFragment2 (no back stack pop) to ensure
+                // the returned VocabFragment2 has predictable return behavior.
+                androidx.fragment.app.FragmentManager fm = requireActivity().getSupportFragmentManager();
+                try {
+                    VocabFragment2 vf2 = new VocabFragment2();
+                    if (topicIndex > 0) {
+                        Bundle b = new Bundle();
+                        b.putInt("topic_index", topicIndex);
+                        vf2.setArguments(b);
                     }
-                });
+                    fm.beginTransaction().setReorderingAllowed(true).replace(R.id.frame_layout, vf2).commitAllowingStateLoss();
+                } catch (Exception ignored) {
+                    if (getActivity() != null) requireActivity().getOnBackPressedDispatcher().onBackPressed();
+                }
             });
         }
     }

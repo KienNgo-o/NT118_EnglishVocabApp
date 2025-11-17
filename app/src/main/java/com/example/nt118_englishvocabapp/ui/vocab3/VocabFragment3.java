@@ -37,6 +37,12 @@ public class VocabFragment3 extends Fragment {
     private VocabWordViewModel viewModel;
     private MediaPlayer mediaPlayer;
     private int wordId = -1;
+    // Nếu được truyền từ VocabFragment2, dùng chuỗi này để chọn definition đúng (vd: adjective "red")
+    private String requestedDefText = null;
+    // Nếu được truyền posName (ví dụ 'adj' hoặc 'adjective'), ưu tiên chọn definition có pos này
+    private String requestedPosName = null;
+    // Nếu được truyền topic_index từ VocabFragment2, lưu lại để truyền tiếp / quay lại
+    private int topicIndex = -1;
 
     public VocabFragment3() { }
 
@@ -54,6 +60,16 @@ public class VocabFragment3 extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             wordId = args.getInt(ARG_WORD_ID, -1);
+            // Nếu có định nghĩa được truyền từ VocabFragment2, lưu lại để chọn đúng
+            if (args.containsKey("arg_def_text")) {
+                requestedDefText = args.getString("arg_def_text");
+            }
+            if (args.containsKey("arg_pos_name")) {
+                requestedPosName = args.getString("arg_pos_name");
+            }
+            if (args.containsKey("topic_index")) {
+                topicIndex = args.getInt("topic_index", -1);
+            }
         }
 
         // 3. GỌI API ĐỂ LẤY DỮ LIỆU
@@ -72,7 +88,7 @@ public class VocabFragment3 extends Fragment {
         final int hostId = (container != null) ? container.getId() : android.R.id.content;
 
         setupTabs(hostId);
-        setupButtons();
+        setupButtons(hostId);
 
         // Khởi tạo tab
         setSelectedTab(binding.tabDefinition);
@@ -113,17 +129,47 @@ public class VocabFragment3 extends Fragment {
         binding.wordText.setText(wordDetail.getWordText());
 
         if (wordDetail.getDefinitions() != null && !wordDetail.getDefinitions().isEmpty()) {
-            Definition firstDef = wordDetail.getDefinitions().get(0);
-
-            if (firstDef.getPos() != null) {
-                binding.wordType.setText("(" + firstDef.getPos().getPosName() + ")");
+            // Nếu có requestedDefText (được truyền từ VocabFragment2), tìm definition khớp
+            Definition chosen = null;
+            // 1) Nếu có requestedPosName, ưu tiên chọn definition có POS trùng
+            if (requestedPosName != null && !requestedPosName.isEmpty()) {
+                String posTarget = requestedPosName.trim().toLowerCase();
+                for (Definition d : wordDetail.getDefinitions()) {
+                    if (d == null || d.getPos() == null || d.getPos().getPosName() == null) continue;
+                    String p = d.getPos().getPosName().trim().toLowerCase();
+                    if (p.equals(posTarget) || p.startsWith(posTarget) || posTarget.startsWith(p)) {
+                        chosen = d;
+                        break;
+                    }
+                }
             }
 
-            binding.definitionVi.setText(firstDef.getTranslationText());
-            binding.definitionEn.setText(firstDef.getDefinitionText());
+            // 2) Nếu chưa có match bằng POS, thử match bằng definition text
+            if (chosen == null && requestedDefText != null && !requestedDefText.isEmpty()) {
+                String target = requestedDefText.trim();
+                for (Definition d : wordDetail.getDefinitions()) {
+                    if (d == null) continue;
+                    String defText = d.getDefinitionText();
+                    if (defText == null) continue;
+                    if (defText.trim().equalsIgnoreCase(target)) {
+                        chosen = d;
+                        break;
+                    }
+                }
+            }
 
-            if (firstDef.getExamples() != null && !firstDef.getExamples().isEmpty()) {
-                Example firstEx = firstDef.getExamples().get(0);
+            // 3) Fallback: dùng definition đầu tiên
+            if (chosen == null) chosen = wordDetail.getDefinitions().get(0);
+
+            if (chosen.getPos() != null) {
+                binding.wordType.setText("(" + chosen.getPos().getPosName() + ")");
+            }
+
+            binding.definitionVi.setText(chosen.getTranslationText());
+            binding.definitionEn.setText(chosen.getDefinitionText());
+
+            if (chosen.getExamples() != null && !chosen.getExamples().isEmpty()) {
+                Example firstEx = chosen.getExamples().get(0);
                 binding.example1En.setText(firstEx.getExampleSentence());
                 binding.example1Vi.setText(firstEx.getTranslationSentence());
             }
@@ -174,6 +220,7 @@ public class VocabFragment3 extends Fragment {
         View.OnClickListener tabClick = v -> {
             Bundle b = new Bundle();
             b.putInt(ARG_WORD_ID, wordId); // 👈 Truyền ID
+            if (topicIndex > 0) b.putInt("topic_index", topicIndex);
 
             if (v.getId() == R.id.tab_definition) {
                 // Đang ở tab này, không làm gì
@@ -206,16 +253,31 @@ public class VocabFragment3 extends Fragment {
      * Cài đặt logic cho các nút bấm khác (Return, Bookmark)
      */
     // ❗️ SỬA LỖI 6: Xóa tham số 'root' không dùng
-    private void setupButtons() {
+    private void setupButtons(int hostId) {
         binding.btnReturn.setOnClickListener(v -> {
-            // Đơn giản hóa logic quay lại
-            getParentFragmentManager().popBackStack();
+            if (getActivity() == null) return;
+            v.setEnabled(false);
+            androidx.fragment.app.FragmentManager fm = requireActivity().getSupportFragmentManager();
+            try {
+                // Clear entire back stack so the new VocabFragment2 is the only fragment and its return
+                // button will behave predictably (fallback to finishing the activity).
+                try { fm.popBackStackImmediate(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE); } catch (Exception ignored) {}
+                try { fm.executePendingTransactions(); } catch (Exception ignored) {}
+
+                VocabFragment2 vf2 = new VocabFragment2();
+                if (topicIndex > 0) {
+                    Bundle b = new Bundle();
+                    b.putInt("topic_index", topicIndex);
+                    vf2.setArguments(b);
+                }
+                fm.beginTransaction().setReorderingAllowed(true).replace(hostId, vf2).commitAllowingStateLoss();
+            } catch (Exception ignored) {
+                if (getActivity() != null) requireActivity().getOnBackPressedDispatcher().onBackPressed();
+            }
         });
 
         // TODO: Gán listener cho nút bookmark của bạn
-        // binding.btnBookmark.setOnClickListener(v -> {
-        //     viewModel.toggleBookmark();
-        // });
+        // binding.btnBookmark.setOnClickListener(v -> { viewModel.toggleBookmark(); });
     }
 
     // Toggle tab UI (Giữ nguyên)

@@ -56,6 +56,18 @@ public class VocabFragment2 extends Fragment {
             VocabFragment3 fragment = new VocabFragment3();
             Bundle b = new Bundle();
             b.putInt(VocabFragment3.ARG_WORD_ID, topic.getWordId());
+            // Nếu Topic có definition (từ flashcard endpoint), truyền theo để VocabFragment3 chọn đúng POS/definition
+            if (topic.getDefinition() != null) {
+                b.putString("arg_def_text", topic.getDefinition());
+            }
+            // Nếu Topic có posName, truyền pos để ưu tiên chọn definition theo loại từ (vd: adj)
+            if (topic.getPosName() != null) {
+                b.putString("arg_pos_name", topic.getPosName());
+            }
+            // Truyền lại topic_index (nếu fragment hiện tại đang ở chế độ topic)
+            if (topicIdArg != null && topicIdArg > 0) {
+                b.putInt("topic_index", topicIdArg);
+            }
             fragment.setArguments(b);
 
             int hostId = (container != null) ? container.getId() : android.R.id.content;
@@ -95,15 +107,18 @@ public class VocabFragment2 extends Fragment {
                     String wordText = fi != null ? fi.getWordText() : "";
                     String defText = def != null ? def.getDefinitionText() : "";
                     String posLabel = "";
+                    String posName = null;
                     if (def != null && def.getPos() != null && def.getPos().getPosName() != null) {
                         posLabel = "(" + def.getPos().getPosName() + ")";
+                        posName = def.getPos().getPosName();
                     }
 
                     Topic uiTopic = new Topic(
                             fi != null ? fi.getWordId() : -1,
                             wordText,
                             posLabel,
-                            defText
+                            defText,
+                            posName
                     );
                     fullTopics.add(uiTopic);
                 }
@@ -184,10 +199,37 @@ public class VocabFragment2 extends Fragment {
             }
         });
 
-        // Nút quay lại
-        ReturnButtonHelper.bind(binding.getRoot(), this, null, () -> requireActivity().finish());
+        // Nút quay lại: luôn chuyển về `VocabFragment` (màn danh sách topic)
         if (binding.btnReturn != null) {
-            binding.btnReturn.setOnClickListener(v -> getParentFragmentManager().popBackStack());
+            // Ensure button is enabled and clickable in case previous fragments disabled similar views
+            binding.btnReturn.setEnabled(true);
+            binding.btnReturn.setClickable(true);
+            binding.btnReturn.setOnClickListener(v -> {
+                android.util.Log.d("VocabFragment2", "btnReturn clicked - attempt popBackStack to VocabFragment2_BackStack");
+                Toast.makeText(requireContext(), "Returning to Topics...", Toast.LENGTH_SHORT).show();
+                try {
+                    androidx.fragment.app.FragmentManager fm = requireActivity().getSupportFragmentManager();
+                    // Try to pop back to the original VocabFragment2 backstack entry that was created when VocabFragment opened VocabFragment2
+                    boolean popped = false;
+                    try {
+                        popped = fm.popBackStackImmediate("VocabFragment2_BackStack", 0);
+                    } catch (Exception ignored) {}
+
+                    if (popped) {
+                        android.util.Log.d("VocabFragment2", "popBackStackImmediate succeeded for VocabFragment2_BackStack");
+                        return;
+                    }
+
+                    // Fallback: replace the activity container with a fresh VocabFragment
+                    com.example.nt118_englishvocabapp.ui.vocab.VocabFragment vf = new com.example.nt118_englishvocabapp.ui.vocab.VocabFragment();
+                    fm.beginTransaction()
+                            .replace(R.id.frame_layout, vf)
+                            .commitAllowingStateLoss();
+                } catch (Exception e) {
+                    android.util.Log.e("VocabFragment2", "Error navigating to VocabFragment: " + e.getMessage(), e);
+                    try { requireActivity().finish(); } catch (Exception ignored) {}
+                }
+            });
         }
 
         Toast.makeText(getContext(), "Vocab Fragment 2 Opened!", Toast.LENGTH_SHORT).show();
