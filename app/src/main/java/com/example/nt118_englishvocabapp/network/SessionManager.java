@@ -12,6 +12,8 @@ public class SessionManager {
     private static final String PREF_NAME = "MyAppSession";
     private static final String KEY_ACCESS_TOKEN = "accessToken";
     private static final String KEY_REFRESH_TOKEN = "refreshToken";
+    private static final String KEY_USERNAME = "username";
+    private static final String KEY_EMAIL = "email";
 
     private SharedPreferences sharedPreferences;
 
@@ -51,6 +53,30 @@ public class SessionManager {
         editor.apply();
     }
 
+    // Lưu username để các fragment khác gọi đến khi cần
+    public void saveUsername(String username) {
+        if (username == null) return;
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_USERNAME, username);
+        editor.apply();
+    }
+
+    public String getUsername() {
+        return sharedPreferences.getString(KEY_USERNAME, null);
+    }
+
+    // Lưu logged-in email
+    public void saveEmail(String email) {
+        if (email == null) return;
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_EMAIL, email);
+        editor.apply();
+    }
+
+    public String getEmail() {
+        return sharedPreferences.getString(KEY_EMAIL, null);
+    }
+
     public String getAccessToken() {
         return sharedPreferences.getString(KEY_ACCESS_TOKEN, null);
     }
@@ -63,6 +89,9 @@ public class SessionManager {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove(KEY_ACCESS_TOKEN);
         editor.remove(KEY_REFRESH_TOKEN);
+        // Clear cả username và email
+        editor.remove(KEY_USERNAME);
+        editor.remove(KEY_EMAIL);
         editor.apply();
     }
 }

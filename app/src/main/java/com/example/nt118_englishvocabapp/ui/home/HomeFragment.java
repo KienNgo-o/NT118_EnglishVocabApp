@@ -24,6 +24,7 @@ import com.example.nt118_englishvocabapp.R;
 import com.example.nt118_englishvocabapp.databinding.FragmentHomeBinding;
 import com.example.nt118_englishvocabapp.ui.account.AccountFragment;
 import com.example.nt118_englishvocabapp.util.StreakManager;
+import com.example.nt118_englishvocabapp.network.SessionManager;
 
 import java.util.Calendar;
 import java.util.HashSet;
@@ -55,8 +56,6 @@ public class HomeFragment extends Fragment {
             // Find views
             TextView quoteText = root.findViewById(R.id.textDialog);
             TextView activeDays = root.findViewById(R.id.text_active_days);
-            TextView vocabProgress1 = root.findViewById(R.id.text_vocab_progress);
-            TextView vocabProgress2 = root.findViewById(R.id.text_vocab_progress2);
             TextView quizProgress1 = root.findViewById(R.id.text_quiz_progress);
             TextView quizProgress2 = root.findViewById(R.id.text_quiz_progress2);
             TextView flashProgress = root.findViewById(R.id.text_flash_progress);
@@ -76,6 +75,12 @@ public class HomeFragment extends Fragment {
             // Populate greeting: use account name from resources as fallback
             try {
                 String accountName = getString(R.string.account_name);
+                // Gọi username
+                try {
+                    SessionManager sm = SessionManager.getInstance(requireContext());
+                    String stored = sm.getUsername();
+                    if (stored != null && !stored.isEmpty()) accountName = stored;
+                } catch (Exception ignored) {}
                 if (greetingBig != null) {
                     greetingBig.setText(getString(R.string.greeting_format, accountName));
                 }
@@ -88,12 +93,6 @@ public class HomeFragment extends Fragment {
             });
             homeViewModel.getActiveDaysText().observe(getViewLifecycleOwner(), s -> {
                 if (activeDays != null) activeDays.setText(s);
-            });
-            homeViewModel.getVocabProgress1().observe(getViewLifecycleOwner(), s -> {
-                if (vocabProgress1 != null) vocabProgress1.setText(s);
-            });
-            homeViewModel.getVocabProgress2().observe(getViewLifecycleOwner(), s -> {
-                if (vocabProgress2 != null) vocabProgress2.setText(s);
             });
             homeViewModel.getQuizProgress1().observe(getViewLifecycleOwner(), s -> {
                 if (quizProgress1 != null) quizProgress1.setText(s);

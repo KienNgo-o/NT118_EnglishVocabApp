@@ -135,6 +135,23 @@ public class AccountFragment extends Fragment {
         imgAvatar = view.findViewById(com.example.nt118_englishvocabapp.R.id.img_avatar);
         ImageButton btnAvatarAction = view.findViewById(com.example.nt118_englishvocabapp.R.id.btn_avatar_action);
 
+        // Gọi username
+        try {
+            TextView headerNameInit = view.findViewById(R.id.tv_name);
+            if (headerNameInit != null) {
+                SessionManager sm = SessionManager.getInstance(requireContext());
+                String stored = sm.getUsername();
+                if (stored != null && !stored.isEmpty()) headerNameInit.setText(stored);
+            }
+            // Populate email in header
+            TextView headerEmail = view.findViewById(R.id.tv_email);
+            if (headerEmail != null) {
+                SessionManager sm2 = SessionManager.getInstance(requireContext());
+                String email = sm2.getEmail();
+                if (email != null && !email.isEmpty()) headerEmail.setText(email);
+            }
+        } catch (Exception ignored) {}
+
         // Use Activity content view as stable root for keyboard detection (same pattern as other fragments)
         if (getActivity() != null) {
             keyboardRootView = requireActivity().findViewById(android.R.id.content);
@@ -351,6 +368,17 @@ public class AccountFragment extends Fragment {
                                 // Cập nhật lại UI (ví dụ: tên ở header)
                                 TextView headerName = view.findViewById(R.id.tv_name);
                                 if (headerName != null) headerName.setText(updatedUser.getUsername());
+                                // Persist updated username in session so other screens show new name
+                                try {
+                                    SessionManager.getInstance(requireContext()).saveUsername(updatedUser.getUsername());
+                                    // Also update and persist email if returned by server
+                                    String updatedEmail = updatedUser.getEmail();
+                                    if (updatedEmail != null) {
+                                        TextView headerEmail = view.findViewById(R.id.tv_email);
+                                        if (headerEmail != null) headerEmail.setText(updatedEmail);
+                                        SessionManager.getInstance(requireContext()).saveEmail(updatedEmail);
+                                    }
+                                } catch (Exception ignored) {}
 
                                 // Xoá trắng các ô password
                                 edtOldPassword.setText("");

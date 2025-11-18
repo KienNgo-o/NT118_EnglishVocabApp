@@ -61,6 +61,19 @@ public class SignInFragment extends Fragment {
             String username = etUsername.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
 
+            // Determine email input: prefer a dedicated input_email field if present, otherwise use username field
+            String emailToSave = null;
+            try {
+                EditText etEmail = getView() != null ? getView().findViewById(R.id.input_email) : null;
+                if (etEmail != null) {
+                    emailToSave = etEmail.getText().toString().trim();
+                }
+            } catch (Exception ignored) {}
+            if (emailToSave == null || emailToSave.isEmpty()) {
+                // fallback: treat the username field as email if a dedicated email field is not present
+                emailToSave = username;
+            }
+
             if (username.isEmpty() || password.isEmpty()) {
                 Toast.makeText(getContext(), "Vui lòng nhập username và password", Toast.LENGTH_SHORT).show();
                 return;
@@ -69,8 +82,8 @@ public class SignInFragment extends Fragment {
             // Hiển thị ProgressBar, vô hiệu hoá nút
             showLoading(true);
 
-            // Gọi API
-            signInUser(username, password);
+            // Gọi API, pass emailToSave so we can persist exactly what the user entered as their email
+            signInUser(username, password, emailToSave);
         });
 
         // Nút chuyển sang màn hình Sign up
@@ -101,7 +114,7 @@ public class SignInFragment extends Fragment {
         return view;
     }
 
-    private void signInUser(String username, String password) {
+    private void signInUser(String username, String password, String emailToSave) {
         SignInRequest request = new SignInRequest(username, password);
 
         // Retrofit tự động chạy call này trên background thread
@@ -120,6 +133,13 @@ public class SignInFragment extends Fragment {
                             signInResponse.getAccessToken(),
                             signInResponse.getRefreshToken()
                     );
+
+                    // Save the username so other screens can display it
+                    try {
+                        sessionManager.saveUsername(username);
+                        // Save the email exactly as user inserted (emailToSave)
+                        sessionManager.saveEmail(emailToSave);
+                    } catch (Exception ignored) {}
 
                     // Chuyển sang MainActivity
                     Intent intent = new Intent(getActivity(), MainActivity.class);
