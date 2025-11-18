@@ -20,26 +20,24 @@
         app:layout_constraintHeight_percent="0.20"
         android:paddingStart="20dp"
         android:paddingEnd="16dp"
-        android:paddingTop="12dp"
         android:paddingBottom="12dp">
 
         <LinearLayout
             android:id="@+id/header_text_block"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:orientation="vertical"
             android:layout_marginStart="8dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/header_right"
-            app:layout_constraintTop_toTopOf="parent"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:gravity="center_vertical">
+            app:layout_constraintEnd_toStartOf="@+id/header_right"
+            app:layout_constraintStart_toStartOf="parent">
 
             <TextView
                 android:id="@+id/text_greeting_big"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hi, Pham Khoi"
+                android:text="@string/account_name"
                 android:textColor="@color/on_purple"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -48,10 +46,10 @@
                 android:id="@+id/text_greeting_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Let's start learning"
+                android:layout_marginTop="4dp"
+                android:text="@string/greeting_small"
                 android:textColor="@color/on_purple"
-                android:textSize="14sp"
-                android:layout_marginTop="4dp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <!-- Right side: streak number + avatar -->
@@ -78,13 +76,13 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/streak"
-                    android:contentDescription="streak_icon" />
+                    android:contentDescription="@string/cd_streak_icon" />
 
                 <TextView
                     android:id="@+id/text_streak_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3"
+                    android:text="@string/streak_number"
                     android:textColor="@color/on_purple"
                     android:textStyle="bold"
                     android:layout_marginStart="6dp" />
@@ -101,8 +99,8 @@
                 android:contentDescription="@string/cd_avatar"
                 android:clickable="true"
                 android:focusable="true"
-                android:clipToOutline="true"
-                android:outlineProvider="background" />
+                android:outlineProvider="background"
+                android:clipToOutline="true" />
 
         </LinearLayout>
 
@@ -134,7 +132,7 @@
                 android:id="@+id/text_today_quotes_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Today's Quote"
+                android:text="@string/today_quote_title"
                 android:textSize="12sp"
                 android:textColor="@color/text_primary"
                 android:layout_marginBottom="3dp" />
@@ -184,212 +182,126 @@
                     android:id="@+id/text_study_days_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Study days"
+                    android:text="@string/study_days"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:layout_marginTop="8dp"
                     android:layout_marginStart="8dp"
                     android:textColor="@color/text_primary" />
 
+                <!-- Calendar header: month and navigation arrows -->
                 <LinearLayout
-                    android:id="@+id/row_days"
+                    android:id="@+id/calendar_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:padding="4dp"
-                    android:gravity="center"
-                    android:weightSum="7">
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
 
-                    <!-- Monday -->
-                    <LinearLayout
+                    <ImageButton
+                        android:id="@+id/button_prev_month"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/next_arrow"
+                        android:rotation="180"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/cd_prev" />
+
+                    <TextView
+                        android:id="@+id/text_month_label"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="4dp">
+                        android:layout_height="wrap_content"
+                        android:text="@string/cd_calendar"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:gravity="center" />
 
-                        <ImageButton
-                            android:id="@+id/day_mon"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/daycheck_no"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="Mon"
-                            android:padding="4dp"
-                            android:scaleType="centerCrop" />
+                    <ImageButton
+                        android:id="@+id/button_next_month"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/next_arrow"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/cd_next" />
+                </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Mon"
-                            android:textSize="12sp"
-                            android:layout_marginTop="4dp" />
-                    </LinearLayout>
+                <!-- Week labels row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp">
 
-                    <!-- Tuesday -->
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_mon"
                         android:gravity="center"
-                        android:padding="4dp">
+                        android:textColor="@color/text_secondary" />
 
-                        <ImageButton
-                            android:id="@+id/day_tue"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/daycheck_no"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="Tue"
-                            android:padding="4dp"
-                            android:scaleType="centerCrop" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Tue"
-                            android:textSize="12sp"
-                            android:layout_marginTop="4dp" />
-                    </LinearLayout>
-
-                    <!-- Wednesday -->
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_tue"
                         android:gravity="center"
-                        android:padding="4dp">
+                        android:textColor="@color/text_secondary" />
 
-                        <ImageButton
-                            android:id="@+id/day_wed"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/daycheck_no"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="Wed"
-                            android:padding="4dp"
-                            android:scaleType="centerCrop" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Wed"
-                            android:textSize="12sp"
-                            android:layout_marginTop="4dp" />
-                    </LinearLayout>
-
-                    <!-- Thursday -->
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_wed"
                         android:gravity="center"
-                        android:padding="4dp">
+                        android:textColor="@color/text_secondary" />
 
-                        <ImageButton
-                            android:id="@+id/day_thu"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/daycheck_no"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="Thu"
-                            android:padding="4dp"
-                            android:scaleType="centerCrop" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Thu"
-                            android:textSize="12sp"
-                            android:layout_marginTop="4dp" />
-                    </LinearLayout>
-
-                    <!-- Friday -->
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_thu"
                         android:gravity="center"
-                        android:padding="4dp">
+                        android:textColor="@color/text_secondary" />
 
-                        <ImageButton
-                            android:id="@+id/day_fri"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/daycheck_no"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="Fri"
-                            android:padding="4dp"
-                            android:scaleType="centerCrop" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Fri"
-                            android:textSize="12sp"
-                            android:layout_marginTop="4dp" />
-                    </LinearLayout>
-
-                    <!-- Saturday -->
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_fri"
                         android:gravity="center"
-                        android:padding="4dp">
+                        android:textColor="@color/text_secondary" />
 
-                        <ImageButton
-                            android:id="@+id/day_sat"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/daycheck_no"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="Sat"
-                            android:padding="4dp"
-                            android:scaleType="centerCrop" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Sat"
-                            android:textSize="12sp"
-                            android:layout_marginTop="4dp" />
-                    </LinearLayout>
-
-                    <!-- Sunday -->
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_sat"
                         android:gravity="center"
-                        android:padding="4dp">
+                        android:textColor="@color/text_secondary" />
 
-                        <ImageButton
-                            android:id="@+id/day_sun"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/daycheck_no"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="Sun"
-                            android:padding="4dp"
-                            android:scaleType="centerCrop" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Sun"
-                            android:textSize="12sp"
-                            android:layout_marginTop="4dp" />
-                    </LinearLayout>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_sun"
+                        android:gravity="center"
+                        android:textColor="@color/text_secondary" />
 
                 </LinearLayout>
+
+                <!-- Calendar grid: 7 columns -->
+                <GridLayout
+                    android:id="@+id/calendar_grid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="7"
+                    android:rowCount="6"
+                    android:useDefaultMargins="true"
+                    android:alignmentMode="alignMargins"
+                    android:padding="8dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -402,13 +314,13 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/calendar"
-                        android:contentDescription="calendar" />
+                        android:contentDescription="@string/cd_calendar" />
 
                     <TextView
                         android:id="@+id/text_active_days"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="1 Active day"
+                        android:text="@string/active_days_default"
                         android:layout_marginStart="8dp"
                         android:textColor="@color/text_secondary" />
                 </LinearLayout>
@@ -438,7 +350,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:text="Vocab learning"
+                        android:text="@string/vocab_learning"
                         android:textStyle="bold"
                         android:textSize="18sp"
                         android:textColor="@color/text_primary" />
@@ -459,13 +371,13 @@
                                 android:layout_width="22dp"
                                 android:layout_height="22dp"
                                 android:src="@drawable/vocab_color"
-                                android:contentDescription="icon" />
+                                android:contentDescription="@string/cd_icon" />
 
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
                                 android:layout_height="wrap_content"
-                                android:text="Fruits"
+                                android:text="@string/fruits"
                                 android:layout_marginStart="8dp"
                                 android:textColor="@color/text_primary"
                                 android:textSize="15sp" />
@@ -474,7 +386,7 @@
                                 android:id="@+id/text_vocab_progress"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="40/48"
+                                android:text="@string/progress_40_48"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="14sp" />
 
@@ -491,13 +403,13 @@
                                 android:layout_width="22dp"
                                 android:layout_height="22dp"
                                 android:src="@drawable/vocab_color"
-                                android:contentDescription="icon" />
+                                android:contentDescription="@string/cd_icon" />
 
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
                                 android:layout_height="wrap_content"
-                                android:text="Education"
+                                android:text="@string/education"
                                 android:layout_marginStart="8dp"
                                 android:textColor="@color/text_primary"
                                 android:textSize="15sp" />
@@ -506,7 +418,7 @@
                                 android:id="@+id/text_vocab_progress2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="6/24"
+                                android:text="@string/progress_6_24"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="14sp" />
 
@@ -540,7 +452,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:text="Quiz taken"
+                        android:text="@string/quiz_taken"
                         android:textStyle="bold"
                         android:textSize="18sp"
                         android:textColor="@color/text_primary" />
@@ -561,13 +473,13 @@
                                 android:layout_width="22dp"
                                 android:layout_height="22dp"
                                 android:src="@drawable/quiz_color"
-                                android:contentDescription="icon" />
+                                android:contentDescription="@string/cd_icon" />
 
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
                                 android:layout_height="wrap_content"
-                                android:text="Business"
+                                android:text="@string/business"
                                 android:layout_marginStart="8dp"
                                 android:textColor="@color/text_primary"
                                 android:textSize="15sp" />
@@ -576,7 +488,7 @@
                                 android:id="@+id/text_quiz_progress"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="40/48"
+                                android:text="@string/progress_40_48"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="14sp" />
 
@@ -593,13 +505,13 @@
                                 android:layout_width="22dp"
                                 android:layout_height="22dp"
                                 android:src="@drawable/quiz_color"
-                                android:contentDescription="icon" />
+                                android:contentDescription="@string/cd_icon" />
 
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
                                 android:layout_height="wrap_content"
-                                android:text="Relationship"
+                                android:text="@string/relationship"
                                 android:layout_marginStart="8dp"
                                 android:textColor="@color/text_primary"
                                 android:textSize="15sp" />
@@ -608,7 +520,7 @@
                                 android:id="@+id/text_quiz_progress2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="6/24"
+                                android:text="@string/progress_6_24"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="14sp" />
 
@@ -644,7 +556,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:text="Flash card learning"
+                        android:text="@string/flashcard_learning"
                         android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -664,7 +576,7 @@
                             <ImageView
                                 android:layout_width="22dp"
                                 android:layout_height="22dp"
-                                android:contentDescription="icon"
+                                android:contentDescription="@string/cd_icon"
                                 android:src="@drawable/flashcard_color" />
 
                             <TextView
@@ -672,7 +584,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
                                 android:layout_weight="1"
-                                android:text="Fruits"
+                                android:text="@string/fruits"
                                 android:textColor="@color/text_primary"
                                 android:textSize="15sp" />
 
@@ -680,7 +592,7 @@
                                 android:id="@+id/text_flash_progress"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="0/0"
+                                android:text="@string/progress_0_0"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="14sp" />
 
@@ -696,7 +608,7 @@
                             <ImageView
                                 android:layout_width="22dp"
                                 android:layout_height="22dp"
-                                android:contentDescription="icon"
+                                android:contentDescription="@string/cd_icon"
                                 android:src="@drawable/flashcard_color" />
 
                             <TextView
@@ -704,7 +616,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
                                 android:layout_weight="1"
-                                android:text="Sample set 2"
+                                android:text="@string/sample_set_2"
                                 android:textColor="@color/text_primary"
                                 android:textSize="15sp" />
 
@@ -712,7 +624,7 @@
                                 android:id="@+id/text_flash_progress2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="0/0"
+                                android:text="@string/progress_0_0"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="14sp" />
 

@@ -23,6 +23,7 @@ import com.example.nt118_englishvocabapp.models.FlashcardItem;
 import com.example.nt118_englishvocabapp.models.LearnableItem;
 import com.example.nt118_englishvocabapp.models.Pronunciation;
 import com.example.nt118_englishvocabapp.models.Topic;
+import com.example.nt118_englishvocabapp.util.StreakManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class FlashcardFragment2 extends Fragment {
 
     private FlashcardViewModel viewModel;
     private MediaPlayer mediaPlayer;
+    private StreakManager streakManager;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -50,6 +52,8 @@ public class FlashcardFragment2 extends Fragment {
 
         viewModel = new ViewModelProvider(requireActivity()).get(FlashcardViewModel.class);
         binding.backView.setRotationY(180f);
+
+        streakManager = new StreakManager(requireContext());
 
         if (getArguments() != null) {
             topicId = getArguments().getInt("topic_index", 1);
@@ -116,9 +120,17 @@ public class FlashcardFragment2 extends Fragment {
         binding.btnNext.setOnClickListener(v -> {
             if (!isOnCongrats()) {
                 currentIndex++;
+                // Mark today's active when user moves to next card (counts as completion of current)
+                try {
+                    streakManager.markTodayActive();
+                } catch (Exception ignored) {}
                 showingFront = true;
                 updateUI();
             } else {
+                // when user finishes all cards, also mark today active
+                try {
+                    streakManager.markTodayActive();
+                } catch (Exception ignored) {}
                 restoreNavigationBar();
                 getParentFragmentManager().popBackStack();
             }

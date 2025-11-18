@@ -84,4 +84,13 @@
     <!-- progress text color for the flashcard progress pill (light mode) -->
     <color name="progress_text">#000000</color>
 
+    <!-- Calendar day pill colors -->
+    <color name="day_peach_bg">#FFF3EE</color>
+    <color name="day_blue_bg">#E7F0FF</color>
+    <color name="day_gray_bg">#F6F6F6</color>
+
+    <color name="day_peach_text">#7A2A13</color>
+    <color name="day_blue_text">#2B5FB6</color>
+    <color name="day_gray_text">#7A7A7A</color>
+
 </resources>

@@ -195,6 +195,10 @@
     <!-- Calendar / active days -->
     <string name="cd_calendar">Calendar</string>
     <string name="active_days_default">1 Active day</string>
+    <plurals name="active_days_count">
+        <item quantity="one">%d Active day</item>
+        <item quantity="other">%d Active days</item>
+    </plurals>
 
     <!-- Cards and sample content -->
     <string name="vocab_learning">Vocab learning</string>
