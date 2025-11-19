@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/light_purple"
     android:orientation="vertical"
-    android:weightSum="10"
-    tools:context=".ui.quiz.MatchingQuizFragment">
+    android:weightSum="10">
 
-    <!-- Header (same style as other fragments) -->
+    <!-- Header (slightly moved down for alignment) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingTop="8dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="64dp"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
 
@@ -38,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="Quiz - Stationery"
+                android:text="@string/title_quiz_matching"
                 android:textColor="@color/dark_purple"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -62,76 +61,43 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- 1) Question indicators -->
-        <LinearLayout
+        <!-- Question counter -->
+        <TextView
+            android:id="@+id/txt_question_count"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="12dp">
+            android:text="Question 1 of 3"
+            android:textColor="@color/light_gray"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"/>
 
-            <TextView
-                android:id="@+id/txt_question_index"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/question_1_of_3"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp">
-
-                <View
-                    android:id="@+id/indicator_1"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/tab_selector" />
-
-                <View
-                    android:id="@+id/indicator_2"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/tab_selector" />
-
-                <View
-                    android:id="@+id/indicator_3"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:background="@drawable/tab_selector" />
-
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- 2) Question type (Match!) -->
+        <!-- Question card (centered, rounded background) -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
+            android:layout_marginBottom="12dp"
             android:orientation="vertical"
-            android:layout_marginBottom="16dp"
-            android:padding="12dp"
-            android:background="@drawable/rounded_white">
+            android:gravity="center"
+            android:background="@drawable/rounded_white"
+            android:padding="6dp">
 
             <TextView
                 android:id="@+id/txt_question"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
                 android:text="Match the pairs"
+                android:textSize="16sp"
                 android:textColor="@color/dark_purple"
-                android:textSize="18sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- 3) Cards area (even number of cards). We use a FrameLayout so we can overlay a LineOverlay view on top -->
+        <!-- Grid area with alternating image (CardView) and word (Button) tiles -->
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="360dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_marginBottom="12dp">
 
             <GridLayout
@@ -146,26 +112,28 @@
                 android:rowOrderPreserved="false"
                 android:useDefaultMargins="true">
 
-                <!-- Example: 8 cards (left/right matching). Texts are placeholder and can be set in code -->
-                <Button
-                    android:id="@+id/card_1"
+                <!-- Pair 1 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_img_1"
                     android:tag="p1"
-                    style="@style/Widget.AppCompat.Button"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_columnWeight="1"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/rounded_white"
-                    android:backgroundTint="@null"
-                    app:backgroundTint="@null"
-                    android:text="Metrics"
-                    android:textAllCaps="false"
-                    android:textColor="@color/dark_purple" />
+                    android:layout_marginEnd="8dp">
+                    <ImageView
+                        android:id="@+id/img_card_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/pen" />
+                </androidx.cardview.widget.CardView>
 
                 <Button
-                    android:id="@+id/card_2"
+                    android:id="@+id/card_word_1"
                     android:tag="p1"
                     style="@style/Widget.AppCompat.Button"
                     android:layout_width="0dp"
@@ -175,65 +143,32 @@
                     android:layout_marginBottom="8dp"
                     android:layout_marginStart="8dp"
                     android:background="@drawable/rounded_white"
-                    android:backgroundTint="@null"
-                    app:backgroundTint="@null"
-                    android:text="Số liệu"
+                    android:text="Pen"
                     android:textAllCaps="false"
                     android:textColor="@color/dark_purple" />
 
-                <Button
-                    android:id="@+id/card_3"
+                <!-- Pair 2 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_img_2"
                     android:tag="p2"
-                    style="@style/Widget.AppCompat.Button"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_columnWeight="1"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/rounded_white"
-                    android:backgroundTint="@null"
-                    app:backgroundTint="@null"
-                    android:text="Algorithm"
-                    android:textAllCaps="false"
-                    android:textColor="@color/dark_purple" />
+                    android:layout_marginEnd="8dp">
+                    <ImageView
+                        android:id="@+id/img_card_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/books_films" />
+                </androidx.cardview.widget.CardView>
 
                 <Button
-                    android:id="@+id/card_4"
-                    android:tag="p3"
-                    style="@style/Widget.AppCompat.Button"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_columnWeight="1"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/rounded_white"
-                    android:backgroundTint="@null"
-                    app:backgroundTint="@null"
-                    android:text="Vật thể"
-                    android:textAllCaps="false"
-                    android:textColor="@color/dark_purple" />
-
-                <Button
-                    android:id="@+id/card_5"
-                    android:tag="p3"
-                    style="@style/Widget.AppCompat.Button"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_columnWeight="1"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/rounded_white"
-                    android:backgroundTint="@null"
-                    app:backgroundTint="@null"
-                    android:text="Object"
-                    android:textAllCaps="false"
-                    android:textColor="@color/dark_purple" />
-
-                <Button
-                    android:id="@+id/card_6"
+                    android:id="@+id/card_word_2"
                     android:tag="p2"
                     style="@style/Widget.AppCompat.Button"
                     android:layout_width="0dp"
@@ -243,31 +178,67 @@
                     android:layout_marginBottom="8dp"
                     android:layout_marginStart="8dp"
                     android:background="@drawable/rounded_white"
-                    android:backgroundTint="@null"
-                    app:backgroundTint="@null"
-                    android:text="Thuật toán"
+                    android:text="Books"
                     android:textAllCaps="false"
                     android:textColor="@color/dark_purple" />
 
+                <!-- Pair 3 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_img_3"
+                    android:tag="p3"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_columnWeight="1"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp">
+                    <ImageView
+                        android:id="@+id/img_card_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/apperances" />
+                </androidx.cardview.widget.CardView>
+
                 <Button
-                    android:id="@+id/card_7"
-                    android:tag="p4"
+                    android:id="@+id/card_word_3"
+                    android:tag="p3"
                     style="@style/Widget.AppCompat.Button"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_columnWeight="1"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
                     android:background="@drawable/rounded_white"
-                    android:backgroundTint="@null"
-                    app:backgroundTint="@null"
-                    android:text="Object"
+                    android:text="Appearence"
                     android:textAllCaps="false"
                     android:textColor="@color/dark_purple" />
 
+                <!-- Pair 4 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_img_4"
+                    android:tag="p4"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_columnWeight="1"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp">
+                    <ImageView
+                        android:id="@+id/img_card_4"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/calendar" />
+                </androidx.cardview.widget.CardView>
+
                 <Button
-                    android:id="@+id/card_8"
+                    android:id="@+id/card_word_4"
                     android:tag="p4"
                     style="@style/Widget.AppCompat.Button"
                     android:layout_width="0dp"
@@ -277,9 +248,7 @@
                     android:layout_marginBottom="8dp"
                     android:layout_marginStart="8dp"
                     android:background="@drawable/rounded_white"
-                    android:backgroundTint="@null"
-                    app:backgroundTint="@null"
-                    android:text="Thuật toán"
+                    android:text="Calendar"
                     android:textAllCaps="false"
                     android:textColor="@color/dark_purple" />
 
@@ -294,16 +263,15 @@
 
         </FrameLayout>
 
-        <!-- 4) Confirm button -->
+        <!-- Confirm button -->
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_confirm"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="150dp"
             android:text="@string/confirm"
             android:background="@drawable/rounded_orange"
-            android:backgroundTint="@null"
-            app:backgroundTint="@null"
             android:textAllCaps="false"
             android:textColor="@color/white" />
 

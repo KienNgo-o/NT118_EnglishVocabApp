@@ -83,9 +83,11 @@
     <string name="answer_b">Banana</string>
     <string name="answer_c">Chair</string>
     <string name="answer_d">Computer</string>
-
-    <!-- Strings used by fragment_quiz_fillanswer.xml -->
-    <string name="title_fill_in_blank">Fill in the blank</string>
+    <string name="title_quiz_audio">Quiz - Choose by Sound</string>
+    <string name="title_quiz_matching">Quiz - Matching</string>
+    <string name="title_quiz_multiplechoice">Quiz - Multiple choice</string>
+    <string name="title_quiz_fillanswer">Quiz - Fill Answer</string>
+    <string name="title_quiz_result">Quiz - Result</string>
     <string name="your_answer">Your answer</string>
     <string name="confirm">Confirm</string>
 
@@ -116,7 +118,6 @@
     <string name="emotion_label">Emotion</string>
 
     <!-- New strings for choose-by-sound fragment -->
-    <string name="title_choose_by_sound">Quiz - Choose by Sound</string>
     <string name="instruction_listen_tap">Listen and tap the matching item</string>
     <string name="cd_play_sound">Play sound</string>
 
