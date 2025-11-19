@@ -17,10 +17,7 @@ import com.example.nt118_englishvocabapp.ui.flashcard.FlashcardFragment;
 import com.example.nt118_englishvocabapp.ui.home.HomeFragment;
 import com.example.nt118_englishvocabapp.ui.quiz.QuizFragment;
 import com.example.nt118_englishvocabapp.ui.vocab.VocabFragment;
-import com.example.nt118_englishvocabapp.ui.translate.TranslateFragment;
-import com.example.nt118_englishvocabapp.ui.account.AccountFragment;
-import com.example.nt118_englishvocabapp.ui.quiz.ChooseAnswerQuizFragment;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.example.nt118_englishvocabapp.ui.quiz.ChooseAudioAnswerQuizFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -66,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         binding.getRoot().findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                replaceFragment(new ChooseAnswerQuizFragment());
+                replaceFragment(new ChooseAudioAnswerQuizFragment());
             }
         });
     }

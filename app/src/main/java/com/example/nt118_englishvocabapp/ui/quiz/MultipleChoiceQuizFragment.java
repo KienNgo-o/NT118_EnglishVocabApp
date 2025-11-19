@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,32 +21,25 @@ import com.example.nt118_englishvocabapp.ui.home.HomeFragment;
 import com.example.nt118_englishvocabapp.util.KeyboardUtils;
 import com.example.nt118_englishvocabapp.util.ReturnButtonHelper;
 
-/**
- * Simple multiple-choice fragment that uses the `fragment_quiz_multiplechoice.xml` layout.
- * - Header/return behavior is wired using ReturnButtonHelper (same as other fragments)
- * - Shows question index, three indicators, question text and four answer buttons
- * - Handles answer selection: highlights correct/incorrect and disables further input
- */
 public class MultipleChoiceQuizFragment extends Fragment {
 
     private View root;
     private View keyboardRootView;
     private ViewTreeObserver.OnGlobalLayoutListener keyboardListener;
 
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_quiz_multiplechoice, container, false);
 
-        // Keyboard visibility listener (same approach as existing QuizFragment)
+        // Keyboard visibility listener
         if (getActivity() != null) {
             keyboardRootView = requireActivity().findViewById(android.R.id.content);
         } else {
             keyboardRootView = root;
         }
-
         keyboardListener = new ViewTreeObserver.OnGlobalLayoutListener() {
             private boolean lastStateVisible = false;
-
             @Override
             public void onGlobalLayout() {
                 if (keyboardRootView == null || getActivity() == null) return;
@@ -54,23 +48,19 @@ public class MultipleChoiceQuizFragment extends Fragment {
                 int screenHeight = keyboardRootView.getRootView().getHeight();
                 int keypadHeight = screenHeight - r.bottom;
                 boolean isKeyboardVisible = keypadHeight > screenHeight * 0.15;
-
                 if (isKeyboardVisible == lastStateVisible) return;
                 lastStateVisible = isKeyboardVisible;
-
                 View bottomAppBar = requireActivity().findViewById(R.id.bottomAppBar);
                 View fab = requireActivity().findViewById(R.id.fab);
-
                 if (bottomAppBar != null) bottomAppBar.setVisibility(isKeyboardVisible ? View.GONE : View.VISIBLE);
                 if (fab != null) fab.setVisibility(isKeyboardVisible ? View.GONE : View.VISIBLE);
             }
         };
-
         if (keyboardRootView != null) {
             keyboardRootView.getViewTreeObserver().addOnGlobalLayoutListener(keyboardListener);
         }
 
-        // Return button binding: hide keyboard then navigate back (or home fallback)
+        // Return button binding
         View.OnClickListener preClick = v -> {
             if (!isAdded()) return;
             keyboardListener = KeyboardUtils.hideKeyboardAndRestoreUI(requireActivity(), v, keyboardRootView, keyboardListener);
@@ -87,6 +77,7 @@ public class MultipleChoiceQuizFragment extends Fragment {
         // Wire views
         TextView txtIndex = root.findViewById(R.id.txt_question_index);
         TextView txtQuestion = root.findViewById(R.id.txt_question);
+        ImageView imgQuestion = root.findViewById(R.id.img_question);
         View indicator1 = root.findViewById(R.id.indicator_1);
         View indicator2 = root.findViewById(R.id.indicator_2);
         View indicator3 = root.findViewById(R.id.indicator_3);
@@ -96,12 +87,11 @@ public class MultipleChoiceQuizFragment extends Fragment {
         Button btnC = root.findViewById(R.id.btn_answer_c);
         Button btnD = root.findViewById(R.id.btn_answer_d);
 
-        // Ensure default appearance: use the rounded white drawable and remove any theme tint that may turn buttons blue
+        // Ensure default appearance for buttons (rounded white, remove theme tint)
         btnA.setBackgroundResource(R.drawable.rounded_white);
         btnB.setBackgroundResource(R.drawable.rounded_white);
         btnC.setBackgroundResource(R.drawable.rounded_white);
         btnD.setBackgroundResource(R.drawable.rounded_white);
-        // Clear any background tint set by theme/styles (use ViewCompat to ensure AppCompat/Material tints are cleared)
         btnA.setBackgroundTintList(null);
         btnB.setBackgroundTintList(null);
         btnC.setBackgroundTintList(null);
@@ -111,29 +101,48 @@ public class MultipleChoiceQuizFragment extends Fragment {
         ViewCompat.setBackgroundTintList(btnC, null);
         ViewCompat.setBackgroundTintList(btnD, null);
 
-        // Example: set question/index from resources (could be replaced by ViewModel/data later)
+        // Sample/default data (can be replaced by arguments or ViewModel)
         txtIndex.setText(R.string.question_1_of_3);
-        txtQuestion.setText(R.string.question_example);
 
-        // Example: mark first indicator active (tint via background selector is used by drawable)
+        // Load image from arguments or fallback drawable
+        int imageRes = R.drawable.apple; // replace with your drawable
+        if (getArguments() != null && getArguments().containsKey("image_res")) {
+            imageRes = getArguments().getInt("image_res", imageRes);
+        }
+        // Enforce modest size and scaling
+        imgQuestion.setAdjustViewBounds(true);
+        imgQuestion.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        int padDp = 8;
+        int padPx = (int) (padDp * getResources().getDisplayMetrics().density + 0.5f);
+        imgQuestion.setPadding(padPx, padPx, padPx, padPx);
+        imgQuestion.setImageResource(imageRes);
+
+        // Question related to image
+        txtQuestion.setText("What color is this fruit?"); // replace with dynamic text if needed
+
+        // Set choices appropriate to the question
+        btnA.setText("Red");
+        btnB.setText("Blue");
+        btnC.setText("Green");
+        btnD.setText("Yellow");
+
         indicator1.setSelected(true);
         indicator2.setSelected(false);
         indicator3.setSelected(false);
 
-        // Answer handling: assume answer A is correct for this example
+        // Answer handling: assume btnA ("Red") is correct
         View.OnClickListener answerClick = v -> {
-            // Make buttons non-clickable to prevent further clicks (avoid changing enabled state which may trigger theme tint)
+            // prevent further clicks
             btnA.setClickable(false);
             btnB.setClickable(false);
             btnC.setClickable(false);
             btnD.setClickable(false);
 
             Button selected = (Button) v;
-            // Simple correctness check: btnA is correct
             int correctId = R.id.btn_answer_a;
             boolean isCorrect = selected.getId() == correctId;
 
-            // Reset all buttons to default white so we have deterministic visuals
+            // reset visuals to deterministic base
             btnA.setBackgroundResource(R.drawable.rounded_white);
             btnB.setBackgroundResource(R.drawable.rounded_white);
             btnC.setBackgroundResource(R.drawable.rounded_white);
@@ -144,11 +153,9 @@ public class MultipleChoiceQuizFragment extends Fragment {
             btnD.setTextColor(ContextCompat.getColor(requireContext(), R.color.dark_purple));
 
             if (isCorrect) {
-                // mark selected correct
                 selected.setBackgroundResource(R.drawable.answer_button_bg_correct);
                 selected.setTextColor(Color.WHITE);
             } else {
-                // mark selected wrong and highlight correct one
                 selected.setBackgroundResource(R.drawable.answer_button_bg_incorrect);
                 selected.setTextColor(Color.WHITE);
 

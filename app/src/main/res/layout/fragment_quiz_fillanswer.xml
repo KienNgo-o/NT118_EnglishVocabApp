@@ -9,16 +9,17 @@
     android:weightSum="10"
     tools:context=".ui.quiz.FillAnswerQuizFragment">
 
-    <!-- Header (same style as other fragments) -->
+    <!-- Header moved down for alignment with other fragments -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingTop="8dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="64dp"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
 
@@ -38,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="@string/title_fill_in_blank"
+                android:text="@string/title_quiz_fillanswer"
                 android:textColor="@color/dark_purple"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -60,9 +61,10 @@
         android:layout_height="0dp"
         android:layout_weight="9"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:paddingBottom="96dp">  <!-- keep space above bottom nav -->
 
-        <!-- 1) Question indicators ("Question 1 of 3" + 3 dots) -->
+        <!-- Question index -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -109,33 +111,45 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- 2) Question content -->
+        <!-- Question card: now shows label + partial word (e.g. `y_ellow`) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
-            android:padding="50dp"
+            android:padding="20dp"
             android:background="@drawable/rounded_white">
 
             <TextView
                 android:id="@+id/txt_question"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/question_example"
+                android:text="Fill in the blank:"
                 android:textColor="@color/dark_purple"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/txt_partial_word"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="y_ellow"
+                android:textColor="@color/orange"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:gravity="center" />
         </LinearLayout>
 
-        <!-- 3) Edit textbox + confirm button -->
+        <!-- Input + confirm -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_marginTop="200dp">
+            android:layout_marginTop="40dp">
 
             <EditText
                 android:id="@+id/edt_answer"
@@ -157,10 +171,9 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/confirm"
                 android:background="@drawable/rounded_orange"
-                android:backgroundTint="@null"
-                app:backgroundTint="@null"
                 android:textAllCaps="false"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:textSize="20dp"/>
 
         </LinearLayout>
 

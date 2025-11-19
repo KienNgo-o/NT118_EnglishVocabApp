@@ -1,0 +1,60 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="32dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp">
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:gravity="center_horizontal">
+
+            <ImageView
+                android:id="@+id/iv_quiz_passed"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:src="@drawable/emoji_quizfinish"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:id="@+id/tv_score_passed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Your score: 0/0"
+                android:textSize="16sp"
+                android:textColor="@color/green_700"
+                android:gravity="center"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tv_message_passed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="You're passed!"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/green_700"
+                android:gravity="center"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/btn_confirm_passed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Confirm"
+                android:backgroundTint="@color/purple_700"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</FrameLayout>
