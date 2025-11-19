@@ -120,26 +120,81 @@ public class FlashcardFragment2 extends Fragment {
         binding.btnNext.setOnClickListener(v -> {
             if (!isOnCongrats()) {
                 currentIndex++;
-                // Mark today's active when user moves to next card (counts as completion of current)
-                try {
-                    streakManager.markTodayActive();
-                } catch (Exception ignored) {}
                 showingFront = true;
+                // Save progress: studied = number of items completed so far (currentIndex)
+                try {
+                    int total = learnableItems == null ? 0 : learnableItems.size();
+                    int studied = Math.max(0, Math.min(total, currentIndex));
+                    String topicName = binding.txtTopicTitle.getText() == null ? "" : binding.txtTopicTitle.getText().toString();
+                    if (viewModel != null) {
+                        Log.d(TAG, "Saving progress on Next: topicId=" + topicId + " topicName=" + topicName + " studied=" + studied + " total=" + total);
+                        viewModel.saveProgress(topicId, topicName, studied, total);
+                    }
+                } catch (Exception e) {
+                    Log.w(TAG, "Failed to save progress on next", e);
+                }
+
                 updateUI();
             } else {
-                // when user finishes all cards, also mark today active
+                // khi user hoàn tất tất cả thẻ, đánh dấu hôm nay active (complete topic)
                 try {
                     streakManager.markTodayActive();
                 } catch (Exception ignored) {}
+
+                // Save final progress as completed
+                try {
+                    int total = learnableItems == null ? 0 : learnableItems.size();
+                    int studied = total;
+                    String topicName = binding.txtTopicTitle.getText() == null ? "" : binding.txtTopicTitle.getText().toString();
+                    if (viewModel != null) {
+                        Log.d(TAG, "Saving final progress on Finish: topicId=" + topicId + " topicName=" + topicName + " studied=" + studied + " total=" + total);
+                        viewModel.saveProgress(topicId, topicName, studied, total);
+                    }
+                } catch (Exception e) {
+                    Log.w(TAG, "Failed to save progress on finish", e);
+                }
+
                 restoreNavigationBar();
                 getParentFragmentManager().popBackStack();
             }
         });
         binding.btnReturnAfterCongrats.setOnClickListener(v -> {
+            // Nếu đang ở màn hình congrats thì đây là hoàn tất chủ đề -> đánh dấu streak
+            try {
+                if (isOnCongrats()) {
+                    try { streakManager.markTodayActive(); } catch (Exception ignored) {}
+                }
+
+                int total = learnableItems == null ? 0 : learnableItems.size();
+                int studied = isOnCongrats() ? total : Math.max(0, Math.min(total, currentIndex));
+                String topicName = binding.txtTopicTitle.getText() == null ? "" : binding.txtTopicTitle.getText().toString();
+                if (viewModel != null) {
+                    Log.d(TAG, "Saving progress on ReturnAfterCongrats: topicId=" + topicId + " topicName=" + topicName + " studied=" + studied + " total=" + total);
+                    viewModel.saveProgress(topicId, topicName, studied, total);
+                }
+            } catch (Exception e) {
+                Log.w(TAG, "Failed to save progress on returnAfterCongrats", e);
+            }
             restoreNavigationBar();
             getParentFragmentManager().popBackStack();
         });
         binding.btnBackTopic.setOnClickListener(v -> {
+            // Nếu đang ở màn hình congrats, đảm bảo markTodayActive trước khi rời
+            try {
+                if (isOnCongrats()) {
+                    try { streakManager.markTodayActive(); } catch (Exception ignored) {}
+                }
+
+                int total = learnableItems == null ? 0 : learnableItems.size();
+                int studied = isOnCongrats() ? total : Math.max(0, Math.min(total, currentIndex));
+                String topicName = binding.txtTopicTitle.getText() == null ? "" : binding.txtTopicTitle.getText().toString();
+                if (viewModel != null) {
+                    Log.d(TAG, "Saving progress on BackTopic: topicId=" + topicId + " topicName=" + topicName + " studied=" + studied + " total=" + total);
+                    viewModel.saveProgress(topicId, topicName, studied, total);
+                }
+            } catch (Exception e) {
+                Log.w(TAG, "Failed to save progress on backTopic", e);
+            }
             restoreNavigationBar();
             getParentFragmentManager().popBackStack();
         });
@@ -337,6 +392,19 @@ public class FlashcardFragment2 extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        // Save progress as a safety net if user leaves the fragment unexpectedly
+        try {
+            int total = learnableItems == null ? 0 : learnableItems.size();
+            int studied = isOnCongrats() ? total : Math.max(0, Math.min(total, currentIndex));
+            String topicName = (binding != null && binding.txtTopicTitle.getText() != null) ? binding.txtTopicTitle.getText().toString() : "";
+            if (viewModel != null) {
+                Log.d(TAG, "Saving progress on Destroy: topicId=" + topicId + " topicName=" + topicName + " studied=" + studied + " total=" + total);
+                viewModel.saveProgress(topicId, topicName, studied, total);
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Failed to save progress on destroy", e);
+        }
+
         restoreNavigationBar();
         if (mediaPlayer != null) {
             mediaPlayer.release();

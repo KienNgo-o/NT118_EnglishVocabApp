@@ -1,3 +1,4 @@
+// Thay đổi: tất cả comment tiếng Anh đã được chuyển sang tiếng Việt
 package com.example.nt118_englishvocabapp.ui.home;
 
 import android.os.Bundle;
@@ -15,6 +16,11 @@ import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.view.animation.OvershootInterpolator;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Base64;
+import java.nio.charset.StandardCharsets;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -25,6 +31,7 @@ import com.example.nt118_englishvocabapp.databinding.FragmentHomeBinding;
 import com.example.nt118_englishvocabapp.ui.account.AccountFragment;
 import com.example.nt118_englishvocabapp.util.StreakManager;
 import com.example.nt118_englishvocabapp.network.SessionManager;
+import com.example.nt118_englishvocabapp.ui.flashcard.FlashcardViewModel;
 
 import java.util.Calendar;
 import java.util.HashSet;
@@ -37,11 +44,10 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private StreakManager streakManager;
     private int displayYear;
-    private int displayMonth; // zero-based
+    private int displayMonth;
 
     private enum DayState { ACTIVE, FREEZE, INACTIVE }
 
-    // no manual content-centering: ConstraintLayout positions the icon between date bottom and pill bottom
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
@@ -53,12 +59,12 @@ public class HomeFragment extends Fragment {
 
             streakManager = new StreakManager(requireContext());
 
-            // Find views
+            // Tìm các view
             TextView quoteText = root.findViewById(R.id.textDialog);
             TextView activeDays = root.findViewById(R.id.text_active_days);
             TextView quizProgress1 = root.findViewById(R.id.text_quiz_progress);
             TextView quizProgress2 = root.findViewById(R.id.text_quiz_progress2);
-            TextView flashProgress = root.findViewById(R.id.text_flash_progress);
+            // flash progress view sẽ được truy xuất khi cần
             ImageView avatar = root.findViewById(R.id.image_avatar);
             TextView greetingBig = root.findViewById(R.id.text_greeting_big);
 
@@ -67,15 +73,15 @@ public class HomeFragment extends Fragment {
             TextView monthLabel = root.findViewById(R.id.text_month_label);
             GridLayout calendarGrid = root.findViewById(R.id.calendar_grid);
 
-            // init display month to current
+            // khởi tạo tháng hiển thị thành tháng hiện tại
             Calendar c = Calendar.getInstance();
             displayYear = c.get(Calendar.YEAR);
             displayMonth = c.get(Calendar.MONTH);
 
-            // Populate greeting: use account name from resources as fallback
+            // Điền lời chào: dùng tên tài khoản từ resources nếu không có
             try {
                 String accountName = getString(R.string.account_name);
-                // Gọi username
+                // Gọi username (lấy username)
                 try {
                     SessionManager sm = SessionManager.getInstance(requireContext());
                     String stored = sm.getUsername();
@@ -87,10 +93,60 @@ public class HomeFragment extends Fragment {
             } catch (Exception ignored) {
             }
 
-            // Observe and populate
+            // Quan sát dữ liệu và cập nhật UI
             homeViewModel.getTodayQuote().observe(getViewLifecycleOwner(), s -> {
                 if (quoteText != null) quoteText.setText(s);
             });
+            // Quan sát tiến độ flashcard từ shared FlashcardViewModel (if present)
+            try {
+                FlashcardViewModel flashVm = new ViewModelProvider(requireActivity()).get(FlashcardViewModel.class);
+                flashVm.getProgressList().observe(getViewLifecycleOwner(), list -> {
+                    TextView flashTopicView = root.findViewById(R.id.text_flash_topic);
+                    TextView flashProgressView = root.findViewById(R.id.text_flash_progress);
+                    TextView flashTopicView2 = root.findViewById(R.id.text_flash_topic2);
+                    TextView flashProgressView2 = root.findViewById(R.id.text_flash_progress2);
+
+                    if (list == null || list.isEmpty()) {
+                        if (flashTopicView != null) flashTopicView.setText(getString(R.string.placeholder_topic_title));
+                        if (flashProgressView != null) flashProgressView.setText(getString(R.string.progress_0_0));
+                        if (flashTopicView2 != null) flashTopicView2.setText(getString(R.string.placeholder_topic_title));
+                        if (flashProgressView2 != null) flashProgressView2.setText(getString(R.string.progress_0_0));
+                        Log.d("HomeFragment", "progressList empty - set defaults for both rows");
+                        return;
+                    }
+
+                    // tìm hai mục gần nhất theo timestamp
+                    FlashcardViewModel.ProgressItem first = null;
+                    FlashcardViewModel.ProgressItem second = null;
+                    for (FlashcardViewModel.ProgressItem p : list) {
+                        if (p == null) continue;
+                        if (first == null || p.timestamp > first.timestamp) {
+                            second = first;
+                            first = p;
+                        } else if (second == null || p.timestamp > second.timestamp) {
+                            second = p;
+                        }
+                    }
+
+                    if (first != null) {
+                        Log.d("HomeFragment", "progressList observer - first topicId=" + first.topicId + " name=" + first.topicName + " studied=" + first.studied + " total=" + first.total + " ts=" + first.timestamp);
+                        String name = (first.topicName == null || first.topicName.isEmpty()) ? getString(R.string.placeholder_topic_title) : first.topicName;
+                        if (flashTopicView != null) flashTopicView.setText(name);
+                        if (flashProgressView != null) flashProgressView.setText(first.studied + "/" + first.total + " (" + first.getProgressPercent() + "%)");
+                    }
+                    if (second != null) {
+                        Log.d("HomeFragment", "progressList observer - second topicId=" + second.topicId + " name=" + second.topicName + " studied=" + second.studied + " total=" + second.total + " ts=" + second.timestamp);
+                        String name2 = (second.topicName == null || second.topicName.isEmpty()) ? getString(R.string.placeholder_topic_title) : second.topicName;
+                        if (flashTopicView2 != null) flashTopicView2.setText(name2);
+                        if (flashProgressView2 != null) flashProgressView2.setText(second.studied + "/" + second.total + " (" + second.getProgressPercent() + "%)");
+                    } else {
+                        // nếu không có mục thứ hai, đặt mặc định
+                        if (flashTopicView2 != null) flashTopicView2.setText(getString(R.string.placeholder_topic_title));
+                        if (flashProgressView2 != null) flashProgressView2.setText(getString(R.string.progress_0_0));
+                    }
+                });
+            } catch (Exception ignored) {}
+
             homeViewModel.getActiveDaysText().observe(getViewLifecycleOwner(), s -> {
                 if (activeDays != null) activeDays.setText(s);
             });
@@ -100,11 +156,13 @@ public class HomeFragment extends Fragment {
             homeViewModel.getQuizProgress2().observe(getViewLifecycleOwner(), s -> {
                 if (quizProgress2 != null) quizProgress2.setText(s);
             });
-            homeViewModel.getFlashProgress().observe(getViewLifecycleOwner(), s -> {
-                if (flashProgress != null) flashProgress.setText(s);
-            });
+            // Lưu ý: tiến độ flash được điều khiển bởi FlashcardViewModel (local).
+            // Tránh ghi đè nó bằng giá trị tĩnh từ HomeViewModel.
+            // homeViewModel.getFlashProgress().observe(getViewLifecycleOwner(), s -> {
+            //     if (flashProgress != null) flashProgress.setText(s);
+            // });
 
-            // month navigation
+            // điều hướng tháng
             prevMonth.setOnClickListener(v -> {
                 displayMonth--;
                 if (displayMonth < 0) {
@@ -122,10 +180,10 @@ public class HomeFragment extends Fragment {
                 populateCalendar(calendarGrid, monthLabel, activeDays);
             });
 
-            // initial population
+            // khởi tạo lịch lần đầu
             populateCalendar(calendarGrid, monthLabel, activeDays);
 
-            // Avatar click -> open AccountFragment
+            // Nhấn avatar -> mở AccountFragment
             avatar.setOnClickListener(v -> {
                 try {
                     if (getActivity() != null) {
@@ -147,7 +205,7 @@ public class HomeFragment extends Fragment {
                     Toast.makeText(getContext(), "Home UI error: " + ex.getMessage(), Toast.LENGTH_LONG).show();
                 }
             } catch (Exception ignored) {}
-            // return a simple empty view to avoid crashing
+            // trả về một View rỗng để tránh gây lỗi
             return new View(requireContext());
         }
     }
@@ -171,22 +229,22 @@ public class HomeFragment extends Fragment {
         cal.set(Calendar.MONTH, displayMonth);
         cal.set(Calendar.DAY_OF_MONTH, 1);
 
-        int firstWeekday = cal.get(Calendar.DAY_OF_WEEK); // Sunday=1 ... Saturday=7
-        // convert to Monday=0..Sunday=6 index
-        int startOffset = (firstWeekday + 5) % 7; // if Sunday(1)->6, Monday(2)->0, etc.
+        int firstWeekday = cal.get(Calendar.DAY_OF_WEEK); // Chủ nhật=1 ... Thứ bảy=7
+        // chuyển sang chỉ số Thứ hai=0 .. Chủ nhật=6
+        int startOffset = (firstWeekday + 5) % 7; // nếu Chủ nhật(1)->6, Thứ hai(2)->0, v.v.
 
         int daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
 
-        // show month label
+        // hiển thị tên tháng
         String monthName = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
         monthLabel.setText(monthName);
 
-        // build a set of active days
+        // xây tập các ngày active
         List<Integer> active = streakManager.getActiveDaysForMonth(displayYear, displayMonth);
         Set<Integer> activeSet = new HashSet<>();
         if (active != null && !active.isEmpty()) activeSet.addAll(active);
 
-        // grid columns = 7. We'll create 6*7 cells (some empty)
+        // lưới có 7 cột. Tạo 6*7 ô (một số rỗng)
         int totalCells = 6 * 7;
         for (int i = 0; i < totalCells; i++) {
             View cell = getLayoutInflater().inflate(R.layout.item_calendar_day, grid, false);
@@ -194,7 +252,7 @@ public class HomeFragment extends Fragment {
             ImageView flame = cell.findViewById(R.id.bg_flame);
             View cellRoot = cell.findViewById(R.id.day_cell_root);
 
-            // Defensive: if the layout doesn't contain expected views, skip this cell
+            // Nếu layout thiếu view mong đợi, bỏ qua cell này
             if (tv == null || flame == null) {
                 continue;
             }
@@ -202,7 +260,7 @@ public class HomeFragment extends Fragment {
             int dayNumber = i - startOffset + 1;
             if (dayNumber >= 1 && dayNumber <= daysInMonth) {
                 tv.setText(String.valueOf(dayNumber));
-                // Determine day state
+                // Xác định trạng thái ngày
                 boolean isActive = activeSet.contains(dayNumber);
                 Calendar today = Calendar.getInstance();
                 int tYear = today.get(Calendar.YEAR);
@@ -212,13 +270,13 @@ public class HomeFragment extends Fragment {
 
                 DayState state;
                 if (isToday) {
-                    // today can be ACTIVE (if marked) or FREEZE (if not marked)
+                    // hôm nay có thể là ACTIVE (nếu được đánh dấu) hoặc FREEZE (nếu không được đánh dấu)
                     state = isActive ? DayState.ACTIVE : DayState.FREEZE;
                 } else {
                     state = isActive ? DayState.ACTIVE : DayState.INACTIVE;
                 }
 
-                // Apply background and text color based on state
+                // Áp dụng nền và màu chữ theo trạng thái
                 if (cellRoot != null) {
                     switch (state) {
                         case ACTIVE:
@@ -239,12 +297,34 @@ public class HomeFragment extends Fragment {
                 final int resId = (state == DayState.ACTIVE) ? R.drawable.streak : (state == DayState.FREEZE ? R.drawable.streak_freeze : R.drawable.streak_no);
                 flame.setVisibility(View.VISIBLE);
                 flame.setImageResource(resId);
-                // Let layout handle vertical centering between date and pill bottom
+
+                // Dịch chuyển hình `streak_no`sang phải 1 xíu để căn nhìn cho thẳng
+                // Chuyển 3dp sang pixel để nhất quán trên các mật độ màn hình
+                try {
+                    float offsetDp = 3f;
+                    float offsetPx = getResources().getDisplayMetrics().density * offsetDp;
+                    if (resId == R.drawable.streak_no) {
+                        flame.setTranslationX(offsetPx);
+                    } else {
+                        flame.setTranslationX(0f);
+                    }
+                } catch (Exception ignored) {}
+
+                // Giảm opacity cho icon streak_no (inactive)
+                try {
+                    if (resId == R.drawable.streak_no) {
+                        flame.setAlpha(0.5f); // 50% opacity cho icon inactive
+                    } else {
+                        flame.setAlpha(1f);
+                    }
+                } catch (Exception ignored) {}
+
+                // Để layout xử lý căn dọc giữa đáy ngày và đáy pill
                 if (isActive && isToday) {
                     flame.post(() -> { try { animateToday(flame, cellRoot); } catch (Exception ignored){} });
                 }
              } else {
-                 // empty cell
+                 // ô trống
                  tv.setText("");
                  flame.setVisibility(View.GONE);
                  if (cellRoot != null) cellRoot.setBackground(null);
@@ -258,15 +338,14 @@ public class HomeFragment extends Fragment {
             grid.addView(cell);
         }
 
-        // update active days label
+        // cập nhật nhãn số ngày hoạt động
         int totalActive = streakManager.getTotalActiveDays();
         if (activeDaysText != null) {
             activeDaysText.setText(getResources().getQuantityString(R.plurals.active_days_count, totalActive, totalActive));
         }
 
-        // update streak number on header
+        // cập nhật số streak trên header
         try {
-            // update streak number on header
             TextView headerStreak = null;
             View root = grid.getRootView();
             if (root != null) headerStreak = root.findViewById(R.id.text_streak_number);
@@ -287,40 +366,40 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    // flashy animation for today's active day: pop + pulse + slight container bounce
+    // animation nổi bật cho hôm nay khi active: phồng + nhịp + bounce nhẹ cho container
     private void animateToday(View icon, View container) {
-        // Animate the icon from the center of the screen (oversized) back to its cell position.
+        // Hiệu ứng: icon bắt đầu ở giữa màn hình (kích thước lớn) rồi về vị trí trong ô lịch
         try {
-            // Ensure measurements are available
+            // Đảm bảo có số đo
             icon.post(() -> {
                 try {
-                    // current translation target (the icon may already have some translation due to layout)
+                    // giá trị dịch chuyển hiện tại (icon có thể đã có dịch chuyển do layout)
                     float targetTX = icon.getTranslationX();
                     float targetTY = icon.getTranslationY();
 
-                    // compute icon center on screen
+                    // tính tâm icon trên màn hình
                     int[] loc = new int[2];
                     icon.getLocationOnScreen(loc);
                     float iconCenterX = loc[0] + icon.getWidth() / 2f;
                     float iconCenterY = loc[1] + icon.getHeight() / 2f;
 
-                    // screen center
+                    // tâm màn hình
                     final android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
                     float screenCenterX = dm.widthPixels / 2f;
                     float screenCenterY = dm.heightPixels / 2f;
 
-                    // compute starting translation so the icon appears at screen center
+                    // tính translation bắt đầu để icon xuất hiện ở tâm màn hình
                     float startTX = screenCenterX - iconCenterX + targetTX;
                     float startTY = screenCenterY - iconCenterY + targetTY;
 
-                    // set initial (start) state: positioned at center, large and invisible
+                    // đặt trạng thái ban đầu: ở giữa màn hình, to và vô hình
                     icon.setTranslationX(startTX);
                     icon.setTranslationY(startTY);
                     icon.setScaleX(3.0f);
                     icon.setScaleY(3.0f);
                     icon.setAlpha(0f);
 
-                    // animate translationX/Y, scale, and alpha to their target values
+                    // animate translationX/Y, scale và alpha về giá trị đích
                     ObjectAnimator aTX = ObjectAnimator.ofFloat(icon, "translationX", startTX, targetTX);
                     ObjectAnimator aTY = ObjectAnimator.ofFloat(icon, "translationY", startTY, targetTY);
                     ObjectAnimator sX = ObjectAnimator.ofFloat(icon, "scaleX", 3.0f, 1.0f);
@@ -332,7 +411,7 @@ public class HomeFragment extends Fragment {
                     arrive.setInterpolator(new OvershootInterpolator(1.6f));
                     arrive.setDuration(700);
 
-                    // small pulse on the icon after arrival
+                    // nhịp nhỏ trên icon sau khi đến
                     ObjectAnimator pulseX = ObjectAnimator.ofFloat(icon, "scaleX", 1f, 1.08f);
                     ObjectAnimator pulseY = ObjectAnimator.ofFloat(icon, "scaleY", 1f, 1.08f);
                     pulseX.setRepeatMode(ValueAnimator.REVERSE);
@@ -344,7 +423,7 @@ public class HomeFragment extends Fragment {
                     AnimatorSet pulse = new AnimatorSet();
                     pulse.playTogether(pulseX, pulseY);
 
-                    // slight container bounce for the pill
+                    // bounce nhẹ cho pill
                     ObjectAnimator cScaleX = ObjectAnimator.ofFloat(container, "scaleX", 1f, 1.03f);
                     ObjectAnimator cScaleY = ObjectAnimator.ofFloat(container, "scaleY", 1f, 1.03f);
                     cScaleX.setRepeatMode(ValueAnimator.REVERSE);
@@ -368,5 +447,72 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Áp dụng tiến trình flashcard đã lưu làm phương án dự phòng nếu LiveData chưa cập nhật
+        try {
+            applyLatestProgressFromPrefs(binding != null ? binding.getRoot() : null);
+        } catch (Exception ignored) {}
+    }
+
+    // Trợ giúp: đọc prefs chia sẻ "flashcard_progress" và chọn tiến trình chủ đề được lưu gần đây nhất
+    private void applyLatestProgressFromPrefs(View root) {
+        if (getContext() == null || root == null) return;
+        SharedPreferences prefs = getContext().getSharedPreferences("flashcard_progress", Context.MODE_PRIVATE);
+        if (prefs == null) return;
+        long firstTs = -1L, secondTs = -1L;
+        String firstName = null, secondName = null;
+        int firstStudied = 0, firstTotal = 0;
+        int secondStudied = 0, secondTotal = 0;
+
+        for (String key : prefs.getAll().keySet()) {
+            if (!key.startsWith("progress_topic_")) continue;
+            Object obj = prefs.getAll().get(key);
+            if (!(obj instanceof String)) continue;
+            String s = (String) obj;
+            String[] parts = s.split("\\|", -1);
+            if (parts.length < 4) continue;
+            String encodedName = parts[0];
+            int studied = 0;
+            int total = 0;
+            long ts = 0L;
+            try { studied = Integer.parseInt(parts[1]); } catch (NumberFormatException ignored) {}
+            try { total = Integer.parseInt(parts[2]); } catch (NumberFormatException ignored) {}
+            try { ts = Long.parseLong(parts[3]); } catch (NumberFormatException ignored) {}
+            String name = "";
+            try { name = new String(Base64.decode(encodedName, Base64.NO_WRAP), StandardCharsets.UTF_8); } catch (Exception ignored) {}
+
+            if (ts > firstTs) {
+                // shift down
+                secondTs = firstTs; secondName = firstName; secondStudied = firstStudied; secondTotal = firstTotal;
+                firstTs = ts; firstName = name; firstStudied = studied; firstTotal = total;
+            } else if (ts > secondTs) {
+                secondTs = ts; secondName = name; secondStudied = studied; secondTotal = total;
+            }
+        }
+
+        TextView flashTopicView = root.findViewById(R.id.text_flash_topic);
+        TextView flashProgressView = root.findViewById(R.id.text_flash_progress);
+        TextView flashTopicView2 = root.findViewById(R.id.text_flash_topic2);
+        TextView flashProgressView2 = root.findViewById(R.id.text_flash_progress2);
+
+        if (firstTs < 0) {
+            if (flashTopicView != null) flashTopicView.setText(getString(R.string.placeholder_topic_title));
+            if (flashProgressView != null) flashProgressView.setText(getString(R.string.progress_0_0));
+        } else {
+            if (flashTopicView != null) flashTopicView.setText(firstName == null || firstName.isEmpty() ? getString(R.string.placeholder_topic_title) : firstName);
+            if (flashProgressView != null) flashProgressView.setText(firstStudied + "/" + firstTotal + " (" + (firstTotal<=0?0:Math.round((firstStudied*100f)/firstTotal)) + "%)");
+        }
+
+        if (secondTs < 0) {
+            if (flashTopicView2 != null) flashTopicView2.setText(getString(R.string.placeholder_topic_title));
+            if (flashProgressView2 != null) flashProgressView2.setText(getString(R.string.progress_0_0));
+        } else {
+            if (flashTopicView2 != null) flashTopicView2.setText(secondName == null || secondName.isEmpty() ? getString(R.string.placeholder_topic_title) : secondName);
+            if (flashProgressView2 != null) flashProgressView2.setText(secondStudied + "/" + secondTotal + " (" + (secondTotal<=0?0:Math.round((secondStudied*100f)/secondTotal)) + "%)");
+        }
     }
 }

@@ -479,6 +479,7 @@
                                 android:src="@drawable/flashcard_color" />
 
                             <TextView
+                                android:id="@+id/text_flash_topic"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
@@ -511,6 +512,7 @@
                                 android:src="@drawable/flashcard_color" />
 
                             <TextView
+                                android:id="@+id/text_flash_topic2"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"

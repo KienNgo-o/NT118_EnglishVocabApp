@@ -151,6 +151,7 @@
     <string name="label_easy">Easy</string>
     <string name="label_medium">Medium</string>
     <string name="label_hard">Hard</string>
+    <string name="placeholder_flash_progress">No progress yet</string>
 
     <!-- Hints used in Account edit fields -->
     <string name="hint_enter_name">Enter your name</string>
