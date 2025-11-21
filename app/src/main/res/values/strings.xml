@@ -182,6 +182,8 @@
     <!-- Streak -->
     <string name="cd_streak_icon">Streak icon</string>
     <string name="streak_number">3</string>
+    <string name="streak_icon_desc">Streak icon</string>
+    <string name="streak_dialog_message">Chúc mừng bạn đã có chuỗi %1$d ngày</string>
 
 
     <!-- Study days -->

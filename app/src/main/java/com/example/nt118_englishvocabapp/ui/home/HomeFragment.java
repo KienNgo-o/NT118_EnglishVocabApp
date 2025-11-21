@@ -15,6 +15,7 @@ import android.animation.ObjectAnimator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.view.animation.OvershootInterpolator;
+import android.view.ViewParent;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -45,6 +46,13 @@ public class HomeFragment extends Fragment {
     private StreakManager streakManager;
     private int displayYear;
     private int displayMonth;
+    // SharedPreferences để lắng nghe thay đổi streak (cập nhật header ngay lập tức)
+    private android.content.SharedPreferences streakPrefs;
+    private android.content.SharedPreferences.OnSharedPreferenceChangeListener streakPrefListener;
+    // ref to overlay added to decor view so we can remove it early if needed
+    private ImageView activeOverlayIv = null;
+    // refs to pending animator sets so we can cancel them in cleanup
+    private AnimatorSet pendingPostArriveAnim = null;
 
     private enum DayState { ACTIVE, FREEZE, INACTIVE }
 
@@ -58,10 +66,22 @@ public class HomeFragment extends Fragment {
             View root = binding.getRoot();
 
             streakManager = new StreakManager(requireContext());
+            // đăng ký prefs listener để cập nhật header khi streak thay đổi
+            try {
+                streakPrefs = requireContext().getSharedPreferences("streak_prefs", Context.MODE_PRIVATE);
+                streakPrefListener = (sharedPreferences, key) -> {
+                    if ("streak_dates".equals(key) || "streak_pending_announce".equals(key)) {
+                        updateHeaderStreak();
+                    }
+                };
+                streakPrefs.registerOnSharedPreferenceChangeListener(streakPrefListener);
+            } catch (Exception ignored) {}
+
+            // cập nhật lần đầu cho header
+            try { updateHeaderStreak(); } catch (Exception ignored) {}
 
             // Tìm các view
             TextView quoteText = root.findViewById(R.id.textDialog);
-            TextView activeDays = root.findViewById(R.id.text_active_days);
             TextView quizProgress1 = root.findViewById(R.id.text_quiz_progress);
             TextView quizProgress2 = root.findViewById(R.id.text_quiz_progress2);
             // flash progress view sẽ được truy xuất khi cần
@@ -146,10 +166,7 @@ public class HomeFragment extends Fragment {
                     }
                 });
             } catch (Exception ignored) {}
-
-            homeViewModel.getActiveDaysText().observe(getViewLifecycleOwner(), s -> {
-                if (activeDays != null) activeDays.setText(s);
-            });
+            
             homeViewModel.getQuizProgress1().observe(getViewLifecycleOwner(), s -> {
                 if (quizProgress1 != null) quizProgress1.setText(s);
             });
@@ -169,7 +186,7 @@ public class HomeFragment extends Fragment {
                     displayMonth = 11;
                     displayYear--;
                 }
-                populateCalendar(calendarGrid, monthLabel, activeDays);
+                populateCalendar(calendarGrid, monthLabel);
             });
             nextMonth.setOnClickListener(v -> {
                 displayMonth++;
@@ -177,11 +194,11 @@ public class HomeFragment extends Fragment {
                     displayMonth = 0;
                     displayYear++;
                 }
-                populateCalendar(calendarGrid, monthLabel, activeDays);
+                populateCalendar(calendarGrid, monthLabel);
             });
 
             // khởi tạo lịch lần đầu
-            populateCalendar(calendarGrid, monthLabel, activeDays);
+            populateCalendar(calendarGrid, monthLabel);
 
             // Nhấn avatar -> mở AccountFragment
             avatar.setOnClickListener(v -> {
@@ -210,7 +227,106 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private void populateCalendar(GridLayout grid, TextView monthLabel, TextView activeDaysText) {
+    // Cập nhật text_streak_number ở header theo giá trị hiện tại trong StreakManager
+    private void updateHeaderStreak() {
+        try {
+            if (getActivity() == null) return;
+            int totalActive = (streakManager != null) ? streakManager.getTotalActiveDays() : 0;
+            // dùng binding nếu có
+            if (binding != null && binding.textStreakNumber != null) {
+                binding.textStreakNumber.setText(String.valueOf(totalActive));
+                return;
+            }
+            // fallback: tìm view trong fragment root
+            View root = getView();
+            if (root != null) {
+                TextView headerStreak = root.findViewById(R.id.text_streak_number);
+                if (headerStreak != null) headerStreak.setText(String.valueOf(totalActive));
+                return;
+            }
+            // fallback 2: tìm trong activity
+            if (getActivity() != null) {
+                TextView headerStreak = getActivity().findViewById(R.id.text_streak_number);
+                if (headerStreak != null) headerStreak.setText(String.valueOf(totalActive));
+            }
+        } catch (Exception ignored) {}
+    }
+
+    // Hiển thị dialog chúc mừng streak trước khi chạy animation overlay
+    private void showStreakDialog(ImageView flameView, View cellRoot, int streakCount) {
+        if (getActivity() == null || flameView == null) return;
+        try {
+            View dlg = getLayoutInflater().inflate(R.layout.dialog_streak, null, false);
+            ImageView iv = dlg.findViewById(R.id.iv_streak_dialog);
+            TextView tv = dlg.findViewById(R.id.tv_streak_message);
+
+            // sử dụng drawable hiện tại của flameView cho dialog
+            if (flameView.getDrawable() != null) {
+                iv.setImageDrawable(flameView.getDrawable());
+            }
+
+            // set kích thước lớn như overlay khởi điểm (tương ứng)
+            int sizeDp = 160; // lớn hơn so với pill, để khớp cảm giác lớn lúc bắt đầu
+            int sizePx = (int) (sizeDp * getResources().getDisplayMetrics().density);
+            iv.getLayoutParams().width = sizePx;
+            iv.getLayoutParams().height = sizePx;
+            iv.requestLayout();
+
+            // text: format từ string resource (Chúc mừng bạn đã có chuỗi %1$d ngày)
+            try {
+                tv.setText(getString(R.string.streak_dialog_message, streakCount));
+            } catch (Exception e) {
+                // fallback nếu có vấn đề với resource
+                tv.setText("Chúc mừng bạn đã có chuỗi " + streakCount + " ngày");
+            }
+
+            final android.app.Dialog d = new android.app.Dialog(requireContext());
+            d.setContentView(dlg);
+            d.setCancelable(true);
+            d.setCanceledOnTouchOutside(true);
+            if (d.getWindow() != null) d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+            // flag để tránh gọi animation 2 lần khi user tap vào nội dung (dialog.dismiss -> onDismiss)
+            final boolean[] animationStarted = {false};
+
+            // khi tap dialog -> đóng dialog và bắt đầu animation
+            dlg.setOnClickListener(v -> {
+                try {
+                    animationStarted[0] = true;
+                    d.dismiss();
+                } catch (Exception ignored) {}
+                try {
+                    // bắt đầu animation overlay vào vị trí của flameView
+                    animateToday(flameView, cellRoot);
+                } catch (Exception ignored) {}
+            });
+
+            // nếu người dùng chạm bên ngoài hoặc dialog bị cancel thì cũng chạy animation (nếu chưa chạy)
+            d.setOnCancelListener(dialog -> {
+                try {
+                    if (!animationStarted[0]) {
+                        animationStarted[0] = true;
+                        animateToday(flameView, cellRoot);
+                    }
+                } catch (Exception ignored) {}
+            });
+
+            d.setOnDismissListener(dialog -> {
+                try {
+                    if (!animationStarted[0]) {
+                        animationStarted[0] = true;
+                        animateToday(flameView, cellRoot);
+                    }
+                } catch (Exception ignored) {}
+            });
+
+            d.show();
+        } catch (Exception ex) {
+            Log.e("HomeFragment", "showStreakDialog error", ex);
+        }
+    }
+
+    private void populateCalendar(GridLayout grid, TextView monthLabel) {
         if (grid == null || monthLabel == null) return;
         try {
             grid.removeAllViews();
@@ -321,7 +437,20 @@ public class HomeFragment extends Fragment {
 
                 // Để layout xử lý căn dọc giữa đáy ngày và đáy pill
                 if (isActive && isToday) {
-                    flame.post(() -> { try { animateToday(flame, cellRoot); } catch (Exception ignored){} });
+                    // chỉ hiển thị dialog/animation nếu StreakManager báo có pending announcement (user vừa hoàn thành topic hôm nay)
+                    try {
+                        if (streakManager.hasPendingAnnouncementForToday()) {
+                            int totalActiveNow = streakManager.getTotalActiveDays();
+                            flame.post(() -> {
+                                try {
+                                    showStreakDialog(flame, cellRoot, totalActiveNow);
+                                    // sau khi show dialog, clear pending announce để không show lại
+                                    streakManager.clearPendingAnnouncement();
+                                } catch (Exception ignored) {
+                                }
+                            });
+                        }
+                    } catch (Exception ignored) {}
                 }
              } else {
                  // ô trống
@@ -338,12 +467,6 @@ public class HomeFragment extends Fragment {
             grid.addView(cell);
         }
 
-        // cập nhật nhãn số ngày hoạt động
-        int totalActive = streakManager.getTotalActiveDays();
-        if (activeDaysText != null) {
-            activeDaysText.setText(getResources().getQuantityString(R.plurals.active_days_count, totalActive, totalActive));
-        }
-
         // cập nhật số streak trên header
         try {
             TextView headerStreak = null;
@@ -353,6 +476,8 @@ public class HomeFragment extends Fragment {
             if (headerStreak == null && getActivity() != null) {
                 headerStreak = getActivity().findViewById(R.id.text_streak_number);
             }
+            // tính lại tổng số active days từ StreakManager trước khi cập nhật header
+            int totalActive = streakManager.getTotalActiveDays();
             if (headerStreak != null) {
                 headerStreak.setText(String.valueOf(totalActive));
             }
@@ -368,84 +493,184 @@ public class HomeFragment extends Fragment {
 
     // animation nổi bật cho hôm nay khi active: phồng + nhịp + bounce nhẹ cho container
     private void animateToday(View icon, View container) {
-        // Hiệu ứng: icon bắt đầu ở giữa màn hình (kích thước lớn) rồi về vị trí trong ô lịch
-        try {
-            // Đảm bảo có số đo
-            icon.post(() -> {
-                try {
-                    // giá trị dịch chuyển hiện tại (icon có thể đã có dịch chuyển do layout)
-                    float targetTX = icon.getTranslationX();
-                    float targetTY = icon.getTranslationY();
+        // Sử dụng một overlay copy của icon để animate từ giữa màn hình vào vị trí thực tế.
+        if (getActivity() == null || icon == null) return;
+        icon.post(() -> {
+            try {
+                // lấy drawable từ icon (nếu là ImageView) hoặc background
+                android.graphics.drawable.Drawable dr = null;
+                if (icon instanceof ImageView) {
+                    dr = ((ImageView) icon).getDrawable();
+                }
+                if (dr == null) dr = icon.getBackground();
+                if (dr == null) return; // không có drawable để sao chép
 
-                    // tính tâm icon trên màn hình
-                    int[] loc = new int[2];
-                    icon.getLocationOnScreen(loc);
-                    float iconCenterX = loc[0] + icon.getWidth() / 2f;
-                    float iconCenterY = loc[1] + icon.getHeight() / 2f;
+                // overlay parent: decor view của activity (đảm bảo không bị cắt bởi các parent)
+                ViewGroup decor = (ViewGroup) getActivity().getWindow().getDecorView();
 
-                    // tâm màn hình
-                    final android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
-                    float screenCenterX = dm.widthPixels / 2f;
-                    float screenCenterY = dm.heightPixels / 2f;
+                // tạo ImageView overlay
+                ImageView overlayIv = new ImageView(requireContext());
+                overlayIv.setImageDrawable(dr);
+                overlayIv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
-                    // tính translation bắt đầu để icon xuất hiện ở tâm màn hình
-                    float startTX = screenCenterX - iconCenterX + targetTX;
-                    float startTY = screenCenterY - iconCenterY + targetTY;
+                // lưu ref để cleanup nếu fragment bị destroy sớm
+                activeOverlayIv = overlayIv;
 
-                    // đặt trạng thái ban đầu: ở giữa màn hình, to và vô hình
-                    icon.setTranslationX(startTX);
-                    icon.setTranslationY(startTY);
-                    icon.setScaleX(3.0f);
-                    icon.setScaleY(3.0f);
-                    icon.setAlpha(0f);
+                // kích thước overlay: dùng kích thước icon nếu có, nếu không thì một giá trị mặc định
+                int w = icon.getWidth() > 0 ? icon.getWidth() : (int) (48 * getResources().getDisplayMetrics().density);
+                int h = icon.getHeight() > 0 ? icon.getHeight() : (int) (48 * getResources().getDisplayMetrics().density);
+                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(w, h);
+                decor.addView(overlayIv, lp);
+                overlayIv.measure(View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY),
+                                  View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY));
 
-                    // animate translationX/Y, scale và alpha về giá trị đích
-                    ObjectAnimator aTX = ObjectAnimator.ofFloat(icon, "translationX", startTX, targetTX);
-                    ObjectAnimator aTY = ObjectAnimator.ofFloat(icon, "translationY", startTY, targetTY);
-                    ObjectAnimator sX = ObjectAnimator.ofFloat(icon, "scaleX", 3.0f, 1.0f);
-                    ObjectAnimator sY = ObjectAnimator.ofFloat(icon, "scaleY", 3.0f, 1.0f);
-                    ObjectAnimator aAlpha = ObjectAnimator.ofFloat(icon, "alpha", 0f, 1f);
+                // vị trí bắt đầu: tâm màn hình (overlay sẽ xuất hiện lớn ở giữa)
+                final android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
+                float startX = dm.widthPixels / 2f - overlayIv.getMeasuredWidth() / 2f;
+                float startY = dm.heightPixels / 2f - overlayIv.getMeasuredHeight() / 2f;
 
-                    AnimatorSet arrive = new AnimatorSet();
-                    arrive.playTogether(aTX, aTY, sX, sY, aAlpha);
-                    arrive.setInterpolator(new OvershootInterpolator(1.6f));
-                    arrive.setDuration(700);
+                // KHỞI ĐIỂM SCALE LỚN HƠN
+                final float START_SCALE = 10.0f; // <-- tăng từ 6.0f lên 10.0f để icon bắt đầu lớn hơn nhiều
 
-                    // nhịp nhỏ trên icon sau khi đến
-                    ObjectAnimator pulseX = ObjectAnimator.ofFloat(icon, "scaleX", 1f, 1.08f);
-                    ObjectAnimator pulseY = ObjectAnimator.ofFloat(icon, "scaleY", 1f, 1.08f);
-                    pulseX.setRepeatMode(ValueAnimator.REVERSE);
-                    pulseY.setRepeatMode(ValueAnimator.REVERSE);
-                    pulseX.setRepeatCount(1);
-                    pulseY.setRepeatCount(1);
-                    pulseX.setDuration(220);
-                    pulseY.setDuration(220);
-                    AnimatorSet pulse = new AnimatorSet();
-                    pulse.playTogether(pulseX, pulseY);
+                overlayIv.setX(startX);
+                overlayIv.setY(startY);
+                overlayIv.setScaleX(START_SCALE);
+                overlayIv.setScaleY(START_SCALE);
+                overlayIv.setAlpha(0f);
+                overlayIv.bringToFront();
 
-                    // bounce nhẹ cho pill
-                    ObjectAnimator cScaleX = ObjectAnimator.ofFloat(container, "scaleX", 1f, 1.03f);
-                    ObjectAnimator cScaleY = ObjectAnimator.ofFloat(container, "scaleY", 1f, 1.03f);
-                    cScaleX.setRepeatMode(ValueAnimator.REVERSE);
-                    cScaleY.setRepeatMode(ValueAnimator.REVERSE);
-                    cScaleX.setRepeatCount(1);
-                    cScaleY.setRepeatCount(1);
-                    cScaleX.setDuration(220);
-                    cScaleY.setDuration(220);
-                    AnimatorSet containerPulse = new AnimatorSet();
-                    containerPulse.playTogether(cScaleX, cScaleY);
+                // tính vị trí đích của overlay: căn về tọa độ của icon trên màn hình
+                int[] iconLoc = new int[2];
+                icon.getLocationOnScreen(iconLoc);
+                // căn chính giữa overlay với icon (overlay có thể khác kích thước so với icon)
+                float targetX = iconLoc[0] + (icon.getWidth() - overlayIv.getMeasuredWidth()) / 2f;
+                float targetY = iconLoc[1] + (icon.getHeight() - overlayIv.getMeasuredHeight()) / 2f;
 
-                    AnimatorSet seq = new AnimatorSet();
-                    seq.playSequentially(arrive, pulse, containerPulse);
-                    seq.start();
-                } catch (Exception ignored) {}
-            });
-        } catch (Exception ignored) {}
+                // ẩn icon thật trong lúc overlay chạy
+                icon.setAlpha(0f);
+
+                // tạo animator: di chuyển, scale và alpha
+                ObjectAnimator aX = ObjectAnimator.ofFloat(overlayIv, "x", startX, targetX);
+                ObjectAnimator aY = ObjectAnimator.ofFloat(overlayIv, "y", startY, targetY);
+                ObjectAnimator sX = ObjectAnimator.ofFloat(overlayIv, "scaleX", START_SCALE, 1.0f);
+                ObjectAnimator sY = ObjectAnimator.ofFloat(overlayIv, "scaleY", START_SCALE, 1.0f);
+                ObjectAnimator aAlpha = ObjectAnimator.ofFloat(overlayIv, "alpha", 0f, 1f);
+
+                AnimatorSet arrive = new AnimatorSet();
+                arrive.playTogether(aX, aY, sX, sY, aAlpha);
+                arrive.setInterpolator(new OvershootInterpolator(1.6f));
+                // tăng duration để làm hiệu ứng chậm hơn, trông uy lực hơn
+                arrive.setDuration(1200);
+
+                // nhịp nhỏ trên icon thật sau khi đến
+                ObjectAnimator pulseX = ObjectAnimator.ofFloat(icon, "scaleX", 1f, 1.08f);
+                ObjectAnimator pulseY = ObjectAnimator.ofFloat(icon, "scaleY", 1f, 1.08f);
+                pulseX.setRepeatMode(ValueAnimator.REVERSE);
+                pulseY.setRepeatMode(ValueAnimator.REVERSE);
+                pulseX.setRepeatCount(1);
+                pulseY.setRepeatCount(1);
+                // làm nhịp dài hơn một chút
+                pulseX.setDuration(400);
+                pulseY.setDuration(400);
+                AnimatorSet pulse = new AnimatorSet();
+                pulse.playTogether(pulseX, pulseY);
+
+                // bounce nhẹ cho pill container
+                ObjectAnimator cScaleX = ObjectAnimator.ofFloat(container, "scaleX", 1f, 1.03f);
+                ObjectAnimator cScaleY = ObjectAnimator.ofFloat(container, "scaleY", 1f, 1.03f);
+                cScaleX.setRepeatMode(ValueAnimator.REVERSE);
+                cScaleY.setRepeatMode(ValueAnimator.REVERSE);
+                cScaleX.setRepeatCount(1);
+                cScaleY.setRepeatCount(1);
+                // tăng duration để bounce chậm và mượt hơn
+                cScaleX.setDuration(400);
+                cScaleY.setDuration(400);
+                AnimatorSet containerPulse = new AnimatorSet();
+                containerPulse.playTogether(cScaleX, cScaleY);
+
+                // Khi arrive kết thúc: nhanh chóng xóa overlay và hiện icon thật, rồi chạy pulse+bounce trên views thật
+                arrive.addListener(new android.animation.AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(android.animation.Animator animation) {
+                        try {
+                            // hiển thị icon thật và xóa overlay NGAY LẬP TỨC sau khi arrive hoàn thành
+                            icon.setAlpha(1f);
+                            if (activeOverlayIv != null) {
+                                try {
+                                    ViewParent p = activeOverlayIv.getParent();
+                                    if (p instanceof ViewGroup) ((ViewGroup) p).removeView(activeOverlayIv);
+                                } catch (Exception ignored) {}
+                                activeOverlayIv = null;
+                            }
+
+                            // bắt đầu pulse và container bounce trên view thật
+                            pendingPostArriveAnim = new AnimatorSet();
+                            pendingPostArriveAnim.playSequentially(pulse, containerPulse);
+                            pendingPostArriveAnim.start();
+
+                            // khi sequence này kết thúc, clear ref
+                            pendingPostArriveAnim.addListener(new android.animation.AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(android.animation.Animator animation) {
+                                    pendingPostArriveAnim = null;
+                                }
+
+                                @Override
+                                public void onAnimationCancel(android.animation.Animator animation) {
+                                    pendingPostArriveAnim = null;
+                                }
+                            });
+                        } catch (Exception ignored) {}
+                    }
+
+                    @Override
+                    public void onAnimationCancel(android.animation.Animator animation) {
+                        try {
+                            // đảm bảo xóa overlay nếu arrive bị hủy
+                            icon.setAlpha(1f);
+                            if (activeOverlayIv != null) {
+                                try {
+                                    ViewParent p = activeOverlayIv.getParent();
+                                    if (p instanceof ViewGroup) ((ViewGroup) p).removeView(activeOverlayIv);
+                                } catch (Exception ignored) {}
+                                activeOverlayIv = null;
+                            }
+                        } catch (Exception ignored) {}
+                    }
+                });
+
+                // khởi động arrive
+                arrive.start();
+            } catch (Exception ignored) {
+            }
+        });
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        // cleanup: nếu có overlay chưa bị xóa, remove nó ngay
+        try {
+            if (activeOverlayIv != null) {
+                ViewParent p = activeOverlayIv.getParent();
+                if (p instanceof ViewGroup) ((ViewGroup) p).removeView(activeOverlayIv);
+                activeOverlayIv = null;
+            }
+        } catch (Exception ignored) {}
+        // cancel any pending post-arrive animations
+        try {
+            if (pendingPostArriveAnim != null) {
+                pendingPostArriveAnim.cancel();
+                pendingPostArriveAnim = null;
+            }
+        } catch (Exception ignored) {}
+        // hủy đăng ký prefs listener
+        try {
+            if (streakPrefs != null && streakPrefListener != null) {
+                streakPrefs.unregisterOnSharedPreferenceChangeListener(streakPrefListener);
+                streakPrefListener = null;
+            }
+        } catch (Exception ignored) {}
         binding = null;
     }
 

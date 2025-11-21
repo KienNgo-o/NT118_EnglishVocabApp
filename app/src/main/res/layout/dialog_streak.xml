@@ -1,0 +1,47 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    tools:background="#88000000">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="32dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@color/card_background">
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:gravity="center_horizontal">
+
+            <ImageView
+                android:id="@+id/iv_streak_dialog"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:contentDescription="@string/streak_icon_desc"
+                android:src="@drawable/streak"
+                tools:src="@drawable/streak"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:id="@+id/tv_streak_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/green_700"
+                android:text="@string/streak_dialog_message"
+                tools:text="Chúc mừng bạn đã có chuỗi 5 ngày"
+                android:gravity="center"
+                android:layout_marginBottom="8dp" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</FrameLayout>

@@ -23,7 +23,8 @@ public class HomeViewModel extends ViewModel {
     public HomeViewModel() {
         // Default sample values; replace these when wiring the backend
         todayQuote.setValue("\"Procrastination is like a credit card: it's a lot of fun until you get the bill.\"");
-        activeDaysText.setValue("1 Active day");
+        // Chỉ đặt số ngày active (sử dụng chuỗi số để UI header có thể hiển thị trực tiếp)
+        activeDaysText.setValue("1");
         vocabProgress1.setValue("40/48");
         vocabProgress2.setValue("6/24");
         quizProgress1.setValue("40/48");

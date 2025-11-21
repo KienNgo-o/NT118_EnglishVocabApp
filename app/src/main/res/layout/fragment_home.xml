@@ -303,28 +303,6 @@
                     android:alignmentMode="alignMargins"
                     android:padding="8dp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:padding="8dp">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/calendar"
-                        android:contentDescription="@string/cd_calendar" />
-
-                    <TextView
-                        android:id="@+id/text_active_days"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/active_days_default"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@color/text_secondary" />
-                </LinearLayout>
-
             </LinearLayout>
 
             <!-- Cards (each is independent) -->

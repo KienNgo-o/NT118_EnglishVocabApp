@@ -21,6 +21,7 @@ import java.util.Set;
 public class StreakManager {
     private static final String PREFS = "streak_prefs";
     private static final String KEY_DATES = "streak_dates"; // stored as comma-separated yyyy-MM-dd
+    private static final String KEY_PENDING_ANNOUNCE = "streak_pending_announce"; // date string when announcement pending
     private static final SimpleDateFormat ISO = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
     private final SharedPreferences prefs;
@@ -29,14 +30,30 @@ public class StreakManager {
         prefs = ctx.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }
 
-    // record today as active (idempotent)
-    public void markTodayActive() {
+    // record today as active (idempotent). Returns true if today was newly added (i.e. first mark today)
+    public boolean markTodayActive() {
         String today = ISO.format(new Date());
         Set<String> set = getDatesSet();
         if (!set.contains(today)) {
             set.add(today);
             persistSet(set);
+            // set pending announce so HomeFragment can show dialog when it becomes visible
+            prefs.edit().putString(KEY_PENDING_ANNOUNCE, today).apply();
+            return true;
         }
+        return false;
+    }
+
+    // whether there is a pending announcement for today
+    public boolean hasPendingAnnouncementForToday() {
+        String today = ISO.format(new Date());
+        String pending = prefs.getString(KEY_PENDING_ANNOUNCE, null);
+        return today.equals(pending);
+    }
+
+    // clear any pending announcement (call after showing dialog)
+    public void clearPendingAnnouncement() {
+        prefs.edit().remove(KEY_PENDING_ANNOUNCE).apply();
     }
 
     private Set<String> getDatesSet() {
@@ -85,4 +102,3 @@ public class StreakManager {
     }
 
 }
-
