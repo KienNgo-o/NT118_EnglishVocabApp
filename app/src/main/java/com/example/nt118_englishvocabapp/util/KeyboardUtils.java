@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 
+import androidx.fragment.app.FragmentActivity;
+
 import com.example.nt118_englishvocabapp.R;
 
 public final class KeyboardUtils {
@@ -91,5 +93,17 @@ public final class KeyboardUtils {
         } catch (Exception e) {
             Log.e(TAG, "Error while attempting to show keyboard", e);
         }
+    }
+
+    public static void hideKeyboard(Activity activity) {
+        if (activity == null) return;
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        // Tìm view đang được focus để lấy token
+        View view = activity.getCurrentFocus();
+        // Nếu không có view nào focus, tạo mới để tránh lỗi null
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

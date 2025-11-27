@@ -26,6 +26,9 @@
     <color name="teal_200">#03DAC5</color>
     <color name="teal_700">#018786</color>
 
+    <color name="badge_start">#2ECC71</color> <!-- xanh lá / xanh ngọc -->
+    <color name="badge_end">#8E44AD</color>   <!-- tím -->
+
     <!-- ==========================
          Flashcard fragment
          (flashcard card, text, nav and arrows)

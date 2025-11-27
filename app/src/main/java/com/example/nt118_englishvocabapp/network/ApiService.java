@@ -22,6 +22,9 @@ import com.example.nt118_englishvocabapp.network.dto.SignUpRequest;
 import com.example.nt118_englishvocabapp.network.dto.UpdateProfileRequest;
 
 import retrofit2.http.PATCH;
+import com.example.nt118_englishvocabapp.models.QuizData;
+import com.example.nt118_englishvocabapp.models.QuizSubmission;
+import com.example.nt118_englishvocabapp.models.QuizResult;
 public interface ApiService {
 
     @POST("/api/auth/signin")
@@ -55,4 +58,12 @@ public interface ApiService {
     Call<Void> deleteAccount(@Body DeleteAccountRequest request);
     @PATCH("/api/users/me")
     Call<User> updateUserProfile(@Body UpdateProfileRequest request);
+
+    // 1. Lấy đề thi
+    @GET("api/topics/{id}/quiz")
+    Call<QuizData> getQuiz(@Path("id") int topicId);
+
+    // 2. Nộp bài
+    @POST("api/topics/{id}/quiz/submit")
+    Call<QuizResult> submitQuiz(@Path("id") int topicId, @Body QuizSubmission submission);
 }

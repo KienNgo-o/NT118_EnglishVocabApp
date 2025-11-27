@@ -52,7 +52,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 // OkHttp (Thư viện nền tảng của Retrofit, cần để tạo Interceptor)
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
-// (Bạn cũng có thể cần thêm logging-interceptor để debug)
+//  thêm logging-interceptor để debug
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
     implementation("com.google.code.gson:gson:2.8.9")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
@@ -60,4 +60,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.8.0")
 // Kiểm tra version mới nhất
     implementation("androidx.lifecycle:lifecycle-livedata:2.8.0")
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
 }

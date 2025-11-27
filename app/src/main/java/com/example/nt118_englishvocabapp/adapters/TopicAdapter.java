@@ -181,17 +181,19 @@ public class TopicAdapter extends ListAdapter<Topic, TopicAdapter.TopicViewHolde
 
             // Logic KHÓA
             if ("locked".equals(topic.getStatus())) {
-                imgLockIcon.setVisibility(View.VISIBLE);
+                itemView.setAlpha(0.6f);
+                // ❗️ XÓA: imgLockIcon.setVisibility(View.VISIBLE);
+                if (btnSave != null) btnSave.setVisibility(View.GONE);
             } else {
-                imgLockIcon.setVisibility(View.GONE);
+                itemView.setAlpha(1.0f);
+                // ❗️ XÓA: imgLockIcon.setVisibility(View.GONE);
+                if (btnSave != null) btnSave.setVisibility(View.VISIBLE);
             }
 
             // Sự kiện Click
             itemView.setOnClickListener(v -> {
                 if (listener != null) listener.onTopicClick(topic);
             });
-
-            // Note: save button already wired above with SharedPreferences persistence
         }
 
         // Update only the word count view to avoid full rebind flicker

@@ -91,8 +91,8 @@ public class VocabTopicAdapter extends ListAdapter<Topic, VocabTopicAdapter.Topi
         private final ImageView imgTopic;
         private final ImageButton btnSave; // 👈 Sửa từ btnSaveTopic
 
-        // ❗️ XÓA: 'imgLockIcon' không tồn tại trong layout này
-        // private final ImageView imgLockIcon;
+
+
 
         private final SharedPreferences prefs;
 
@@ -107,8 +107,6 @@ public class VocabTopicAdapter extends ListAdapter<Topic, VocabTopicAdapter.Topi
             txtWords = itemView.findViewById(R.id.txt_words); // 👈 Sửa ID
             btnSave = itemView.findViewById(R.id.btn_save); // 👈 Sửa ID
 
-            // ❗️ XÓA: ID 'img_lock_icon' không tồn tại
-            // imgLockIcon = itemView.findViewById(R.id.img_lock_icon);
         }
 
         public void bind(final Topic topic, final OnTopicClickListener listener) {

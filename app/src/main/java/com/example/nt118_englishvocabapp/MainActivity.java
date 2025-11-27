@@ -15,9 +15,9 @@ import androidx.appcompat.app.AppCompatDelegate;
 import com.example.nt118_englishvocabapp.databinding.ActivityMainBinding;
 import com.example.nt118_englishvocabapp.ui.flashcard.FlashcardFragment;
 import com.example.nt118_englishvocabapp.ui.home.HomeFragment;
-import com.example.nt118_englishvocabapp.ui.quiz.QuizFragment;
+import com.example.nt118_englishvocabapp.ui.quiz.QuizListFragment;
+import com.example.nt118_englishvocabapp.ui.quiz.QuizViewModel;
 import com.example.nt118_englishvocabapp.ui.vocab.VocabFragment;
-import com.example.nt118_englishvocabapp.ui.quiz.ChooseAudioAnswerQuizFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,20 +52,13 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.flashcard) {
                 replaceFragment(new FlashcardFragment());
             } else if (itemId == R.id.quiz) {
-                replaceFragment(new QuizFragment());
+                replaceFragment(new QuizListFragment());
             } else if (itemId == R.id.vocab) {
                 replaceFragment(new VocabFragment());
             }
             return true;
         });
 
-        // Add this block for the FAB
-        binding.getRoot().findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                replaceFragment(new ChooseAudioAnswerQuizFragment());
-            }
-        });
     }
 
 
