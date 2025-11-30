@@ -170,140 +170,151 @@
             android:orientation="vertical">
 
             <!-- Study days (streak) area: moved into lower part (scroll) -->
-            <LinearLayout
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_study_days"
                 android:layout_width="match_parent"
+                android:layout_marginTop="12dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="8dp"
-                android:background="@color/card_background"
-                android:layout_marginTop="1dp">
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@color/card_background">
 
-                <TextView
-                    android:id="@+id/text_study_days_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/study_days"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginStart="8dp"
-                    android:textColor="@color/text_primary" />
-
-                <!-- Calendar header: month and navigation arrows -->
                 <LinearLayout
-                    android:id="@+id/calendar_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="8dp">
-
-                    <ImageButton
-                        android:id="@+id/button_prev_month"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/next_arrow"
-                        android:rotation="180"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/cd_prev" />
+                    android:orientation="vertical"
+                    android:padding="10dp">
 
                     <TextView
-                        android:id="@+id/text_month_label"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:id="@+id/text_study_days_label"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/cd_calendar"
-                        android:textSize="16sp"
+                        android:text="@string/study_days"
                         android:textStyle="bold"
-                        android:gravity="center" />
+                        android:textSize="15sp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginStart="6dp"
+                        android:textColor="@color/text_primary" />
 
-                    <ImageButton
-                        android:id="@+id/button_next_month"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/next_arrow"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/cd_next" />
+                    <!-- Calendar header: month and navigation arrows -->
+                    <LinearLayout
+                        android:id="@+id/calendar_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="6dp">
+
+                        <ImageButton
+                            android:id="@+id/button_prev_month"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/next_arrow"
+                            android:rotation="180"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/cd_prev" />
+
+                        <TextView
+                            android:id="@+id/text_month_label"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="@string/cd_calendar"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:gravity="center" />
+
+                        <ImageButton
+                            android:id="@+id/button_next_month"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/next_arrow"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/cd_next" />
+                    </LinearLayout>
+
+                    <!-- Week labels row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_mon"
+                            android:gravity="center"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_tue"
+                            android:gravity="center"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_wed"
+                            android:gravity="center"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_thu"
+                            android:gravity="center"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_fri"
+                            android:gravity="center"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_sat"
+                            android:gravity="center"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_sun"
+                            android:gravity="center"
+                            android:textColor="@color/text_secondary" />
+
+                    </LinearLayout>
+
+                    <!-- Calendar grid: 7 columns -->
+                    <GridLayout
+                        android:id="@+id/calendar_grid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:columnCount="7"
+                        android:rowCount="6"
+                        android:useDefaultMargins="true"
+                        android:alignmentMode="alignMargins"
+                        android:padding="6dp" />
+
                 </LinearLayout>
 
-                <!-- Week labels row -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingStart="4dp"
-                    android:paddingEnd="4dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_mon"
-                        android:gravity="center"
-                        android:textColor="@color/text_secondary" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_tue"
-                        android:gravity="center"
-                        android:textColor="@color/text_secondary" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_wed"
-                        android:gravity="center"
-                        android:textColor="@color/text_secondary" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_thu"
-                        android:gravity="center"
-                        android:textColor="@color/text_secondary" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_fri"
-                        android:gravity="center"
-                        android:textColor="@color/text_secondary" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_sat"
-                        android:gravity="center"
-                        android:textColor="@color/text_secondary" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_sun"
-                        android:gravity="center"
-                        android:textColor="@color/text_secondary" />
-
-                </LinearLayout>
-
-                <!-- Calendar grid: 7 columns -->
-                <GridLayout
-                    android:id="@+id/calendar_grid"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:columnCount="7"
-                    android:rowCount="6"
-                    android:useDefaultMargins="true"
-                    android:alignmentMode="alignMargins"
-                    android:padding="8dp" />
-
-            </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
             <!-- Cards (each is independent) -->
 
@@ -353,6 +364,7 @@
                                 android:contentDescription="@string/cd_icon" />
 
                             <TextView
+                                android:id="@+id/text_quiz_topic"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
                                 android:layout_height="wrap_content"
@@ -385,6 +397,7 @@
                                 android:contentDescription="@string/cd_icon" />
 
                             <TextView
+                                android:id="@+id/text_quiz_topic2"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
                                 android:layout_height="wrap_content"

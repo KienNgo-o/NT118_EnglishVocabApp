@@ -101,4 +101,59 @@ public class StreakManager {
         return getDatesSet().size();
     }
 
+    /**
+     * Returns the current consecutive streak ending today (number of consecutive days including today).
+     * If today is not active, returns 0.
+     */
+    public int getCurrentStreak() {
+        Set<String> set = getDatesSet();
+        if (set == null || set.isEmpty()) return 0;
+        Calendar cal = Calendar.getInstance();
+        int streak = 0;
+        while (true) {
+            String day = ISO.format(cal.getTime());
+            if (set.contains(day)) {
+                streak++;
+                cal.add(Calendar.DAY_OF_MONTH, -1);
+            } else {
+                break;
+            }
+        }
+        return streak;
+    }
+
+    /**
+     * Returns the longest consecutive streak found among recorded dates.
+     */
+    public int getLongestStreak() {
+        Set<String> set = getDatesSet();
+        if (set == null || set.isEmpty()) return 0;
+        int best = 0;
+        for (String s : set) {
+            try {
+                Date d = ISO.parse(s);
+                if (d == null) continue;
+                Calendar start = Calendar.getInstance();
+                start.setTime(d);
+                Calendar prev = (Calendar) start.clone();
+                prev.add(Calendar.DAY_OF_MONTH, -1);
+                String prevStr = ISO.format(prev.getTime());
+                if (set.contains(prevStr)) continue; // not start of a chain
+
+                // expand forward
+                int len = 0;
+                Calendar cur = (Calendar) start.clone();
+                while (true) {
+                    String curStr = ISO.format(cur.getTime());
+                    if (set.contains(curStr)) {
+                        len++;
+                        cur.add(Calendar.DAY_OF_MONTH, 1);
+                    } else break;
+                }
+                if (len > best) best = len;
+            } catch (Exception ignored) {}
+        }
+        return best;
+    }
+
 }

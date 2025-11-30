@@ -2,13 +2,10 @@ package com.example.nt118_englishvocabapp.ui.quiz;
 
 import android.app.Dialog;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.text.InputFilter;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,12 +28,14 @@ import com.example.nt118_englishvocabapp.adapters.QuizOptionAdapter;
 import com.example.nt118_englishvocabapp.databinding.FragmentQuizGameBinding;
 import com.example.nt118_englishvocabapp.models.QuizData;
 import com.example.nt118_englishvocabapp.models.QuizSubmission;
+import com.example.nt118_englishvocabapp.util.StreakManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -67,6 +66,7 @@ public class QuizGameFragment extends Fragment {
     // Để dễ dàng tìm view khi cần reset (unmatch)
     private List<View> leftViews = new ArrayList<>();
     private List<View> rightViews = new ArrayList<>();
+    private StreakManager streakManager;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,6 +77,8 @@ public class QuizGameFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        streakManager = new StreakManager(requireContext());
 
         viewModel = new ViewModelProvider(requireActivity()).get(QuizViewModel.class);
 
@@ -157,7 +159,7 @@ public class QuizGameFragment extends Fragment {
             if (seconds == null) return;
             int min = seconds / 60;
             int sec = seconds % 60;
-            binding.txtTimer.setText(String.format("%02d:%02d", min, sec));
+            binding.txtTimer.setText(String.format(Locale.getDefault(), "%02d:%02d", min, sec));
             if (seconds < 30) binding.txtTimer.setTextColor(Color.RED);
             if (seconds == 0) {
                 Toast.makeText(getContext(), "Time's up! Submitting...", Toast.LENGTH_SHORT).show();
@@ -167,6 +169,13 @@ public class QuizGameFragment extends Fragment {
 
         viewModel.getQuizResult().observe(getViewLifecycleOwner(), result -> {
             if (result != null) {
+                // Mark today active when user finishes a quiz (counts toward streak)
+                try {
+                    if (streakManager != null) {
+                        streakManager.markTodayActive();
+                    }
+                } catch (Exception ignored) {}
+
                 Toast.makeText(getContext(), "Score: " + result.score + "/100. Passed: " + result.passed, Toast.LENGTH_LONG).show();
                 getParentFragmentManager().popBackStack();
             }
@@ -191,7 +200,7 @@ public class QuizGameFragment extends Fragment {
         dialog.setCancelable(false); // Không cho bấm ra ngoài để thoát
 
         TextView tvScore = dialog.findViewById(R.id.tv_score_passed);
-        tvScore.setText("Your score: " + score + "/100");
+        tvScore.setText(String.format(Locale.getDefault(), "Your score: %d/100", score));
 
         View btnConfirm = dialog.findViewById(R.id.btn_confirm_passed);
         if (btnConfirm != null) {
@@ -224,7 +233,7 @@ public class QuizGameFragment extends Fragment {
 
         TextView tvScore = dialog.findViewById(R.id.tv_score_failed);
         if (tvScore != null) {
-            tvScore.setText("Your score: " + score + "/100");
+            tvScore.setText(String.format(Locale.getDefault(), "Your score: %d/100", score));
         }
 
         // Tìm nút bấm
@@ -359,6 +368,7 @@ public class QuizGameFragment extends Fragment {
         for (QuizData.Pair p : leftSide) {
             View view = LayoutInflater.from(getContext()).inflate(R.layout.item_matching_card_left, colLeft, false);
             ImageView img = view.findViewById(R.id.img_match);
+            // load into the item image view instead of the fragment's main image
             Glide.with(this).load(p.imageUrl).into(img);
 
             // Gán tag để tìm lại sau này
@@ -446,7 +456,7 @@ public class QuizGameFragment extends Fragment {
         selectedLeftView = null;
     }
 
-    // [NEW] HÀM GỠ BỎ CẶP ĐÃ NỐI
+    // [NEW] HÀM GỬ BỎ CẶP ĐÃ NỐI
     private void unmatchPair(String imageUrl, String wordText) {
         // Xóa dữ liệu
         currentMatches.remove(imageUrl);

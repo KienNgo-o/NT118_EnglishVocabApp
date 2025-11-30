@@ -2,6 +2,10 @@ package com.example.nt118_englishvocabapp.ui.quiz;
 
 import android.app.Application;
 import android.os.CountDownTimer;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Base64;
+import java.nio.charset.StandardCharsets;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -19,6 +23,7 @@ import retrofit2.Response;
 
 public class QuizViewModel extends AndroidViewModel {
     private final ApiService apiService;
+    private final SharedPreferences quizPrefs;
 
     // Data đề thi
     private final MutableLiveData<QuizData> quizData = new MutableLiveData<>();
@@ -36,6 +41,7 @@ public class QuizViewModel extends AndroidViewModel {
     public QuizViewModel(@NonNull Application application) {
         super(application);
         apiService = RetrofitClient.getApiService(application.getApplicationContext());
+        quizPrefs = application.getApplicationContext().getSharedPreferences("quiz_progress", Context.MODE_PRIVATE);
     }
 
     // Getters
@@ -118,7 +124,41 @@ public class QuizViewModel extends AndroidViewModel {
             @Override
             public void onResponse(Call<QuizResult> call, Response<QuizResult> response) {
                 if (response.isSuccessful()) {
-                    quizResult.postValue(response.body());
+                    QuizResult res = response.body();
+                    quizResult.postValue(res);
+                    try {
+                        if (res != null) {
+                            // persist latest quiz result for Home fallback (title from quizData if available)
+                            String title = "";
+                            QuizData qd = quizData.getValue();
+                            if (qd != null && qd.title != null) title = qd.title;
+                            String encodedTitle = Base64.encodeToString(title.getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP);
+                            long ts = System.currentTimeMillis();
+                            // Compute a robust normalized score on 0..100 scale.
+                            int normalizedScore;
+                            if (res.totalPossiblePoints > 0 && res.score <= res.totalPossiblePoints) {
+                                // server returned raw points (e.g. 2/10)
+                                normalizedScore = Math.round(res.score * 100f / res.totalPossiblePoints);
+                            } else if (res.score <= 100) {
+                                // server returned a percentage already (0..100)
+                                normalizedScore = res.score;
+                            } else if (res.totalPossiblePoints > 0) {
+                                // fallback: try scaling (but guard against huge values)
+                                normalizedScore = Math.round(res.score * 100f / res.totalPossiblePoints);
+                            } else {
+                                // unknown format: clamp to 0..100
+                                normalizedScore = Math.max(0, Math.min(res.score, 100));
+                            }
+                            normalizedScore = Math.max(0, Math.min(normalizedScore, 100));
+                            // store as: base64(title)|normalizedScore|100|timestamp
+                            String value = encodedTitle + "|" + normalizedScore + "|" + 100 + "|" + ts;
+                            quizPrefs.edit().putString("quiz_result_topic_" + topicId, value).apply();
+                            // Also persist as the globally latest quiz result so Home can prioritize showing it
+                            try {
+                                quizPrefs.edit().putString("quiz_latest", value).apply();
+                            } catch (Exception ignored) {}
+                        }
+                    } catch (Exception ignored) {}
                 }
             }
             @Override

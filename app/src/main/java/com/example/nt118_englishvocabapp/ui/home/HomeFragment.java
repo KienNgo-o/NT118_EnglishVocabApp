@@ -231,23 +231,22 @@ public class HomeFragment extends Fragment {
     private void updateHeaderStreak() {
         try {
             if (getActivity() == null) return;
-            int totalActive = (streakManager != null) ? streakManager.getTotalActiveDays() : 0;
-            // dùng binding nếu có
+            int currentStreak = (streakManager != null) ? streakManager.getCurrentStreak() : 0;
             if (binding != null && binding.textStreakNumber != null) {
-                binding.textStreakNumber.setText(String.valueOf(totalActive));
+                binding.textStreakNumber.setText(String.valueOf(currentStreak));
                 return;
             }
             // fallback: tìm view trong fragment root
             View root = getView();
             if (root != null) {
                 TextView headerStreak = root.findViewById(R.id.text_streak_number);
-                if (headerStreak != null) headerStreak.setText(String.valueOf(totalActive));
+                if (headerStreak != null) headerStreak.setText(String.valueOf(currentStreak));
                 return;
             }
             // fallback 2: tìm trong activity
             if (getActivity() != null) {
                 TextView headerStreak = getActivity().findViewById(R.id.text_streak_number);
-                if (headerStreak != null) headerStreak.setText(String.valueOf(totalActive));
+                if (headerStreak != null) headerStreak.setText(String.valueOf(currentStreak));
             }
         } catch (Exception ignored) {}
     }
@@ -419,7 +418,8 @@ public class HomeFragment extends Fragment {
                 try {
                     float offsetDp = 3f;
                     float offsetPx = getResources().getDisplayMetrics().density * offsetDp;
-                    if (resId == R.drawable.streak_no) {
+                    // Shift both the inactive (streak_no) and freeze (streak_freeze) icons slightly to the right
+                    if (resId == R.drawable.streak_no || resId == R.drawable.streak_freeze) {
                         flame.setTranslationX(offsetPx);
                     } else {
                         flame.setTranslationX(0f);
@@ -440,10 +440,10 @@ public class HomeFragment extends Fragment {
                     // chỉ hiển thị dialog/animation nếu StreakManager báo có pending announcement (user vừa hoàn thành topic hôm nay)
                     try {
                         if (streakManager.hasPendingAnnouncementForToday()) {
-                            int totalActiveNow = streakManager.getTotalActiveDays();
+                            int currentStreakNow = streakManager.getCurrentStreak();
                             flame.post(() -> {
                                 try {
-                                    showStreakDialog(flame, cellRoot, totalActiveNow);
+                                    showStreakDialog(flame, cellRoot, currentStreakNow);
                                     // sau khi show dialog, clear pending announce để không show lại
                                     streakManager.clearPendingAnnouncement();
                                 } catch (Exception ignored) {
@@ -477,9 +477,9 @@ public class HomeFragment extends Fragment {
                 headerStreak = getActivity().findViewById(R.id.text_streak_number);
             }
             // tính lại tổng số active days từ StreakManager trước khi cập nhật header
-            int totalActive = streakManager.getTotalActiveDays();
+            int currentStreak = streakManager.getCurrentStreak();
             if (headerStreak != null) {
-                headerStreak.setText(String.valueOf(totalActive));
+                headerStreak.setText(String.valueOf(currentStreak));
             }
         } catch (Exception ex) {
             Log.e("HomeFragment", "populateCalendar failed", ex);
@@ -681,6 +681,10 @@ public class HomeFragment extends Fragment {
         try {
             applyLatestProgressFromPrefs(binding != null ? binding.getRoot() : null);
         } catch (Exception ignored) {}
+        // Áp dụng tiến trình quiz đã lưu nếu có
+        try {
+            applyLatestQuizProgressFromPrefs(binding != null ? binding.getRoot() : null);
+        } catch (Exception ignored) {}
     }
 
     // Trợ giúp: đọc prefs chia sẻ "flashcard_progress" và chọn tiến trình chủ đề được lưu gần đây nhất
@@ -739,5 +743,91 @@ public class HomeFragment extends Fragment {
             if (flashTopicView2 != null) flashTopicView2.setText(secondName == null || secondName.isEmpty() ? getString(R.string.placeholder_topic_title) : secondName);
             if (flashProgressView2 != null) flashProgressView2.setText(secondStudied + "/" + secondTotal + " (" + (secondTotal<=0?0:Math.round((secondStudied*100f)/secondTotal)) + "%)");
         }
+    }
+
+    // Trợ giúp: Điền card Quiz bằng cùng dữ liệu được lưu (fallback) — dùng format giống flashcard section
+    private void applyLatestQuizProgressFromPrefs(View root) {
+        if (getContext() == null || root == null) return;
+        SharedPreferences prefs = getContext().getSharedPreferences("quiz_progress", Context.MODE_PRIVATE);
+        if (prefs == null) return;
+        // Prefer the explicit "quiz_latest" key if present
+        String latest = prefs.getString("quiz_latest", null);
+        if (latest != null) {
+            // parse and display just the latest entry
+            try {
+                String[] parts = latest.split("\\|", -1);
+                if (parts.length >= 4) {
+                    String title = new String(android.util.Base64.decode(parts[0], android.util.Base64.NO_WRAP), java.nio.charset.StandardCharsets.UTF_8);
+                    int score = Integer.parseInt(parts[1]);
+                    // display
+                    TextView quizTopic1 = root.findViewById(R.id.text_quiz_topic);
+                    TextView quizProgress1 = root.findViewById(R.id.text_quiz_progress);
+                    if (quizTopic1 != null) quizTopic1.setText(title == null || title.isEmpty() ? getString(R.string.placeholder_topic_title) : title);
+                    int s = Math.max(0, Math.min(score, 100));
+                    if (quizProgress1 != null) quizProgress1.setText(s + "/100 (" + s + "%)");
+                }
+            } catch (Exception ignored) {}
+            // We displayed the latest entry; still allow scanning for two items if needed, but return to avoid double-setting
+            return;
+        }
+        // (reuse 'prefs' declared above) — continue scanning stored quiz_result_topic_* entries
+        long firstTs = -1L, secondTs = -1L;
+        String firstTitle = null, secondTitle = null;
+        int firstScore = 0, firstTotal = 0;
+        int secondScore = 0, secondTotal = 0;
+
+        for (String key : prefs.getAll().keySet()) {
+            if (!key.startsWith("quiz_result_topic_")) continue;
+            Object obj = prefs.getAll().get(key);
+            if (!(obj instanceof String)) continue;
+            String s = (String) obj;
+            String[] parts = s.split("\\|", -1);
+            if (parts.length < 4) continue;
+            String encodedTitle = parts[0];
+            int score = 0;
+            int total = 0;
+            long ts = 0L;
+            try { score = Integer.parseInt(parts[1]); } catch (NumberFormatException ignored) {}
+            try { total = Integer.parseInt(parts[2]); } catch (NumberFormatException ignored) {}
+            try { ts = Long.parseLong(parts[3]); } catch (NumberFormatException ignored) {}
+            String title = "";
+            try { title = new String(Base64.decode(encodedTitle, Base64.NO_WRAP), StandardCharsets.UTF_8); } catch (Exception ignored) {}
+
+            if (ts > firstTs) {
+                secondTs = firstTs; secondTitle = firstTitle; secondScore = firstScore; secondTotal = firstTotal;
+                firstTs = ts; firstTitle = title; firstScore = score; firstTotal = total;
+            } else if (ts > secondTs) {
+                secondTs = ts; secondTitle = title; secondScore = score; secondTotal = total;
+            }
+        }
+
+        TextView quizTopic1 = root.findViewById(R.id.text_quiz_topic);
+        TextView quizProgress1 = root.findViewById(R.id.text_quiz_progress);
+        TextView quizTopic2 = root.findViewById(R.id.text_quiz_topic2);
+        TextView quizProgress2 = root.findViewById(R.id.text_quiz_progress2);
+
+        // displayed values on 0..100 scale
+        int displayed1 = 0;
+        int displayed2 = 0;
+
+        if (firstTs < 0) {
+            if (quizTopic1 != null) quizTopic1.setText(getString(R.string.placeholder_topic_title));
+            if (quizProgress1 != null) quizProgress1.setText("0/100");
+        } else {
+            if (quizTopic1 != null) quizTopic1.setText(firstTitle == null || firstTitle.isEmpty() ? getString(R.string.placeholder_topic_title) : firstTitle);
+            // Treat stored score as a percentage (0..100). Clamp to [0,100].
+            displayed1 = Math.max(0, Math.min(firstScore, 100));
+            if (quizProgress1 != null) quizProgress1.setText(displayed1 + "/100 (" + displayed1 + "%)");
+        }
+
+        if (secondTs < 0) {
+            if (quizTopic2 != null) quizTopic2.setText(getString(R.string.placeholder_topic_title));
+            if (quizProgress2 != null) quizProgress2.setText("0/100");
+        } else {
+            if (quizTopic2 != null) quizTopic2.setText(secondTitle == null || secondTitle.isEmpty() ? getString(R.string.placeholder_topic_title) : secondTitle);
+            displayed2 = Math.max(0, Math.min(secondScore, 100));
+            if (quizProgress2 != null) quizProgress2.setText(displayed2 + "/100 (" + displayed2 + "%)");
+        }
+        // Note: we intentionally do not update HomeViewModel here; the LiveData-backed UI will be used when available.
     }
 }
