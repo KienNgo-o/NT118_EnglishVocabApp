@@ -527,6 +527,19 @@
 
             </androidx.cardview.widget.CardView>
 
+            <!-- Rate this app button: placed at the end of the scrollable content -->
+            <Button
+                android:id="@+id/btn_rate_app"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="24dp"
+                android:text="@string/rate_app_button"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp" />
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

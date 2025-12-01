@@ -14,4 +14,25 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <!-- Minimal fallback ShapeAppearance to satisfy resource linking when a simple base style is required -->
+    <style name="ShapeAppearance">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">4dp</item>
+    </style>
+
+    <!-- Rounded shape appearance used by dialog card -->
+    <style name="ShapeAppearance.Rounded12">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <!-- Theme overlay for the rating dialog to use MaterialAlertDialog styling -->
+    <style name="RateDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <!-- Apply rounded corners via shapeAppearance -->
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Rounded12</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Rounded12</item>
+        <!-- Ensure dialog width is reasonably constrained on tablets -->
+        <item name="android:windowMinWidthMajor">80%</item>
+    </style>
 </resources>

@@ -214,6 +214,99 @@ public class HomeFragment extends Fragment {
                 }
             });
 
+            // Rate button: mở dialog đánh giá
+            try {
+                View rateBtn = root.findViewById(R.id.btn_rate_app);
+                if (rateBtn != null) {
+                    rateBtn.setOnClickListener(v -> {
+                        try {
+                            android.view.LayoutInflater li = getLayoutInflater();
+                            View dlgView = li.inflate(R.layout.dialog_rate, null, false);
+                            android.widget.RatingBar rb = dlgView.findViewById(R.id.rating_bar);
+                            android.widget.EditText etComment = dlgView.findViewById(R.id.et_rate_comment);
+                            android.widget.Button btnSubmit = dlgView.findViewById(R.id.btn_rate_submit);
+
+                            final android.app.Dialog d = new android.app.Dialog(new android.view.ContextThemeWrapper(requireContext(), R.style.RateDialogTheme));
+                            d.setContentView(dlgView);
+                            d.setCancelable(true);
+                            if (d.getWindow() != null) {
+                                d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                                // dim the background a bit when the dialog is shown
+                                d.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                                d.getWindow().setDimAmount(0.60f); // slightly darker outside
+
+                                // reduce width a little: set dialog width to 88% of screen width
+                                android.view.WindowManager.LayoutParams lp = new android.view.WindowManager.LayoutParams();
+                                lp.copyFrom(d.getWindow().getAttributes());
+                                int widthPx = (int) (getResources().getDisplayMetrics().widthPixels * 0.88f);
+                                lp.width = widthPx;
+                                d.getWindow().setAttributes(lp);
+                            }
+
+                            // Make rating interactive and tint stars on change
+                            if (rb != null) {
+                                // ensure default rating 0 and stars grey by default
+                                try {
+                                    rb.setRating(0f);
+                                    android.graphics.drawable.LayerDrawable initStars = (android.graphics.drawable.LayerDrawable) rb.getProgressDrawable();
+                                    android.graphics.drawable.Drawable filledInit = initStars.getDrawable(2);
+                                    android.graphics.drawable.Drawable halfInit = initStars.getDrawable(1);
+                                    android.graphics.drawable.Drawable emptyInit = initStars.getDrawable(0);
+                                    // use darker gray so stars are clearly visible
+                                    int greyColor = ContextCompat.getColor(requireContext(), R.color.row_icon_tint);
+                                    try { filledInit.setTint(greyColor); } catch (Exception ignored) {}
+                                    try { halfInit.setTint(greyColor); } catch (Exception ignored) {}
+                                    try { emptyInit.setTint(greyColor); } catch (Exception ignored) {}
+                                } catch (Exception ignored) {}
+
+                                rb.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+                                    try {
+                                        // Colors: selected stars -> app orange, others -> grey
+                                        int selectedColor = ContextCompat.getColor(requireContext(), R.color.orange);
+                                        int greyColor = ContextCompat.getColor(requireContext(), R.color.row_icon_tint);
+
+                                        // RatingBar layered drawable: drawable 2 = filled portion, 1 = secondary, 0 = background
+                                        android.graphics.drawable.LayerDrawable stars = (android.graphics.drawable.LayerDrawable) ratingBar.getProgressDrawable();
+                                        android.graphics.drawable.Drawable filled = stars.getDrawable(2);
+                                        android.graphics.drawable.Drawable secondary = stars.getDrawable(1);
+                                        android.graphics.drawable.Drawable background = stars.getDrawable(0);
+
+                                        // Tint background grey and filled/secondary selected color
+                                        try { background.setTint(greyColor); } catch (Exception ignored) {}
+                                        try { secondary.setTint(selectedColor); } catch (Exception ignored) {}
+                                        try { filled.setTint(selectedColor); } catch (Exception ignored) {}
+
+                                        // No scaling/pulse animation anymore: keep stars stable in size per user request
+
+                                    } catch (Exception ex) {
+                                        Log.e("HomeFragment", "rating change handling error", ex);
+                                    }
+                                });
+                            }
+
+                            btnSubmit.setOnClickListener(bv -> {
+                                try {
+                                    float ratingVal = (rb != null) ? rb.getRating() : 0f;
+                                    String comment = (etComment != null) ? etComment.getText().toString() : "";
+                                    // For now: show a toast and dismiss. You can send rating/comment to analytics/server here.
+                                    try {
+                                        Toast.makeText(requireContext(), getString(R.string.rate_dialog_thanks), Toast.LENGTH_SHORT).show();
+                                    } catch (Exception ignored) {}
+                                    d.dismiss();
+                                } catch (Exception ex) {
+                                    Log.e("HomeFragment", "rate submit error", ex);
+                                    try { d.dismiss(); } catch (Exception ignored) {}
+                                }
+                            });
+
+                            d.show();
+                        } catch (Exception ex) {
+                            Log.e("HomeFragment", "show rate dialog error", ex);
+                        }
+                    });
+                }
+            } catch (Exception ignored) {}
+
             return root;
         } catch (Exception ex) {
             Log.e("HomeFragment", "onCreateView error", ex);
