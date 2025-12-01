@@ -40,6 +40,13 @@
     <color name="arrow_tint">#410FA3</color>
     <color name="card_text_color">#410FA3</color>
 
+    <!-- Header color for flashcard fragment (day) -->
+    <color name="flashcard_header">#410FA3</color>
+
+    <!-- Topic card explicit text colors (keep same for night) -->
+    <color name="topic_card_title">#FF000000</color>
+    <color name="topic_card_secondary">#7A7A7A</color>
+
     <!-- ==========================
          Vocab / List fragments
          (vocab list items & quiz button backgrounds)

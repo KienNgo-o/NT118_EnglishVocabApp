@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/screen_background"
+    android:background="@color/light_purple"
     android:orientation="vertical"
     android:weightSum="10"
-    tools:context=".ui.quiz.QuizFragment">  <!-- fixed tools context -->
+    tools:context=".ui.quiz.QuizListFragment">
 
-    <!-- Upper part: reserve 2 weight units to match fragment_vocab spacing -->
+    <!-- Upper part (copied precisely from fragment_vocab to ensure identical layout/spacings) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:orientation="vertical">
 
-        <!-- Top half: toolbar + divider (copied from fragment_vocab) -->
+        <!-- Upper part - top half -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -61,27 +62,69 @@
         </LinearLayout>
 
 
+        <!-- Upper part - bottom half (search) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:elevation="4dp"
+                android:background="@drawable/rounded_white"
+                android:padding="5dp">
+
+
+                <EditText
+                    android:id="@+id/search_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_toStartOf="@id/search_topic"
+                    android:layout_alignParentStart="true"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/hint_search_topic"
+                    android:textColorHint="@android:color/darker_gray"
+                    android:textColor="@android:color/black"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:gravity="center_vertical"
+                    android:includeFontPadding="false"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:importantForAutofill="no" />
+
+
+                <ImageView
+                    android:id="@+id/search_topic"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="5dp"
+                    android:src="@drawable/search_topic"
+                    app:tint="@color/search_icon_color"
+                    app:tintMode="src_in"
+                    android:contentDescription="@string/cd_search_topic" />
+            </RelativeLayout>
+        </LinearLayout>
+
     </LinearLayout>
 
-    <!-- Lower part: RecyclerView occupies remaining 8 weight units -->
-    <LinearLayout
-        android:id="@+id/lower_container"
+    <!-- Lower part: RecyclerView (keeps existing id) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/stagesRecycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="9"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:gravity="center">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/stagesRecycler"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:clipToPadding="false"
-            android:layout_gravity="center" />
-
-    </LinearLayout>
+        android:layout_weight="7.3"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:clipToPadding="false" />
 
 </LinearLayout>

@@ -4,88 +4,120 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white_gray"
+    android:background="@color/light_purple"
     android:orientation="vertical"
     android:weightSum="10"
     tools:context=".ui.quiz.QuizListFragment">
 
+    <!-- Upper part (copied from fragment_vocab/flashcard to match UI) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2.2"
-        android:background="@color/light_purple"
+        android:layout_weight="2"
         android:orientation="vertical"
         android:paddingBottom="16dp">
 
-        <RelativeLayout
+        <!-- Upper part - top half -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <ImageButton
-                android:id="@+id/btn_return"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:background="@null"
-                android:contentDescription="@string/cd_back"
-                android:padding="8dp"
-                android:src="@drawable/return_final" />
-
-            <TextView
-                android:id="@+id/txt_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="Quizzes"
-                android:textColor="@color/dark_purple"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@color/dark_purple" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="24dp"
-            android:background="@drawable/rounded_white"
-            android:elevation="4dp"
-            android:padding="6dp">
-
-            <ImageView
-                android:id="@+id/icon_search"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="8dp"
-                android:src="@drawable/search_topic"
-                app:tint="@color/gray" />
-
-            <EditText
-                android:id="@+id/search_edit_text"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/icon_search"
-                android:background="@android:color/transparent"
-                android:hint="Search quiz..."
+                android:layout_height="56dp"
                 android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:textColor="@color/black"
-                android:textSize="16sp" />
-        </RelativeLayout>
+                android:paddingEnd="12dp">
+
+                <ImageButton
+                    android:id="@+id/btn_return"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:background="@null"
+                    android:contentDescription="@string/cd_back"
+                    android:padding="8dp"
+                    android:src="@drawable/return_final" />
+
+                <TextView
+                    android:id="@+id/txt_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/title_quiz"
+                    android:textColor="@color/dark_purple"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/dark_purple" />
+        </LinearLayout>
+
+
+        <!-- Upper part - bottom half (new) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:elevation="4dp"
+                android:background="@drawable/rounded_white"
+                android:padding="5dp">
+
+
+                <EditText
+                    android:id="@+id/search_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_toStartOf="@id/search_topic"
+                    android:layout_alignParentStart="true"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/hint_search_topic"
+                    android:textColorHint="@android:color/darker_gray"
+                    android:textColor="@android:color/black"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:gravity="center_vertical"
+                    android:includeFontPadding="false"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:importantForAutofill="no" />
+
+
+                <ImageView
+                    android:id="@+id/search_topic"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="5dp"
+                    android:src="@drawable/search_topic"
+                    app:tint="@color/search_icon_color"
+                    app:tintMode="src_in"
+                    android:contentDescription="@string/cd_search_topic" />
+            </RelativeLayout>
+        </LinearLayout>
+
     </LinearLayout>
 
+    <!-- RecyclerView (keep existing below) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_quizzes"
         android:layout_width="match_parent"

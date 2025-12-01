@@ -42,6 +42,10 @@
     <color name="quiz_button_bg">#FFFFFFFF</color>
     <color name="green_700">#2E7D32</color>
 
+    <!-- Explicit topic card text colors (keep same as day) -->
+    <color name="topic_card_title">#FF000000</color>
+    <color name="topic_card_secondary">#7A7A7A</color>
+
     <!-- ==========================
          UI / Kiểu chữ (ghi đè cho night)
          ========================== -->

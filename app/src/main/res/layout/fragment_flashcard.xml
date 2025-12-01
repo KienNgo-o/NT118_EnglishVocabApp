@@ -47,7 +47,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:text="Flashcards"
-                    android:textColor="@color/dark_purple"
+                    android:textColor="@color/flashcard_header"
                     android:textSize="24sp"
                     android:textStyle="bold" />
             </RelativeLayout>
@@ -58,7 +58,7 @@
                 android:layout_height="2dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                android:background="@color/dark_purple" />
+                android:background="@color/flashcard_header" />
         </LinearLayout>
 
         <!-- Upper part: search row (weight 1) -->

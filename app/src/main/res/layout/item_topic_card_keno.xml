@@ -10,7 +10,7 @@
     android:layout_margin="8dp"
     app:cardCornerRadius="18dp"
     app:cardElevation="6dp"
-    app:cardBackgroundColor="@color/light_purple">
+    app:cardBackgroundColor="@color/flashcard_bg">
 
     <!-- ConstraintLayout flattens hierarchy and gives precise constraints -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -40,11 +40,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/topic_card_secondary"
             android:textSize="13sp"
             app:layout_constraintBottom_toTopOf="@+id/txt_topic_name"
             app:layout_constraintEnd_toEndOf="parent"
@@ -62,7 +61,7 @@
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="2"
-            android:textColor="@color/topic_title_color"
+            android:textColor="@color/topic_card_title"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/txt_word_count"
@@ -78,7 +77,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:gravity="center"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/topic_card_secondary"
             android:textSize="13sp"
             app:layout_constraintBottom_toTopOf="@+id/img_topic"
             app:layout_constraintEnd_toEndOf="parent"
