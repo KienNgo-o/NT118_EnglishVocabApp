@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="18dp"
-        android:minHeight="220dp">
+        android:minHeight="240dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_rate_title"
@@ -37,8 +37,8 @@
             android:isIndicator="false"
             android:layout_gravity="center"
             android:layout_marginBottom="12dp"
-            android:scaleX="2"
-            android:scaleY="2" />
+            android:scaleX="2.2"
+            android:scaleY="2.2" />
 
         <EditText
             android:id="@+id/et_rate_comment"

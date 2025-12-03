@@ -233,13 +233,15 @@ public class HomeFragment extends Fragment {
                                 d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                                 // dim the background a bit when the dialog is shown
                                 d.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                                d.getWindow().setDimAmount(0.60f); // slightly darker outside
+                                d.getWindow().setDimAmount(0.70f); // slightly darker outside
 
-                                // reduce width a little: set dialog width to 88% of screen width
+                                // reduce width a little: set dialog width to 86% of screen width
                                 android.view.WindowManager.LayoutParams lp = new android.view.WindowManager.LayoutParams();
                                 lp.copyFrom(d.getWindow().getAttributes());
-                                int widthPx = (int) (getResources().getDisplayMetrics().widthPixels * 0.88f);
+                                int widthPx = (int) (getResources().getDisplayMetrics().widthPixels * 0.86f);
                                 lp.width = widthPx;
+                                // increase height a bit: set a min height for dialog content
+                                lp.height = android.view.WindowManager.LayoutParams.WRAP_CONTENT;
                                 d.getWindow().setAttributes(lp);
                             }
 
@@ -248,12 +250,13 @@ public class HomeFragment extends Fragment {
                                 // ensure default rating 0 and stars grey by default
                                 try {
                                     rb.setRating(0f);
+                                    // enlarge stars visually but keep drawable size stable by using scale in layout
                                     android.graphics.drawable.LayerDrawable initStars = (android.graphics.drawable.LayerDrawable) rb.getProgressDrawable();
                                     android.graphics.drawable.Drawable filledInit = initStars.getDrawable(2);
                                     android.graphics.drawable.Drawable halfInit = initStars.getDrawable(1);
                                     android.graphics.drawable.Drawable emptyInit = initStars.getDrawable(0);
                                     // use darker gray so stars are clearly visible
-                                    int greyColor = ContextCompat.getColor(requireContext(), R.color.row_icon_tint);
+                                    int greyColor = ContextCompat.getColor(requireContext(), R.color.dialog_star_grey);
                                     try { filledInit.setTint(greyColor); } catch (Exception ignored) {}
                                     try { halfInit.setTint(greyColor); } catch (Exception ignored) {}
                                     try { emptyInit.setTint(greyColor); } catch (Exception ignored) {}
@@ -261,23 +264,24 @@ public class HomeFragment extends Fragment {
 
                                 rb.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
                                     try {
-                                        // Colors: selected stars -> app orange, others -> grey
                                         int selectedColor = ContextCompat.getColor(requireContext(), R.color.orange);
-                                        int greyColor = ContextCompat.getColor(requireContext(), R.color.row_icon_tint);
+                                        int greyColor = ContextCompat.getColor(requireContext(), R.color.dialog_star_grey);
 
-                                        // RatingBar layered drawable: drawable 2 = filled portion, 1 = secondary, 0 = background
+                                        // We want only the filled portion up to current rating to be colored
                                         android.graphics.drawable.LayerDrawable stars = (android.graphics.drawable.LayerDrawable) ratingBar.getProgressDrawable();
                                         android.graphics.drawable.Drawable filled = stars.getDrawable(2);
                                         android.graphics.drawable.Drawable secondary = stars.getDrawable(1);
                                         android.graphics.drawable.Drawable background = stars.getDrawable(0);
 
-                                        // Tint background grey and filled/secondary selected color
+                                        // Tint everything grey first
                                         try { background.setTint(greyColor); } catch (Exception ignored) {}
-                                        try { secondary.setTint(selectedColor); } catch (Exception ignored) {}
+                                        try { secondary.setTint(greyColor); } catch (Exception ignored) {}
+                                        try { filled.setTint(greyColor); } catch (Exception ignored) {}
+
+                                        // Then color the filled part (drawn area) with selected color. The RatingBar will mask it according to rating.
                                         try { filled.setTint(selectedColor); } catch (Exception ignored) {}
 
-                                        // No scaling/pulse animation anymore: keep stars stable in size per user request
-
+                                        // Do not change star size on selection
                                     } catch (Exception ex) {
                                         Log.e("HomeFragment", "rating change handling error", ex);
                                     }
@@ -288,10 +292,33 @@ public class HomeFragment extends Fragment {
                                 try {
                                     float ratingVal = (rb != null) ? rb.getRating() : 0f;
                                     String comment = (etComment != null) ? etComment.getText().toString() : "";
-                                    // For now: show a toast and dismiss. You can send rating/comment to analytics/server here.
+
+                                    // send rating to server via Retrofit
                                     try {
-                                        Toast.makeText(requireContext(), getString(R.string.rate_dialog_thanks), Toast.LENGTH_SHORT).show();
-                                    } catch (Exception ignored) {}
+                                        com.example.nt118_englishvocabapp.network.ApiService api = com.example.nt118_englishvocabapp.network.RetrofitClient.getApiService(requireContext());
+                                        java.util.Map<String, Integer> payload = new java.util.HashMap<>();
+                                        payload.put("rating", (int) ratingVal);
+
+                                        api.rateApp(payload).enqueue(new retrofit2.Callback<Void>() {
+                                            @Override
+                                            public void onResponse(retrofit2.Call<Void> call, retrofit2.Response<Void> response) {
+                                                if (response.isSuccessful()) {
+                                                    Toast.makeText(requireContext(), getString(R.string.rate_dialog_thanks), Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    Toast.makeText(requireContext(), getString(R.string.rate_dialog_submit_error), Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onFailure(retrofit2.Call<Void> call, Throwable t) {
+                                                Log.e("HomeFragment", "rateApp request failed", t);
+                                                Toast.makeText(requireContext(), getString(R.string.rate_dialog_submit_error), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    } catch (Exception ex) {
+                                        Log.e("HomeFragment", "error sending rating", ex);
+                                    }
+
                                     d.dismiss();
                                 } catch (Exception ex) {
                                     Log.e("HomeFragment", "rate submit error", ex);

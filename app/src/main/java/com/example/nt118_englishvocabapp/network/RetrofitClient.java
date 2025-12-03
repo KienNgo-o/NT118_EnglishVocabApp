@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitClient {
 
     // THAY THẾ IP NÀY BẰNG IP CỦA BẠN
-    private static final String BASE_URL = "http://192.168.1.5:5001/";
+    private static final String BASE_URL = "http://98.94.144.216:5001/";
 
     private static Retrofit retrofit = null;
     private static ApiService apiService = null;

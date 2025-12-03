@@ -66,4 +66,7 @@ public interface ApiService {
     // 2. Nộp bài
     @POST("api/topics/{id}/quiz/submit")
     Call<QuizResult> submitQuiz(@Path("id") int topicId, @Body QuizSubmission submission);
+
+    @POST("api/users/rate-app")
+    Call<Void> rateApp(@Body java.util.Map<String, Integer> ratingPayload);
 }

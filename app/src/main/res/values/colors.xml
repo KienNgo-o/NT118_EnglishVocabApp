@@ -103,4 +103,7 @@
     <color name="day_blue_text">#2B5FB6</color>
     <color name="day_gray_text">#7A7A7A</color>
 
+    <!-- Dialog / Rating specific colors -->
+    <color name="dialog_star_grey">#9E9E9E</color> <!-- darker grey for unselected stars -->
+
 </resources>

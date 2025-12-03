@@ -241,4 +241,5 @@
     <string name="rate_dialog_submit">Submit</string>
     <string name="rate_dialog_thanks">Thanks for your feedback!</string>
     <string name="rate_comment_hint">Optional comment</string>
+    <string name="rate_dialog_submit_error">Unable to submit rating. Please try again later.</string>
 </resources>
