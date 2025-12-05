@@ -242,4 +242,25 @@
     <string name="rate_dialog_thanks">Thanks for your feedback!</string>
     <string name="rate_comment_hint">Optional comment</string>
     <string name="rate_dialog_submit_error">Unable to submit rating. Please try again later.</string>
+
+    <!-- Pronounce dialog strings -->
+    <string name="dialog_pronounce_title">Before you start, make sure you have:</string>
+    <string name="dialog_wifi_label">A stable internet connection</string>
+    <string name="dialog_quiet_label">A quiet place</string>
+    <string name="dialog_micro_label">A device can record audio</string>
+    <string name="cd_wifi_icon">Wifi icon</string>
+    <string name="cd_quiet_icon">Quiet icon</string>
+    <string name="cd_microphone_icon">Microphone icon</string>
+    <string name="cd_sound_icon">Sound icon</string>
+    <string name="btn_start">Start</string>
+
+    <!-- Pronounce fragment strings -->
+    <string name="title_pronounce">Pronounce</string>
+    <string name="cd_filter">Filter icon</string>
+    <string name="seg_normal_text">Normal</string>
+    <string name="seg_advanced_text">Advanced</string>
+    <string name="sample_word">listen</string>
+    <string name="sample_phonetic">/lɪ.sən/</string>
+    <string name="listening_label_text">Listening</string>
+    <string name="cd_playback">Playback</string>
 </resources>

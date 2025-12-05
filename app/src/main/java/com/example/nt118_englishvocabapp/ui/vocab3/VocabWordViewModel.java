@@ -72,12 +72,6 @@ public class VocabWordViewModel extends AndroidViewModel {
         });
     }
 
-    /**
-     * Gọi API 4: Thêm/Xóa Bookmark
-     */
-
-
-    // Xóa hàm setWordDetails cũ
 
     // Getter để các Fragment khác có thể lấy wordId hiện tại (để truyền lại khi chuyển tab)
     public int getCurrentWordId() {

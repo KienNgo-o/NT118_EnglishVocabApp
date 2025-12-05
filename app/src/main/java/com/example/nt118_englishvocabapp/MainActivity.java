@@ -7,8 +7,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.view.View;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
@@ -16,8 +16,8 @@ import com.example.nt118_englishvocabapp.databinding.ActivityMainBinding;
 import com.example.nt118_englishvocabapp.ui.flashcard.FlashcardFragment;
 import com.example.nt118_englishvocabapp.ui.home.HomeFragment;
 import com.example.nt118_englishvocabapp.ui.quiz.QuizListFragment;
-import com.example.nt118_englishvocabapp.ui.quiz.QuizViewModel;
 import com.example.nt118_englishvocabapp.ui.vocab.VocabFragment;
+import com.example.nt118_englishvocabapp.ui.pronounce.PronounceFragment; // NEW: import pronounce fragment
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,8 +32,7 @@ public class MainActivity extends AppCompatActivity {
                     .getBoolean("pref_dark_mode", false);
             AppCompatDelegate.setDefaultNightMode(darkEnabled ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
         } catch (Exception e) {
-            // if anything goes wrong, log or ignore and continue with default
-            e.printStackTrace();
+            Log.w("MainActivity", "Failed to read theme preference", e);
         }
 
         super.onCreate(savedInstanceState);
@@ -59,6 +58,15 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
+        // NEW: navigate to PronounceFragment when FAB (app icon) is clicked
+        binding.fab.setOnClickListener(v -> {
+            replaceFragment(new PronounceFragment());
+            // Optionally, clear bottom nav selection so it doesn't highlight another tab
+            try {
+                binding.bottomNavigationView.getMenu().setGroupCheckable(0, false, true);
+            } catch (Exception ignored) {}
+        });
+
     }
 
 
@@ -73,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
     public void navigateToHome() {
         replaceFragment(new HomeFragment());
         // update bottom navigation selection so the highlighted icon matches the shown fragment
-        if (binding != null && binding.bottomNavigationView != null) {
+        if (binding != null) {
             binding.bottomNavigationView.setSelectedItemId(R.id.home);
         }
     }

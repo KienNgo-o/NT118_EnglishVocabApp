@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#FFFFFF" />
+    <corners android:radius="16dp" />
+    <padding android:left="12dp" android:top="12dp" android:right="12dp" android:bottom="12dp" />
+    <!-- Increased width so dialog card is larger on phones -->
+    <size android:width="360dp" />
+    <stroke android:width="0dp" android:color="#00000000" />
+    <!-- subtle elevation using shadow on Android 9+ isn't possible in drawable; rely on cardView/elevation in layout if needed -->
+</shape>

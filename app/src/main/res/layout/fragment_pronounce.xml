@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="10">
+
+    <!-- Top header region: occupies same space as fragment_vocab3 (weight 2) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp">
+
+                <ImageButton
+                    android:id="@+id/btn_return"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:background="@null"
+                    android:contentDescription="@string/cd_back"
+                    android:padding="8dp"
+                    android:src="@drawable/return_final" />
+
+                <TextView
+                    android:id="@+id/txt_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/title_pronounce"
+                    android:textSize="24sp"
+                    android:textColor="@color/dark_purple"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/top_divider"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="0dp"
+                android:background="@color/dark_purple" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="12dp"
+            android:padding="4dp"
+            android:minWidth="0dp"
+            android:background="@drawable/tabs_bg_wrap"
+            android:layout_gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/seg_normal"
+                android:layout_width="100dp"
+                android:layout_height="48dp"
+                android:background="@drawable/tab_selector"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp"
+                android:text="@string/seg_normal_text"
+                android:textAllCaps="false"
+                android:textColor="@color/tab_text_color"
+                android:textSize="13sp"
+                android:textAlignment="center" />
+
+            <View
+                android:layout_width="6dp"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/seg_advanced"
+                android:layout_width="100dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="0dp"
+                android:background="@drawable/tab_selector"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp"
+                android:text="@string/seg_advanced_text"
+                android:textAllCaps="false"
+                android:textColor="@color/tab_text_color"
+                android:textSize="13sp"
+                android:textAlignment="center" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Lower region: main content area (weight 8) implemented as a FrameLayout
+         so we can stack the scrollable content and the mic button anchored to bottom -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="8">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:orientation="vertical">
+
+                <!-- Word and phonetic -->
+                <TextView
+                    android:id="@+id/word"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/sample_word"
+                    android:textSize="34sp"
+                    android:textStyle="bold"
+                    android:textColor="#222222" />
+
+                <TextView
+                    android:id="@+id/phonetic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sample_phonetic"
+                    android:textSize="16sp"
+                    android:textColor="#888888"
+                    android:layout_marginTop="8dp" />
+
+                <!-- Controls row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="18dp"
+                    android:gravity="center_vertical">
+
+                    <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/btn_sound"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:background="@drawable/circle_white_stroke"
+                        android:padding="8dp"
+                        app:srcCompat="@drawable/ic_audio_speaker"
+                        app:tint="#444444"
+                        android:contentDescription="@string/cd_sound_icon"
+                        android:scaleType="centerInside" />
+
+                </LinearLayout>
+
+                <!-- Small youtube-like row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:id="@+id/record_dot"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:background="#FF3B30"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/listening_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@string/listening_label_text"
+                        android:textColor="#666666"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
+
+                    <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/btn_playback"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="12dp"
+                        android:background="@null"
+                        android:contentDescription="Playback"
+                        app:srcCompat="@drawable/ic_audio_speaker"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp" />
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Waveform visual placed above the mic -->
+        <com.example.nt118_englishvocabapp.ui.pronounce.WaveformView
+            android:id="@+id/waveform"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <!-- Large mic button anchored to bottom center inside FrameLayout -->
+        <FrameLayout
+            android:id="@+id/micButton"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center|bottom"
+            android:layout_marginBottom="100dp"
+            android:background="@drawable/circle_green"
+            android:clickable="true"
+            android:focusable="true">
+
+            <!-- Glow behind the mic (hidden by default) -->
+            <View
+                android:id="@+id/mic_glow"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/mic_icon"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:src="@drawable/microphone"
+                android:contentDescription="@string/cd_microphone_icon"
+                app:tint="#FFFFFF"
+                android:scaleType="centerCrop"
+                android:scaleX="0.8"
+                android:scaleY="0.8" />
+
+        </FrameLayout>
+
+    </FrameLayout>
+
+</LinearLayout>
