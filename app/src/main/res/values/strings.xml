@@ -263,4 +263,8 @@
     <string name="sample_phonetic">/lɪ.sən/</string>
     <string name="listening_label_text">Listening</string>
     <string name="cd_playback">Playback</string>
+    <string name="cd_pause">Pause</string>
+    <string name="definition_sample">to give attention to someone or something in order to hear him, her, or it:</string>
+    <string name="topic_title_sample">Topic Title</string>
+    <string name="topic_progress_sample">0/5</string>
 </resources>

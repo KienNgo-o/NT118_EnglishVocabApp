@@ -17,7 +17,7 @@ import com.example.nt118_englishvocabapp.ui.flashcard.FlashcardFragment;
 import com.example.nt118_englishvocabapp.ui.home.HomeFragment;
 import com.example.nt118_englishvocabapp.ui.quiz.QuizListFragment;
 import com.example.nt118_englishvocabapp.ui.vocab.VocabFragment;
-import com.example.nt118_englishvocabapp.ui.pronounce.PronounceFragment; // NEW: import pronounce fragment
+import com.example.nt118_englishvocabapp.ui.pronounce.PronounceTopicFragment; // navigate to topic timeline
 
 public class MainActivity extends AppCompatActivity {
 
@@ -58,9 +58,9 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        // NEW: navigate to PronounceFragment when FAB (app icon) is clicked
+        // NEW: navigate to PronounceTopicFragment when FAB (app icon) is clicked
         binding.fab.setOnClickListener(v -> {
-            replaceFragment(new PronounceFragment());
+            replaceFragment(new PronounceTopicFragment());
             // Optionally, clear bottom nav selection so it doesn't highlight another tab
             try {
                 binding.bottomNavigationView.getMenu().setGroupCheckable(0, false, true);

@@ -11,12 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
+        android:gravity="center_vertical"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -52,6 +52,7 @@
                 android:layout_height="2dp"
                 android:layout_marginStart="0dp"
                 android:layout_marginEnd="0dp"
+                android:layout_marginBottom="20dp"
                 android:background="@color/dark_purple" />
 
         </LinearLayout>
@@ -59,6 +60,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
             android:orientation="horizontal"
             android:gravity="center"
             android:layout_marginBottom="12dp"
@@ -146,6 +148,18 @@
                     android:textColor="#888888"
                     android:layout_marginTop="8dp" />
 
+                <!-- Definition line -->
+                <TextView
+                    android:id="@+id/definition"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/definition_sample"
+                    android:textSize="16sp"
+                    android:textColor="#444444"
+                    android:maxLines="2"
+                    android:ellipsize="end" />
+
                 <!-- Controls row -->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -161,45 +175,59 @@
                         android:background="@drawable/circle_white_stroke"
                         android:padding="8dp"
                         app:srcCompat="@drawable/ic_audio_speaker"
-                        app:tint="#444444"
+                        android:tint="@null"
                         android:contentDescription="@string/cd_sound_icon"
                         android:scaleType="centerInside" />
 
                 </LinearLayout>
 
-                <!-- Small youtube-like row -->
+                <!-- NEW: Waveform + Playback row (replaces previous small youtube-like row) -->
                 <LinearLayout
+                    android:id="@+id/playback_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="12dp"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="12dp">
+
+                    <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/btn_playback"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/circle_white_stroke"
+                        android:padding="8dp"
+                        android:contentDescription="@string/cd_playback"
+                        app:srcCompat="@drawable/ic_play_24"
+                        android:tint="@null"
+                        android:visibility="gone" />
 
                     <View
+                        android:layout_width="12dp"
+                        android:layout_height="1dp" />
+
+                    <com.example.nt118_englishvocabapp.ui.pronounce.WaveformView
+                        android:id="@+id/waveform"
+                        android:layout_width="0dp"
+                        android:layout_height="64dp"
+                        android:layout_weight="1"
+                        android:visibility="gone" />
+
+                    <TextView
                         android:id="@+id/record_dot"
                         android:layout_width="12dp"
                         android:layout_height="12dp"
+                        android:layout_marginStart="12dp"
                         android:background="#FF3B30"
                         android:visibility="gone" />
 
                     <TextView
-                        android:id="@+id/listening_label"
+                        android:id="@+id/record_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:text="@string/listening_label_text"
                         android:textColor="#666666"
                         android:textSize="14sp"
-                        android:visibility="gone" />
-
-                    <androidx.appcompat.widget.AppCompatImageButton
-                        android:id="@+id/btn_playback"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="12dp"
-                        android:background="@null"
-                        android:contentDescription="Playback"
-                        app:srcCompat="@drawable/ic_audio_speaker"
                         android:visibility="gone" />
 
                 </LinearLayout>
@@ -211,14 +239,6 @@
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
-
-        <!-- Waveform visual placed above the mic -->
-        <com.example.nt118_englishvocabapp.ui.pronounce.WaveformView
-            android:id="@+id/waveform"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_gravity="center"
-            android:visibility="gone" />
 
         <!-- Large mic button anchored to bottom center inside FrameLayout -->
         <FrameLayout

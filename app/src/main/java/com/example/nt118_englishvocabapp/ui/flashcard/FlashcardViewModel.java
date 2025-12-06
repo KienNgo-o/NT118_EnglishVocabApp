@@ -51,6 +51,12 @@ public class FlashcardViewModel extends AndroidViewModel {
     private final SharedPreferences progressPrefs;
     private final MutableLiveData<List<ProgressItem>> progressList = new MutableLiveData<>();
 
+    // LiveData for words by topic (used by PronounceWordlistFragment)
+    private final MutableLiveData<List<com.example.nt118_englishvocabapp.models.VocabWord>> wordsByTopic = new MutableLiveData<>();
+
+    // LiveData for pronounce-ready words (includes phonetic spelling)
+    private final MutableLiveData<List<com.example.nt118_englishvocabapp.models.PronounceWord>> pronounceWords = new MutableLiveData<>();
+
     public FlashcardViewModel(@NonNull Application application) {
         super(application);
         this.apiService = RetrofitClient.getApiService(application.getApplicationContext());
@@ -66,6 +72,8 @@ public class FlashcardViewModel extends AndroidViewModel {
     public LiveData<List<LearnableItem>> getLearnableItems() { return learnableList; }
     public LiveData<String> getError() { return error; }
     public LiveData<List<ProgressItem>> getProgressList() { return progressList; }
+    public LiveData<List<com.example.nt118_englishvocabapp.models.VocabWord>> getWordsByTopic() { return wordsByTopic; }
+    public LiveData<List<com.example.nt118_englishvocabapp.models.PronounceWord>> getPronounceWords() { return pronounceWords; }
 
     // --- Methods to save/load progress ---
     /**
@@ -366,6 +374,155 @@ public class FlashcardViewModel extends AndroidViewModel {
                 error.postValue("Network error: " + t.getMessage());
             }
         });
+    }
+
+    /**
+     * Fetch words intended for pronunciation practice for a given topic.
+     * This method will fetch the base word list (from pronun endpoint or fallback) and then
+     * fetch WordDetail for each word to extract the first phonetic spelling (if available).
+     */
+    public void fetchWordsForPronounce(int topicId) {
+        // indicate loading
+        pronounceWords.postValue(null);
+
+        // Try the pronun endpoint that returns a wrapper containing data[]
+        apiService.getPronunForTopic(topicId).enqueue(new Callback<com.example.nt118_englishvocabapp.models.PronunResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<com.example.nt118_englishvocabapp.models.PronunResponse> call, @NonNull Response<com.example.nt118_englishvocabapp.models.PronunResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    List<com.example.nt118_englishvocabapp.models.PronunItem> data = response.body().getData();
+                    List<com.example.nt118_englishvocabapp.models.PronounceWord> out = new ArrayList<>();
+                    for (com.example.nt118_englishvocabapp.models.PronunItem pi : data) {
+                        if (pi == null) continue;
+                        com.example.nt118_englishvocabapp.models.PronounceWord pw = new com.example.nt118_englishvocabapp.models.PronounceWord(pi.getWordId(), pi.getWordText(), null);
+                        // pick first definition if available
+                        try {
+                            if (pi.getDefinitions() != null && !pi.getDefinitions().isEmpty()) {
+                                String d = pi.getDefinitions().get(0).getDefinitionText();
+                                pw = new com.example.nt118_englishvocabapp.models.PronounceWord(pi.getWordId(), pi.getWordText(), d);
+                            }
+                        } catch (Exception ignored) {}
+                        // pick first non-empty phonetic from pronunciations
+                        try {
+                            if (pi.getPronunciations() != null && !pi.getPronunciations().isEmpty()) {
+                                for (com.example.nt118_englishvocabapp.models.Pronunciation p : pi.getPronunciations()) {
+                                    if (p == null) continue;
+                                    String phon = p.getPhoneticSpelling();
+                                    if (phon == null) continue;
+                                    phon = phon.trim();
+                                    if (!phon.isEmpty()) { pw.setPhoneticSpelling(phon); break; }
+                                }
+                            }
+                        } catch (Exception ignored) {}
+                        out.add(pw);
+                    }
+                    pronounceWords.postValue(out);
+                } else {
+                    // fallback to older behavior which fetches vocab list then wordDetails
+                    apiService.getPronunciationWords(topicId).enqueue(new Callback<List<com.example.nt118_englishvocabapp.models.VocabWord>>() {
+                        @Override
+                        public void onResponse(@NonNull Call<List<com.example.nt118_englishvocabapp.models.VocabWord>> call, @NonNull Response<List<com.example.nt118_englishvocabapp.models.VocabWord>> response) {
+                            if (response.isSuccessful() && response.body() != null) {
+                                buildPronounceListFromVocab(response.body());
+                            } else {
+                                fetchWordsFallbackForPronounce(topicId);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Call<List<com.example.nt118_englishvocabapp.models.VocabWord>> call, @NonNull Throwable t) {
+                            fetchWordsFallbackForPronounce(topicId);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<com.example.nt118_englishvocabapp.models.PronunResponse> call, @NonNull Throwable t) {
+                // pronun endpoint failed -> fallback
+                apiService.getPronunciationWords(topicId).enqueue(new Callback<List<com.example.nt118_englishvocabapp.models.VocabWord>>() {
+                    @Override
+                    public void onResponse(@NonNull Call<List<com.example.nt118_englishvocabapp.models.VocabWord>> call, @NonNull Response<List<com.example.nt118_englishvocabapp.models.VocabWord>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            buildPronounceListFromVocab(response.body());
+                        } else {
+                            fetchWordsFallbackForPronounce(topicId);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<List<com.example.nt118_englishvocabapp.models.VocabWord>> call, @NonNull Throwable t) {
+                        fetchWordsFallbackForPronounce(topicId);
+                    }
+                });
+            }
+        });
+    }
+
+    private void fetchWordsFallbackForPronounce(int topicId) {
+        apiService.getWordsForTopic(topicId).enqueue(new Callback<List<com.example.nt118_englishvocabapp.models.VocabWord>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<com.example.nt118_englishvocabapp.models.VocabWord>> call, @NonNull Response<List<com.example.nt118_englishvocabapp.models.VocabWord>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    buildPronounceListFromVocab(response.body());
+                } else {
+                    pronounceWords.postValue(new ArrayList<>());
+                    error.postValue("Failed to load words. Code: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<com.example.nt118_englishvocabapp.models.VocabWord>> call, @NonNull Throwable t) {
+                pronounceWords.postValue(new ArrayList<>());
+                error.postValue("Network error: " + t.getMessage());
+            }
+        });
+    }
+
+    // Build list of PronounceWord and fetch WordDetail for each to extract phonetic spelling
+    private void buildPronounceListFromVocab(List<com.example.nt118_englishvocabapp.models.VocabWord> vocabList) {
+        if (vocabList == null) {
+            pronounceWords.postValue(new ArrayList<>());
+            return;
+        }
+
+        final int n = vocabList.size();
+        final List<com.example.nt118_englishvocabapp.models.PronounceWord> out = new ArrayList<>(n);
+        for (com.example.nt118_englishvocabapp.models.VocabWord v : vocabList) {
+            out.add(new com.example.nt118_englishvocabapp.models.PronounceWord(v.getWordId(), v.getWordText(), v.getPrimaryDefinition()));
+        }
+
+        if (n == 0) {
+            pronounceWords.postValue(out);
+            return;
+        }
+
+        final AtomicInteger remaining = new AtomicInteger(n);
+
+        for (int i = 0; i < n; i++) {
+            final int idx = i;
+            final int wordId = out.get(i).getWordId();
+            apiService.getWordDetails(wordId).enqueue(new Callback<com.example.nt118_englishvocabapp.models.WordDetail>() {
+                @Override
+                public void onResponse(@NonNull Call<com.example.nt118_englishvocabapp.models.WordDetail> call, @NonNull Response<com.example.nt118_englishvocabapp.models.WordDetail> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        com.example.nt118_englishvocabapp.models.WordDetail wd = response.body();
+                        try {
+                            if (wd.getPronunciations() != null && !wd.getPronunciations().isEmpty()) {
+                                String phon = wd.getPronunciations().get(0).getPhoneticSpelling();
+                                out.get(idx).setPhoneticSpelling(phon);
+                            }
+                        } catch (Exception ignored) {}
+                    }
+                    if (remaining.decrementAndGet() == 0) pronounceWords.postValue(out);
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<com.example.nt118_englishvocabapp.models.WordDetail> call, @NonNull Throwable t) {
+                    if (remaining.decrementAndGet() == 0) pronounceWords.postValue(out);
+                }
+            });
+        }
     }
 
     // Local cache helpers

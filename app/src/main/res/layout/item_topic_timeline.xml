@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp">
+
+    <!-- Center guideline: logical center for connectors -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.50121653" />
+
+    <!-- Left side content (visible when item is on left) -->
+    <LinearLayout
+        android:id="@+id/left_box"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end|center_vertical"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        app:layout_constraintEnd_toStartOf="@id/guideline_center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <!-- Circle with topic image only (wrapped to allow lock overlay) -->
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:foregroundGravity="center">
+
+                <ImageView
+                    android:id="@+id/img_topic_left"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@drawable/circle_bg"
+                    android:padding="6dp"
+                    android:contentDescription="@string/topic_image"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/animals" />
+
+                <ImageView
+                    android:id="@+id/img_lock_left"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:contentDescription="@string/cd_prev"
+                    android:src="@drawable/ic_lock"
+                    app:tint="#FFFFFF" />
+
+            </FrameLayout>
+
+            <!-- Topic title under the circle -->
+            <TextView
+                android:id="@+id/tv_title_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:text="@string/topic_title_sample"
+                android:textSize="14sp"
+                android:textColor="#222222"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Connector from left box to center line: short fixed-width so box is closer to center -->
+        <View
+            android:layout_width="40dp"
+            android:layout_height="2dp"
+            android:layout_marginStart="6dp"
+            android:background="#CCCCCC" />
+
+    </LinearLayout>
+
+    <!-- Right side content (visible when item is on right) -->
+    <LinearLayout
+        android:id="@+id/right_box"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        app:layout_constraintStart_toEndOf="@id/guideline_center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Connector from center line to right box: short fixed-width so box is closer to center -->
+        <View
+            android:layout_width="40dp"
+            android:layout_height="2dp"
+            android:layout_marginEnd="6dp"
+            android:background="#CCCCCC" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <!-- Circle with topic image only (wrapped to allow lock overlay) -->
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:foregroundGravity="center">
+
+                <ImageView
+                    android:id="@+id/img_topic_right"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@drawable/circle_bg"
+                    android:padding="6dp"
+                    android:contentDescription="@string/topic_image"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/animals" />
+
+                <ImageView
+                    android:id="@+id/img_lock_right"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:contentDescription="@string/cd_prev"
+                    android:src="@drawable/ic_lock"
+                    app:tint="#FFFFFF" />
+
+            </FrameLayout>
+
+            <!-- Topic title under the circle -->
+            <TextView
+                android:id="@+id/tv_title_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:text="@string/topic_title_sample"
+                android:textSize="14sp"
+                android:textColor="#222222"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

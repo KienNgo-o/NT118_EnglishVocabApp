@@ -25,6 +25,11 @@ import retrofit2.http.PATCH;
 import com.example.nt118_englishvocabapp.models.QuizData;
 import com.example.nt118_englishvocabapp.models.QuizSubmission;
 import com.example.nt118_englishvocabapp.models.QuizResult;
+import com.example.nt118_englishvocabapp.models.PronunResponse;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.http.Multipart;
+import retrofit2.http.Part;
 public interface ApiService {
 
     @POST("/api/auth/signin")
@@ -52,6 +57,15 @@ public interface ApiService {
     );
     @GET("api/topics/{id}/words")
     Call<List<VocabWord>> getWordsForTopic(@Path("id") int topicId);
+
+    // Pronunciation-specific list of words for a topic (some backends expose this endpoint)
+    @GET("api/words/{id}/pronun")
+    Call<List<VocabWord>> getPronunciationWords(@Path("id") int topicId);
+
+    // New: endpoint that returns the full pronun response with data array
+    @GET("api/words/{id}/pronun")
+    Call<PronunResponse> getPronunForTopic(@Path("id") int topicId);
+
     @GET("api/words/{id}")
     Call<WordDetail> getWordDetails(@Path("id") int wordId);
     @HTTP(method = "DELETE", path = "/api/users/me", hasBody = true)
@@ -69,4 +83,9 @@ public interface ApiService {
 
     @POST("api/users/rate-app")
     Call<Void> rateApp(@Body java.util.Map<String, Integer> ratingPayload);
+
+    // Upload user's recorded audio for grading (multipart: word_id (text) + user_audio (file))
+    @Multipart
+    @POST("api/pronun/grade")
+    Call<com.example.nt118_englishvocabapp.models.PronunGradeResponse> postPronunGrade(@Part("word_id") RequestBody wordId, @Part MultipartBody.Part user_audio);
 }

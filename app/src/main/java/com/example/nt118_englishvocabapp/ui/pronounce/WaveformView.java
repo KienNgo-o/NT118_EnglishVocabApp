@@ -15,7 +15,8 @@ public class WaveformView extends View {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private int barCount = 20;
     private float[] levels;
-    private int barColor = 0xFFFFFFFF; // white by default
+    // Use a darker default so waveform is visible on light backgrounds
+    private int barColor = 0xFF444444; // dark gray by default
 
     public WaveformView(Context context) {
         super(context);
