@@ -21,14 +21,15 @@ public class HomeViewModel extends ViewModel {
     private final MutableLiveData<List<String>> studyDays = new MutableLiveData<>();
 
     public HomeViewModel() {
-        // Default sample values; replace these when wiring the backend
+        // Default neutral values to avoid showing sample topics/values in UI
         todayQuote.setValue("\"Procrastination is like a credit card: it's a lot of fun until you get the bill.\"");
         // Chỉ đặt số ngày active (sử dụng chuỗi số để UI header có thể hiển thị trực tiếp)
         activeDaysText.setValue("1");
-        vocabProgress1.setValue("40/48");
-        vocabProgress2.setValue("6/24");
-        quizProgress1.setValue("40/48");
-        quizProgress2.setValue("6/24");
+        // Use neutral placeholders (no sample data)
+        vocabProgress1.setValue("0/0");
+        vocabProgress2.setValue("0/0");
+        quizProgress1.setValue("0/100 (0%)");
+        quizProgress2.setValue("0/100 (0%)");
         flashProgress.setValue("0/0");
 
         // Sample active study days (Mon, Tue, Fri) - backend can replace

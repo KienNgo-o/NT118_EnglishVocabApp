@@ -30,6 +30,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.http.Multipart;
 import retrofit2.http.Part;
+import retrofit2.http.Header;
 public interface ApiService {
 
     @POST("/api/auth/signin")
@@ -88,4 +89,12 @@ public interface ApiService {
     @Multipart
     @POST("api/pronun/grade")
     Call<com.example.nt118_englishvocabapp.models.PronunGradeResponse> postPronunGrade(@Part("word_id") RequestBody wordId, @Part MultipartBody.Part user_audio);
+
+    // Update user's streak count
+    @POST("api/users/streak")
+    Call<Void> updateStreak(@Body com.example.nt118_englishvocabapp.network.dto.UpdateStreakRequest request);
+
+    // Explicit method that allows providing the Authorization header directly
+    @POST("api/users/streak")
+    Call<Void> updateStreakWithAuth(@Header("Authorization") String authorization, @Body com.example.nt118_englishvocabapp.network.dto.UpdateStreakRequest request);
 }

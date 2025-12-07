@@ -49,6 +49,9 @@ public class HomeFragment extends Fragment {
     // SharedPreferences để lắng nghe thay đổi streak (cập nhật header ngay lập tức)
     private android.content.SharedPreferences streakPrefs;
     private android.content.SharedPreferences.OnSharedPreferenceChangeListener streakPrefListener;
+    // SharedPreferences listener for quiz progress so Home can update two quiz rows immediately
+    private android.content.SharedPreferences quizPrefs;
+    private android.content.SharedPreferences.OnSharedPreferenceChangeListener quizPrefListener;
     // ref to overlay added to decor view so we can remove it early if needed
     private ImageView activeOverlayIv = null;
     // refs to pending animator sets so we can cancel them in cleanup
@@ -75,6 +78,18 @@ public class HomeFragment extends Fragment {
                     }
                 };
                 streakPrefs.registerOnSharedPreferenceChangeListener(streakPrefListener);
+            } catch (Exception ignored) {}
+
+            // đăng ký prefs listener để cập nhật tiến độ quiz khi có kết quả mới
+            try {
+                quizPrefs = requireContext().getSharedPreferences("quiz_progress", Context.MODE_PRIVATE);
+                quizPrefListener = (sharedPreferences, key) -> {
+                    // whenever any quiz_progress entry changes, refresh the two-row quiz card
+                    try {
+                        applyLatestQuizProgressFromPrefs(binding != null ? binding.getRoot() : null);
+                    } catch (Exception ignored) {}
+                };
+                if (quizPrefs != null) quizPrefs.registerOnSharedPreferenceChangeListener(quizPrefListener);
             } catch (Exception ignored) {}
 
             // cập nhật lần đầu cho header
@@ -566,6 +581,8 @@ public class HomeFragment extends Fragment {
                                     showStreakDialog(flame, cellRoot, currentStreakNow);
                                     // sau khi show dialog, clear pending announce để không show lại
                                     streakManager.clearPendingAnnouncement();
+                                    // NOTE: moved syncStreakToServer() to run after the animation completes (see animateToday)
+                                    // streakManager.syncStreakToServer();
                                 } catch (Exception ignored) {
                                 }
                             });
@@ -732,6 +749,13 @@ public class HomeFragment extends Fragment {
                             pendingPostArriveAnim.addListener(new android.animation.AnimatorListenerAdapter() {
                                 @Override
                                 public void onAnimationEnd(android.animation.Animator animation) {
+                                    // After the visual animations finish, POST the updated streak to backend
+                                    try {
+                                        if (streakManager != null) {
+                                            streakManager.syncStreakToServer();
+                                        }
+                                    } catch (Exception ignored) {}
+
                                     pendingPostArriveAnim = null;
                                 }
 
@@ -789,6 +813,12 @@ public class HomeFragment extends Fragment {
             if (streakPrefs != null && streakPrefListener != null) {
                 streakPrefs.unregisterOnSharedPreferenceChangeListener(streakPrefListener);
                 streakPrefListener = null;
+            }
+        } catch (Exception ignored) {}
+        try {
+            if (quizPrefs != null && quizPrefListener != null) {
+                quizPrefs.unregisterOnSharedPreferenceChangeListener(quizPrefListener);
+                quizPrefListener = null;
             }
         } catch (Exception ignored) {}
         binding = null;
@@ -870,55 +900,80 @@ public class HomeFragment extends Fragment {
         if (getContext() == null || root == null) return;
         SharedPreferences prefs = getContext().getSharedPreferences("quiz_progress", Context.MODE_PRIVATE);
         if (prefs == null) return;
-        // Prefer the explicit "quiz_latest" key if present
-        String latest = prefs.getString("quiz_latest", null);
-        if (latest != null) {
-            // parse and display just the latest entry
+
+        // Small holder for parsed entries
+        class QEntry { String title; int score; int total; long ts; int topicId; }
+
+        java.util.List<QEntry> entries = new java.util.ArrayList<>();
+        java.util.Map<String, ?> all = prefs.getAll();
+        if (all == null) all = java.util.Collections.emptyMap();
+
+        // Parse stored per-topic entries: quiz_result_topic_<id>
+        for (String key : all.keySet()) {
+            if (!key.startsWith("quiz_result_topic_")) continue;
+            Object v = all.get(key);
+            if (!(v instanceof String)) continue;
+            String s = (String) v;
             try {
+                String[] parts = s.split("\\|", -1);
+                if (parts.length < 4) continue;
+                String encodedTitle = parts[0];
+                int score = 0, total = 0; long ts = 0L;
+                try { score = Integer.parseInt(parts[1]); } catch (NumberFormatException ignored) {}
+                try { total = Integer.parseInt(parts[2]); } catch (NumberFormatException ignored) {}
+                try { ts = Long.parseLong(parts[3]); } catch (NumberFormatException ignored) {}
+                String title = "";
+                try { title = new String(Base64.decode(encodedTitle, Base64.NO_WRAP), StandardCharsets.UTF_8); } catch (Exception ignored) {}
+                QEntry e = new QEntry(); e.title = title; e.score = score; e.total = total; e.ts = ts;
+                try { e.topicId = Integer.parseInt(key.substring("quiz_result_topic_".length())); } catch (NumberFormatException ignored) { e.topicId = -1; }
+                entries.add(e);
+            } catch (Exception ex) {
+                Log.d("HomeFragment", "bad quiz_result entry: " + s, ex);
+            }
+        }
+
+        // Also include quiz_latest if present (synthetic entry, topicId = -1)
+        try {
+            String latest = prefs.getString("quiz_latest", null);
+            if (latest != null) {
                 String[] parts = latest.split("\\|", -1);
                 if (parts.length >= 4) {
-                    String title = new String(android.util.Base64.decode(parts[0], android.util.Base64.NO_WRAP), java.nio.charset.StandardCharsets.UTF_8);
-                    int score = Integer.parseInt(parts[1]);
-                    // display
-                    TextView quizTopic1 = root.findViewById(R.id.text_quiz_topic);
-                    TextView quizProgress1 = root.findViewById(R.id.text_quiz_progress);
-                    if (quizTopic1 != null) quizTopic1.setText(title == null || title.isEmpty() ? getString(R.string.placeholder_topic_title) : title);
-                    int s = Math.max(0, Math.min(score, 100));
-                    if (quizProgress1 != null) quizProgress1.setText(s + "/100 (" + s + "%)");
+                    QEntry le = new QEntry();
+                    try { le.title = new String(Base64.decode(parts[0], Base64.NO_WRAP), StandardCharsets.UTF_8); } catch (Exception ignored) { le.title = ""; }
+                    try { le.score = Integer.parseInt(parts[1]); } catch (NumberFormatException ignored) { le.score = 0; }
+                    try { le.total = Integer.parseInt(parts[2]); } catch (NumberFormatException ignored) { le.total = 0; }
+                    try { le.ts = Long.parseLong(parts[3]); } catch (NumberFormatException ignored) { le.ts = -1L; }
+                    le.topicId = -1;
+                    entries.add(le);
                 }
-            } catch (Exception ignored) {}
-            // We displayed the latest entry; still allow scanning for two items if needed, but return to avoid double-setting
+            }
+        } catch (Exception ignored) {}
+
+        if (entries.isEmpty()) {
+            // set defaults
+            TextView quizTopic1 = root.findViewById(R.id.text_quiz_topic);
+            TextView quizProgress1 = root.findViewById(R.id.text_quiz_progress);
+            TextView quizTopic2 = root.findViewById(R.id.text_quiz_topic2);
+            TextView quizProgress2 = root.findViewById(R.id.text_quiz_progress2);
+            if (quizTopic1 != null) quizTopic1.setText(getString(R.string.placeholder_topic_title));
+            if (quizProgress1 != null) quizProgress1.setText(getString(R.string.progress_0_0));
+            if (quizTopic2 != null) quizTopic2.setText(getString(R.string.placeholder_topic_title));
+            if (quizProgress2 != null) quizProgress2.setText(getString(R.string.progress_0_0));
             return;
         }
-        // (reuse 'prefs' declared above) — continue scanning stored quiz_result_topic_* entries
-        long firstTs = -1L, secondTs = -1L;
-        String firstTitle = null, secondTitle = null;
-        int firstScore = 0, firstTotal = 0;
-        int secondScore = 0, secondTotal = 0;
 
-        for (String key : prefs.getAll().keySet()) {
-            if (!key.startsWith("quiz_result_topic_")) continue;
-            Object obj = prefs.getAll().get(key);
-            if (!(obj instanceof String)) continue;
-            String s = (String) obj;
-            String[] parts = s.split("\\|", -1);
-            if (parts.length < 4) continue;
-            String encodedTitle = parts[0];
-            int score = 0;
-            int total = 0;
-            long ts = 0L;
-            try { score = Integer.parseInt(parts[1]); } catch (NumberFormatException ignored) {}
-            try { total = Integer.parseInt(parts[2]); } catch (NumberFormatException ignored) {}
-            try { ts = Long.parseLong(parts[3]); } catch (NumberFormatException ignored) {}
-            String title = "";
-            try { title = new String(Base64.decode(encodedTitle, Base64.NO_WRAP), StandardCharsets.UTF_8); } catch (Exception ignored) {}
+        // sort by timestamp desc
+        entries.sort((a,b) -> Long.compare(b.ts, a.ts));
 
-            if (ts > firstTs) {
-                secondTs = firstTs; secondTitle = firstTitle; secondScore = firstScore; secondTotal = firstTotal;
-                firstTs = ts; firstTitle = title; firstScore = score; firstTotal = total;
-            } else if (ts > secondTs) {
-                secondTs = ts; secondTitle = title; secondScore = score; secondTotal = total;
-            }
+        // pick top two distinct by topicId/title
+        QEntry first = null, second = null;
+        for (QEntry e : entries) {
+            if (e == null) continue;
+            if (first == null) { first = e; continue; }
+            boolean sameTopic = (first.topicId != -1 && e.topicId != -1 && first.topicId == e.topicId);
+            boolean sameTitle = (first.title != null && e.title != null && first.title.equals(e.title));
+            if (sameTopic || sameTitle) continue;
+            second = e; break;
         }
 
         TextView quizTopic1 = root.findViewById(R.id.text_quiz_topic);
@@ -926,28 +981,24 @@ public class HomeFragment extends Fragment {
         TextView quizTopic2 = root.findViewById(R.id.text_quiz_topic2);
         TextView quizProgress2 = root.findViewById(R.id.text_quiz_progress2);
 
-        // displayed values on 0..100 scale
-        int displayed1 = 0;
-        int displayed2 = 0;
-
-        if (firstTs < 0) {
+        if (first == null) {
             if (quizTopic1 != null) quizTopic1.setText(getString(R.string.placeholder_topic_title));
-            if (quizProgress1 != null) quizProgress1.setText("0/100");
+            if (quizProgress1 != null) quizProgress1.setText(getString(R.string.progress_0_0));
         } else {
-            if (quizTopic1 != null) quizTopic1.setText(firstTitle == null || firstTitle.isEmpty() ? getString(R.string.placeholder_topic_title) : firstTitle);
-            // Treat stored score as a percentage (0..100). Clamp to [0,100].
-            displayed1 = Math.max(0, Math.min(firstScore, 100));
-            if (quizProgress1 != null) quizProgress1.setText(displayed1 + "/100 (" + displayed1 + "%)");
+            String t = (first.title == null || first.title.isEmpty()) ? getString(R.string.placeholder_topic_title) : first.title;
+            int score = Math.max(0, Math.min(first.score, 100));
+            if (quizTopic1 != null) quizTopic1.setText(t);
+            if (quizProgress1 != null) quizProgress1.setText(score + "/100 (" + score + "%)");
         }
 
-        if (secondTs < 0) {
+        if (second == null) {
             if (quizTopic2 != null) quizTopic2.setText(getString(R.string.placeholder_topic_title));
-            if (quizProgress2 != null) quizProgress2.setText("0/100");
+            if (quizProgress2 != null) quizProgress2.setText(getString(R.string.progress_0_0));
         } else {
-            if (quizTopic2 != null) quizTopic2.setText(secondTitle == null || secondTitle.isEmpty() ? getString(R.string.placeholder_topic_title) : secondTitle);
-            displayed2 = Math.max(0, Math.min(secondScore, 100));
-            if (quizProgress2 != null) quizProgress2.setText(displayed2 + "/100 (" + displayed2 + "%)");
+            String t2 = (second.title == null || second.title.isEmpty()) ? getString(R.string.placeholder_topic_title) : second.title;
+            int score2 = Math.max(0, Math.min(second.score, 100));
+            if (quizTopic2 != null) quizTopic2.setText(t2);
+            if (quizProgress2 != null) quizProgress2.setText(score2 + "/100 (" + score2 + "%)");
         }
-        // Note: we intentionally do not update HomeViewModel here; the LiveData-backed UI will be used when available.
     }
-}
+ }
