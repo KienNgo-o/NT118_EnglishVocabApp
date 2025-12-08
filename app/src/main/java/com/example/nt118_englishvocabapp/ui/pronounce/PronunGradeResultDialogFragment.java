@@ -33,10 +33,9 @@ public class PronunGradeResultDialogFragment extends DialogFragment {
 
         AlertDialog.Builder b = new AlertDialog.Builder(requireContext());
         b.setTitle("Pronunciation Result");
-        String message = String.format(java.util.Locale.getDefault(), "Score: %.1f\n\nFeedback: %s", score, (feedback == null || feedback.isEmpty()) ? "(no feedback)" : feedback);
+        String message = String.format(java.util.Locale.getDefault(), "Score: %.1f/100\n\nFeedback: %s", score, (feedback == null || feedback.isEmpty()) ? "(no feedback)" : feedback);
         b.setMessage(message);
         b.setPositiveButton(android.R.string.ok, (d, which) -> dismiss());
         return b.create();
     }
 }
-

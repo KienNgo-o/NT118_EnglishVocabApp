@@ -65,7 +65,6 @@ public class VocabFragment5 extends Fragment {
         // 4. Theo dõi (Observe) LiveData
         observeViewModel();
 
-        Toast.makeText(getContext(), "Vocab Fragment 5 Opened!", Toast.LENGTH_SHORT).show();
         return root;
     }
 

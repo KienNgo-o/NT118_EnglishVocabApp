@@ -3,9 +3,6 @@ package com.example.nt118_englishvocabapp.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.os.Handler;
-import android.os.Looper;
-import android.widget.Toast;
 
 import com.example.nt118_englishvocabapp.network.ApiService;
 import com.example.nt118_englishvocabapp.network.RetrofitClient;
@@ -63,12 +60,6 @@ public class StreakManager {
                 prefs.edit().putString(KEY_PENDING_ANNOUNCE, today).apply();
             }
 
-            // Show a toast so developer can observe local marking
-            try {
-                int streakNow = getCurrentStreak();
-                showToast("Marked today active. Local streak: " + streakNow);
-            } catch (Exception ignored) {}
-
             return true;
         }
         return false;
@@ -86,17 +77,6 @@ public class StreakManager {
         prefs.edit().remove(KEY_PENDING_ANNOUNCE).apply();
     }
 
-    // helper: show a toast on the main thread
-    private void showToast(final String msg) {
-        try {
-            new Handler(Looper.getMainLooper()).post(() -> {
-                try {
-                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-                } catch (Exception ignored) {}
-            });
-        } catch (Exception ignored) {}
-    }
-
     /**
      * Sync current streak count to backend server.
      * Call this after showing streak dialog/animation to user.
@@ -106,9 +86,6 @@ public class StreakManager {
         try {
             // Log the outgoing payload for easier debugging
             Log.d(TAG, "Preparing to sync streak to server: " + currentStreak);
-
-            // Show toast indicating a sync attempt
-            try { showToast("Preparing to sync streak: " + currentStreak); } catch (Exception ignored) {}
 
             // Log access token presence (masked) to help debug auth-related issues
             try {
@@ -131,7 +108,6 @@ public class StreakManager {
                 String token = sm != null ? sm.getAccessToken() : null;
                 if (token == null) {
                     Log.w(TAG, "Not sending streak to server: no access token available (user not logged in)");
-                    showToast("Not sending streak: not logged in");
                     return;
                 }
             } catch (Exception ignored) {}
@@ -143,7 +119,6 @@ public class StreakManager {
             try {
                 String json = new Gson().toJson(request);
                 Log.d(TAG, "Streak request JSON: " + json);
-                showToast("Sending streak to server: " + json);
             } catch (Exception ignored) {}
 
             // Send the request with explicit Authorization header using the stored access token
@@ -159,14 +134,10 @@ public class StreakManager {
                         String payload = new String(decoded, java.nio.charset.StandardCharsets.UTF_8);
                         String trunc = payload.length() > 300 ? payload.substring(0,300) + "..." : payload;
                         Log.d(TAG, "Decoded token payload: " + trunc);
-                        showToast("Token payload: " + (trunc.length() > 120 ? trunc.substring(0,120) + "..." : trunc));
                     }
                 } catch (Exception ex) {
                     Log.d(TAG, "Failed to decode token payload", ex);
                 }
-
-                String maskedToken = (token == null) ? "<null>" : (token.length() <= 8 ? "<present>" : (token.substring(0,4) + "..." + token.substring(token.length()-4)));
-                showToast("Using token: " + maskedToken);
 
                 String authHeader = "Bearer " + token;
                 apiService.updateStreakWithAuth(authHeader, request).enqueue(new Callback<Void>() {
@@ -174,7 +145,6 @@ public class StreakManager {
                     public void onResponse(Call<Void> call, Response<Void> response) {
                         if (response.isSuccessful()) {
                             Log.d(TAG, "Streak synced to server successfully: " + currentStreak);
-                            try { showToast("Streak synced to server: " + currentStreak); } catch (Exception ignored) {}
                         } else {
                             try {
                                 String err = "<no body>";
@@ -191,20 +161,8 @@ public class StreakManager {
 
                                 Log.w(TAG, "Failed to sync streak. URL: " + url + " Response code: " + response.code() + " headers: " + respHeaders + " body: " + err);
 
-                                // show truncated error body in toast for debugging along with URL and code
-                                String truncated = err.length() > 200 ? err.substring(0,200) + "..." : err;
-                                String toastMsg = "POST " + url + " -> " + response.code() + ": " + truncated;
-                                if (respHeaders != null && !respHeaders.isEmpty()) {
-                                    // include first header line if present (avoid huge toast)
-                                    String firstHeaderLine = respHeaders.split("\\r?\\n")[0];
-                                    toastMsg += " | " + firstHeaderLine;
-                                }
-                                showToast(toastMsg);
-
-                                Log.d(TAG, "Server error body: " + err);
                             } catch (Exception ex) {
                                 Log.w(TAG, "Failed to sync streak. Response code: " + response.code() + " (error reading body)");
-                                showToast("Failed to sync streak. Code: " + response.code());
                             }
                         }
                     }
@@ -212,16 +170,13 @@ public class StreakManager {
                     @Override
                     public void onFailure(Call<Void> call, Throwable t) {
                         Log.e(TAG, "Network error syncing streak to server", t);
-                        try { showToast("Network error syncing streak: " + (t != null && t.getMessage() != null ? t.getMessage() : "unknown")); } catch (Exception ignored) {}
                     }
                 });
             } catch (Exception ex) {
                 Log.e(TAG, "Error sending streak with explicit auth", ex);
-                try { showToast("Error sending streak: " + ex.getMessage()); } catch (Exception ignored) {}
             }
         } catch (Exception e) {
             Log.e(TAG, "Error creating API call for streak sync", e);
-            try { showToast("Error preparing streak sync: " + e.getMessage()); } catch (Exception ignored) {}
         }
     }
 

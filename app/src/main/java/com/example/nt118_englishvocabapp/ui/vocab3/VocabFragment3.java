@@ -93,7 +93,6 @@ public class VocabFragment3 extends Fragment {
         // Khởi tạo tab
         setSelectedTab(binding.tabDefinition);
 
-        Toast.makeText(getContext(), "Vocab Fragment 3 Opened!", Toast.LENGTH_SHORT).show();
         return binding.getRoot(); // 👈 Trả về binding.getRoot()
     }
 
